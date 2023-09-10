@@ -154,7 +154,7 @@ const DoctorDashboard = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#EAEAEA',
+    backgroundColor: '#E4E4E4',
   },
   header: {
     flexDirection: 'row',

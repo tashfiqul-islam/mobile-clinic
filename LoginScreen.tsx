@@ -101,52 +101,23 @@ const LoginScreen = () => {
 
   const handleLogin = async () => {
     if (data.username && data.password) {
-      setIsLoading(true); // Show the loader
+      setIsLoading(true);
   
       try {
         const result = await loginHandle(data.username, data.password);
   
         if (result.success) {
           console.log('Authentication successful');
-  
-          // Redirect based on userType
-          if (result.userType === 'Doctor') {
-            navigation.navigate('DocDashboard'); // Redirect to the Doctor dashboard
-          } else if (result.userType === 'Patient') {
-            navigation.navigate('PatDashboard'); // Redirect to the Patient dashboard
-          }
-  
+          navigateByUserType(result.userType);
           Burnt.toast({
-            from: 'bottom',
             title: 'Success!',
             message: 'Login Successful',
-            shouldDismissByDrag: true,
             preset: 'done',
-            haptic: 'success',
+            from: 'bottom',
             duration: 5,
           });
         } else {
-          console.error('Authentication failed:', result.error);
-          if (result.error === 'auth/email-already-in-use') {
-            Burnt.toast({
-              title: 'Failed!',
-              message:
-                'Email is already in use. Please use another email address.',
-              preset: 'error',
-              from: 'bottom',
-              haptic: 'error',
-              duration: 5,
-            });
-          } else {
-            Burnt.toast({
-              title: 'Failed!',
-              message: 'Login failed. Please check your credentials.',
-              preset: 'error',
-              from: 'bottom',
-              haptic: 'error',
-              duration: 5,
-            });
-          }
+          handleError(result.error);
         }
       } catch (error) {
         console.error('Authentication error:', error);
@@ -158,7 +129,7 @@ const LoginScreen = () => {
           duration: 5,
         });
       } finally {
-        setIsLoading(false); // Hide the loader
+        setIsLoading(false);
       }
     } else {
       console.log('Incomplete login credentials');
@@ -171,6 +142,40 @@ const LoginScreen = () => {
       });
     }
   };
+  
+  const navigateByUserType = (userType) => {
+    if (userType === 'Doctor') {
+      navigation.navigate('DocDashboard');
+    } else if (userType === 'Patient') {
+      navigation.navigate('PatDashboard');
+    }
+    // Add more conditions for other user types if needed.
+  };
+  
+  const handleError = (error) => {
+    console.error('Error:', error);
+  
+    if (error === 'auth/email-already-in-use') {
+      Burnt.toast({
+        title: 'Failed!',
+        message: 'Email is already in use. Please use another email address.',
+        preset: 'error',
+        from: 'bottom',
+        haptic: 'error',
+        duration: 5,
+      });
+    } else {
+      Burnt.toast({
+        title: 'Failed!',
+        message: 'An error occurred. Please try again later.',
+        preset: 'error',
+        from: 'bottom',
+        haptic: 'error',
+        duration: 5,
+      });
+    }
+  };
+  
   
 
   return (

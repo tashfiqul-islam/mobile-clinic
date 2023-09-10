@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -11,37 +11,18 @@ import * as Animatable from 'react-native-animatable';
 import {LinearGradient} from 'expo-linear-gradient';
 import {useTheme} from '@react-navigation/native';
 import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
-import * as Font from 'expo-font';
 import Footer from './Footer';
 
 const theme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: '#1069AD', // Define your primary color here
+    primary: '#1069AD',
   },
 };
 
 const SplashScreen = ({navigation}) => {
   const {colors} = useTheme();
-  const [fontsLoaded, setFontsLoaded] = useState(false);
-
-  useEffect(() => {
-    const loadFonts = async () => {
-      await Font.loadAsync({
-        'Roboto-Regular': require('./assets/fonts/Roboto-Regular.ttf'),
-        'Roboto-Bold': require('./assets/fonts/Roboto-Bold.ttf'),
-      });
-
-      setFontsLoaded(true);
-    };
-
-    loadFonts();
-  }, []);
-
-  if (!fontsLoaded) {
-    return null; // Return null while fonts are loading
-  }
 
   return (
     <PaperProvider theme={theme}>
@@ -59,9 +40,7 @@ const SplashScreen = ({navigation}) => {
         <Animatable.View
           style={[styles.footer, {backgroundColor: colors.background}]}
           animation="fadeInUpBig">
-          <Text style={[styles.title, {color: colors.text}]}>
-            Mobile Clinic
-          </Text>
+          <Text style={[styles.title, {color: colors.text}]}>Mobile Clinic</Text>
           <View style={styles.textContainer}>
             <Text style={styles.text}>... Revolutionizing </Text>
             <Text style={styles.text}>Healthcare</Text>

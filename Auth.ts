@@ -1,20 +1,12 @@
-// auth.ts
-
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/database';
 import { firebaseConfig } from './firebaseConfig';
-import * as Crypto from 'expo-crypto';
 
 firebase.initializeApp(firebaseConfig);
 
 export const loginHandle = async (email, password) => {
   try {
-    const hashedPassword = await Crypto.digestStringAsync(
-      Crypto.CryptoDigestAlgorithm.SHA512,
-      password,
-    );
-
     const userCredential = await firebase
       .auth()
       .signInWithEmailAndPassword(email, password);
@@ -39,11 +31,6 @@ export const loginHandle = async (email, password) => {
 
 export const signupHandle = async (fullName, email, password, userType) => {
   try {
-    const hashedPassword = await Crypto.digestStringAsync(
-      Crypto.CryptoDigestAlgorithm.SHA512,
-      password,
-    );
-
     // Create a new user in Firebase Authentication
     const userCredential = await firebase
       .auth()
@@ -61,7 +48,7 @@ export const signupHandle = async (fullName, email, password, userType) => {
         fullName: fullName,
         email: email,
         userType: userType,
-        password: password,
+        userBio: '',
       });
 
     return { success: true, userType };

@@ -136,106 +136,87 @@ const SignUpScreen = ({navigation}) => {
     });
   };
 
-  const handleSignUp = async () => {
-    setIsLoading(true); // Enable the loading indicator
+  // Helper function to navigate based on the user type
+const navigateByUserType = (userType) => {
+  if (userType === 'Doctor') {
+      navigation.navigate('DocDashboard');
+  } else if (userType === 'Patient') {
+      navigation.navigate('PatDashboard');
+  }
+};
 
-    if (
+// Helper function to handle specific errors
+const handleError = (error) => {
+  if (error.code === 'auth/email-already-in-use') {
+      Burnt.toast({
+          title: 'Email is already in use. Please use another email address!',
+          preset: 'error',
+          from: 'bottom',
+          haptic: 'error',
+          duration: 5,
+      });
+  } else {
+      Burnt.toast({
+          title: 'An error occurred during registration. Please try again later.',
+          preset: 'none',
+          from: 'bottom',
+          duration: 5,
+      });
+  }
+};
+
+// Main sign up handler
+const handleSignUp = async () => {
+  setIsLoading(true);
+
+  if (
       data.fullName &&
       data.email &&
       data.password &&
       data.userType &&
       agreeCheckbox
-    ) {
+  ) {
       try {
-        // Hash the password
-        const hashedPassword = await Crypto.digestStringAsync(
-          Crypto.CryptoDigestAlgorithm.SHA512,
-          data.password,
-        );
+          const result = await signupHandle(
+              data.fullName,
+              data.email,
+              data.password,
+              data.userType
+          );
 
-        // Call signupHandle function from auth.ts
-        const result = await signupHandle(
-          data.fullName,
-          data.email,
-          data.password,
-          data.userType,
-        );
-
-        if (result.success) {
-          // Display success toast with checkmark icon
-          Burnt.toast({
-            title: 'Registration successful!',
-            preset: 'done',
-            from: 'bottom',
-            duration: 5,
-          });
-
-          // Redirect based on userType
-          if (result.userType === 'Doctor') {
-            navigation.navigate('DocDashboard'); // Redirect to the Doctor dashboard
-          } else if (result.userType === 'Patient') {
-            navigation.navigate('PatDashboard'); // Redirect to the Patient dashboard
-          }
-
-          // You can add more userType checks and redirects as needed
-        } else {
-          // Registration failed, handle the error
-          // You can access the error message from result.error
-          console.log('Registration failed:', result.error);
-
-          if (result.error.code === 'auth/email-already-in-use') {
-            // Handle the case where the email is already in use
-            console.log('Email is already in use.');
-            // Display error toast message
-            Burnt.toast({
-              title: 'Email is already in use. Please use another email address!',
-              preset: 'error',
-              from: 'bottom',
-              haptic: 'error',
-              duration: 5,
-            });
+          if (result.success) {
+              Burnt.toast({
+                  title: 'Registration successful!',
+                  preset: 'done',
+                  from: 'bottom',
+                  duration: 5,
+              });
+              navigateByUserType(result.userType);
           } else {
-            // Handle other registration errors
-            console.error('Firebase registration error:', result.error);
-            // Display general error toast message
-            Burnt.toast({
+              handleError(result.error);
+          }
+      } catch (error) {
+          console.error('Error during registration:', error);
+          Burnt.toast({
               title: 'An error occurred during registration. Please try again later.',
               preset: 'none',
               from: 'bottom',
               duration: 5,
-            });
-          }
-        }
-      } catch (error) {
-        console.error('Error during registration:', error);
-
-        // Handle other registration errors
-        // Display general error toast message
-        Burnt.toast({
-          title:
-            'An error occurred during registration. Please try again later.',
+          });
+      } finally {
+          setIsLoading(false);
+      }
+  } else {
+      console.log('Incomplete registration data');
+      Burnt.toast({
+          title: 'Incomplete registration data!',
           preset: 'none',
           from: 'bottom',
           duration: 5,
-        });
-      } finally {
-        setIsLoading(false); // Disable the loading indicator
-      }
-    } else {
-      // Handle validation errors (e.g., incomplete form)
-      console.log('Incomplete registration data');
-
-      // Display warning toast with an exclamation mark icon
-      Burnt.toast({
-        title: 'Incomplete registration data!',
-        preset: 'none',
-        from: 'bottom',
-        duration: 5,
       });
-
-      setIsLoading(false); // Disable the loading indicator
-    }
-  };
+      setIsLoading(false);
+  }
+};
 
   return (
     <View style={styles.container}>

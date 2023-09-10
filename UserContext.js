@@ -11,6 +11,11 @@ export const useUser = () => {
 export const UserProvider = ({ children }) => {
   const [userFullName, setUserFullName] = useState('');
   const [userEmail, setUserEmail] = useState('');
+  const [userBio, setUserBio] = useState('');
+  const [userPassword, setUserPassword] = useState('');
+  const [userLocation, setUserLocation] = useState('');
+
+
 
   useEffect(() => {
     // Listen for changes in the user's data (e.g., full name and email)
@@ -24,6 +29,8 @@ export const UserProvider = ({ children }) => {
           const userData = snapshot.val();
           setUserFullName(userData.fullName || '');
           setUserEmail(userData.email || '');
+          setUserBio(userData.userBio || '');
+          setUserLocation(userData.location || '');
         });
       } else {
         // User is signed out, clear user data
@@ -43,6 +50,12 @@ export const UserProvider = ({ children }) => {
     setUserFullName,
     userEmail,
     setUserEmail,
+    userBio,
+    setUserBio,
+    userPassword,  
+    setUserPassword,  
+    userLocation, 
+    setUserLocation,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
