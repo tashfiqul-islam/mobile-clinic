@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
 import { Ionicons } from '@expo/vector-icons'
@@ -32,6 +32,7 @@ const Tab = createMaterialBottomTabNavigator()
 const DoctorDashboard = ({ route }) => {
   const { userFullName, setUserFullName } = useUser()
   const navigation = useNavigation()
+  const [userImage, setUserImage] = useState(null);  // <-- Add this state
 
   useEffect(() => {
     const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
@@ -44,7 +45,9 @@ const DoctorDashboard = ({ route }) => {
             if (snapshot.exists()) {
               const userData = snapshot.val()
               const fullName = userData.fullName
+              const imageUrl = userData.profileImage || null // <-- Get the profile image URL
               setUserFullName(fullName)
+              setUserImage(imageUrl)  // <-- Set the profile image URL
             } else {
               console.log('User data does not exist')
             }
@@ -73,7 +76,7 @@ const DoctorDashboard = ({ route }) => {
       <View style={styles.header}>
         <View style={styles.profileImageContainer}>
           <Image
-            source={require('./assets/images/head-4.jpg')}
+            source={userImage ? { uri: userImage } : require('./assets/images/defaultProfile.png')} // Use the defaultProfile.png image if userImage is null
             style={styles.profileImage}
           />
         </View>
@@ -95,11 +98,7 @@ const DoctorDashboard = ({ route }) => {
         barStyle={{
           backgroundColor: '#fff',
           position: 'absolute',
-          borderRadius: 20,
-          marginRight: 0,
-          marginLeft: 0,
-          marginBottom: 0,
-          marginTop: 0,
+          marginBottom: -12,
         }}
       >
         <Tab.Screen

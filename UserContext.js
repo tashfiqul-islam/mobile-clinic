@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
+import 'firebase/compat/database'
 
 const UserContext = createContext()
 
@@ -14,6 +15,7 @@ export const UserProvider = ({ children }) => {
   const [userBio, setUserBio] = useState('')
   const [userPassword, setUserPassword] = useState('')
   const [userLocation, setUserLocation] = useState('')
+  const [userImage, setUserImage] = useState('')
 
   useEffect(() => {
     // Listen for changes in the user's data (e.g., full name and email)
@@ -29,11 +31,13 @@ export const UserProvider = ({ children }) => {
           setUserEmail(userData.email || '')
           setUserBio(userData.userBio || '')
           setUserLocation(userData.location || '')
+          setUserImage(userData.profileImage || '')
         })
       } else {
         // User is signed out, clear user data
         setUserFullName('')
         setUserEmail('')
+        setUserImage('')
       }
     })
 
@@ -54,7 +58,11 @@ export const UserProvider = ({ children }) => {
     setUserPassword,
     userLocation,
     setUserLocation,
+    userImage,
+    setUserImage
   }
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>
 }
+
+export default UserContext
