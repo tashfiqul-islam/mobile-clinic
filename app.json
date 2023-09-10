@@ -15,9 +15,11 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "com.cse299.mobileclinic",
       "supportsTablet": true
     },
     "android": {
+      "package": "com.cse299.mobileclinic",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -25,6 +27,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "920785b9-2614-4f29-8cb2-5b65071a669d"
+      }
+    },
+    "owner": "tashfiq61"
   }
 }
