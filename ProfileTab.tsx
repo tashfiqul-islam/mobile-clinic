@@ -49,6 +49,8 @@ const EditableField = ({
     }
   }
 
+  const navigation = useNavigation();
+
   const handleChange = (text) => {
     setFieldValue(text)
   }
@@ -71,12 +73,12 @@ const EditableField = ({
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <PaperTextInput
                 ref={inputRef}
-                style={styles.textInput}
+                style={[styles.textInput, { height: 40 }]} // Set a fixed height here
                 value={fieldValue}
                 onChangeText={handleChange}
                 onBlur={handleUpdate}
                 textAlignVertical="top"
-                secureTextEntry={isPassword} // Add this line
+                secureTextEntry={isPassword}
               />
             </View>
           ) : (
@@ -151,13 +153,26 @@ const ProfileTab = () => {
 
   const handleLogout = async () => {
     try {
-      await firebase.auth().signOut()
-      // Redirect the user to the login screen or any other desired screen
-      navigation.navigate('Home')
+      // Clear user credentials and data
+      await firebase.auth().signOut();
+  
+      // Clear user-related data from your app's state
+      setUserFullName('');
+      setUserEmail('');
+      setUserBio('');
+      setUserLocation('');
+  
+      // Reset the navigation stack to the "Home" screen
+      navigation.reset({
+        index: 0, // Navigate to the first screen in the stack
+        routes: [{ name: 'Login' }], // Specify the route to navigate to
+      });
     } catch (error) {
-      console.error('Error while logging out:', error.message)
+      console.error('Error while logging out:', error.message);
     }
   }
+  
+  
 
   const updateFullName = async (newFullName) => {
     try {
@@ -333,7 +348,7 @@ const ProfileTab = () => {
         style={[
           styles.footer,
           {
-            backgroundColor: colors.background,
+            backgroundColor: '#E5E5E5',
           },
         ]}
       >
@@ -447,7 +462,6 @@ const styles = StyleSheet.create({
   },
   footer: {
     flex: 10,
-    backgroundColor: '#E4E4E4',
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingHorizontal: 20,

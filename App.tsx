@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import * as Font from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen'
 import { NavigationContainer } from '@react-navigation/native'
@@ -21,6 +21,7 @@ const App: React.FC = () => {
   const [initialRouteName, setInitialRouteName] = useState('Home')
   const [dashboardTitle, setDashboardTitle] = useState('Dashboard')
   const [isAppReady, setAppReady] = useState(false)
+  const navigationRef = useRef(null);
 
   useEffect(() => {
     async function prepareApp() {
@@ -91,7 +92,7 @@ const App: React.FC = () => {
 
   return (
     <UserProvider>
-      <NavigationContainer>
+      <NavigationContainer ref={navigationRef}>
         <Stack.Navigator initialRouteName={initialRouteName}>
           <Stack.Screen
             name="Home"
