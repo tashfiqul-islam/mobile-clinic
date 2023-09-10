@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react'
 import {
   View,
   Text,
@@ -7,27 +7,27 @@ import {
   StyleSheet,
   StatusBar,
   ActivityIndicator,
-} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import * as Animatable from 'react-native-animatable';
-import {LinearGradient} from 'expo-linear-gradient';
-import {Feather} from '@expo/vector-icons';
-import {useTheme} from 'react-native-paper';
-import Footer from './Footer';
-import * as Burnt from 'burnt';
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/auth';
-import 'firebase/compat/database';
-import {firebaseConfig} from './firebaseConfig';
-import {loginHandle} from './Auth';
-import {useFonts} from 'expo-font';
+} from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+import * as Animatable from 'react-native-animatable'
+import { LinearGradient } from 'expo-linear-gradient'
+import { Feather } from '@expo/vector-icons'
+import { useTheme } from 'react-native-paper'
+import Footer from './Footer'
+import * as Burnt from 'burnt'
+import firebase from 'firebase/compat/app'
+import 'firebase/compat/auth'
+import 'firebase/compat/database'
+import { firebaseConfig } from './firebaseConfig'
+import { loginHandle } from './Auth'
+import { useFonts } from 'expo-font'
 
 const LoginScreen = () => {
   const [fontsLoaded] = useFonts({
     Feather: require('@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Feather.ttf'),
-  });
-  const navigation = useNavigation();
-  const {colors} = useTheme();
+  })
+  const navigation = useNavigation()
+  const { colors } = useTheme()
   const [data, setData] = useState({
     username: '',
     password: '',
@@ -35,126 +35,126 @@ const LoginScreen = () => {
     secureTextEntry: true,
     isValidUser: true,
     isValidPassword: true,
-  });
+  })
 
-  const [isLoading, setIsLoading] = useState(false); // Add isLoading state
+  const [isLoading, setIsLoading] = useState(false) // Add isLoading state
 
   useEffect(() => {
     // Initialize Firebase using the imported configuration
-    firebase.initializeApp(firebaseConfig);
-  }, []);
+    firebase.initializeApp(firebaseConfig)
+  }, [])
 
-  const textInputChange = val => {
+  const textInputChange = (val) => {
     if (val.trim().length >= 4) {
       setData({
         ...data,
         username: val,
         check_textInputChange: true,
         isValidUser: true,
-      });
+      })
     } else {
       setData({
         ...data,
         username: val,
         check_textInputChange: false,
         isValidUser: false,
-      });
+      })
     }
-  };
+  }
 
-  const handlePasswordChange = val => {
+  const handlePasswordChange = (val) => {
     if (val.trim().length >= 8) {
       setData({
         ...data,
         password: val,
         isValidPassword: true,
-      });
+      })
     } else {
       setData({
         ...data,
         password: val,
         isValidPassword: false,
-      });
+      })
     }
-  };
+  }
 
   const updateSecureTextEntry = () => {
     setData({
       ...data,
       secureTextEntry: !data.secureTextEntry,
-    });
-  };
+    })
+  }
 
-  const handleValidUser = val => {
+  const handleValidUser = (val) => {
     if (val.trim().length >= 4) {
       setData({
         ...data,
         isValidUser: true,
-      });
+      })
     } else {
       setData({
         ...data,
         isValidUser: false,
-      });
+      })
     }
-  };
+  }
 
   const handleLogin = async () => {
     if (data.username && data.password) {
-      setIsLoading(true);
-  
+      setIsLoading(true)
+
       try {
-        const result = await loginHandle(data.username, data.password);
-  
+        const result = await loginHandle(data.username, data.password)
+
         if (result.success) {
-          console.log('Authentication successful');
-          navigateByUserType(result.userType);
+          console.log('Authentication successful')
+          navigateByUserType(result.userType)
           Burnt.toast({
             title: 'Success!',
             message: 'Login Successful',
             preset: 'done',
             from: 'bottom',
             duration: 5,
-          });
+          })
         } else {
-          handleError(result.error);
+          handleError(result.error)
         }
       } catch (error) {
-        console.error('Authentication error:', error);
+        console.error('Authentication error:', error)
         Burnt.toast({
           title: 'Error',
           message: 'An error occurred. Please try again later.',
           preset: 'none',
           from: 'bottom',
           duration: 5,
-        });
+        })
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
     } else {
-      console.log('Incomplete login credentials');
+      console.log('Incomplete login credentials')
       Burnt.toast({
         title: '⚠️ Warning',
         message: 'Incomplete login credentials!',
         preset: 'none',
         from: 'bottom',
         duration: 5,
-      });
+      })
     }
-  };
-  
+  }
+
   const navigateByUserType = (userType) => {
     if (userType === 'Doctor') {
-      navigation.navigate('DocDashboard');
+      navigation.navigate('DocDashboard')
     } else if (userType === 'Patient') {
-      navigation.navigate('PatDashboard');
+      navigation.navigate('PatDashboard')
     }
     // Add more conditions for other user types if needed.
-  };
-  
+  }
+
   const handleError = (error) => {
-    console.error('Error:', error);
-  
+    console.error('Error:', error)
+
     if (error === 'auth/email-already-in-use') {
       Burnt.toast({
         title: 'Failed!',
@@ -163,7 +163,7 @@ const LoginScreen = () => {
         from: 'bottom',
         haptic: 'error',
         duration: 5,
-      });
+      })
     } else {
       Burnt.toast({
         title: 'Failed!',
@@ -172,11 +172,9 @@ const LoginScreen = () => {
         from: 'bottom',
         haptic: 'error',
         duration: 5,
-      });
+      })
     }
-  };
-  
-  
+  }
 
   return (
     <View style={styles.container}>
@@ -191,20 +189,23 @@ const LoginScreen = () => {
           {
             backgroundColor: colors.background,
           },
-        ]}>
-        <Text style={[styles.text_footer, {color: colors.text}]}>Username</Text>
+        ]}
+      >
+        <Text style={[styles.text_footer, { color: colors.text }]}>
+          Username
+        </Text>
         <View style={styles.action}>
-        <Feather name="user" color="black" size={20} />
+          <Feather name="user" color="black" size={20} />
           <TextInput
             placeholder="Your Username"
             placeholderTextColor="#666666"
             style={[
               styles.textInput,
-              {color: colors.text, fontFamily: 'Roboto', marginTop: -5},
+              { color: colors.text, fontFamily: 'Roboto', marginTop: -5 },
             ]}
             autoCapitalize="none"
-            onChangeText={val => textInputChange(val)}
-            onEndEditing={e => handleValidUser(e.nativeEvent.text)}
+            onChangeText={(val) => textInputChange(val)}
+            onEndEditing={(e) => handleValidUser(e.nativeEvent.text)}
           />
           {data.check_textInputChange ? (
             <Animatable.View animation="bounceIn">
@@ -220,7 +221,9 @@ const LoginScreen = () => {
           </Animatable.View>
         )}
 
-        <Text style={[styles.text_footer, {color: colors.text, marginTop: 35}]}>
+        <Text
+          style={[styles.text_footer, { color: colors.text, marginTop: 35 }]}
+        >
           Password
         </Text>
         <View style={styles.action}>
@@ -231,10 +234,10 @@ const LoginScreen = () => {
             secureTextEntry={data.secureTextEntry}
             style={[
               styles.textInput,
-              {color: colors.text, fontFamily: 'Roboto', marginTop: -5},
+              { color: colors.text, fontFamily: 'Roboto', marginTop: -5 },
             ]}
             autoCapitalize="none"
-            onChangeText={val => handlePasswordChange(val)}
+            onChangeText={(val) => handlePasswordChange(val)}
           />
           <TouchableOpacity onPress={updateSecureTextEntry}>
             {data.secureTextEntry ? (
@@ -253,7 +256,7 @@ const LoginScreen = () => {
         )}
 
         <TouchableOpacity>
-          <Text style={{color: '#1069AD', marginTop: 15}}>
+          <Text style={{ color: '#1069AD', marginTop: 15 }}>
             Forgot password?
           </Text>
         </TouchableOpacity>
@@ -261,16 +264,20 @@ const LoginScreen = () => {
           <TouchableOpacity
             style={styles.signIn}
             onPress={() => {
-              handleLogin(data.username, data.password);
-            }}>
+              handleLogin(data.username, data.password)
+            }}
+          >
             <LinearGradient
               colors={['#1069AD', '#0C5A97']}
-              style={styles.signIn}>
+              style={styles.signIn}
+            >
               {/* Show ActivityIndicator if isLoading is true, otherwise show "Sign In" */}
               {isLoading ? (
                 <ActivityIndicator color="#fff" size="small" />
               ) : (
-                <Text style={[styles.textSign, {color: '#fff'}]}>Sign In</Text>
+                <Text style={[styles.textSign, { color: '#fff' }]}>
+                  Sign In
+                </Text>
               )}
             </LinearGradient>
           </TouchableOpacity>
@@ -284,15 +291,18 @@ const LoginScreen = () => {
                 borderWidth: 1,
                 marginTop: 15,
               },
-            ]}>
-            <Text style={[styles.textSign, {color: '#1069AD'}]}>Register</Text>
+            ]}
+          >
+            <Text style={[styles.textSign, { color: '#1069AD' }]}>
+              Register
+            </Text>
           </TouchableOpacity>
         </View>
       </Animatable.View>
       <Footer />
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -356,6 +366,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-});
+})
 
-export default LoginScreen;
+export default LoginScreen

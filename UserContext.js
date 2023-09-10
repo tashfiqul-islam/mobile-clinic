@@ -1,49 +1,47 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/auth';
+import React, { createContext, useContext, useState, useEffect } from 'react'
+import firebase from 'firebase/compat/app'
+import 'firebase/compat/auth'
 
-const UserContext = createContext();
+const UserContext = createContext()
 
 export const useUser = () => {
-  return useContext(UserContext);
-};
+  return useContext(UserContext)
+}
 
 export const UserProvider = ({ children }) => {
-  const [userFullName, setUserFullName] = useState('');
-  const [userEmail, setUserEmail] = useState('');
-  const [userBio, setUserBio] = useState('');
-  const [userPassword, setUserPassword] = useState('');
-  const [userLocation, setUserLocation] = useState('');
-
-
+  const [userFullName, setUserFullName] = useState('')
+  const [userEmail, setUserEmail] = useState('')
+  const [userBio, setUserBio] = useState('')
+  const [userPassword, setUserPassword] = useState('')
+  const [userLocation, setUserLocation] = useState('')
 
   useEffect(() => {
     // Listen for changes in the user's data (e.g., full name and email)
     const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         // User is signed in, fetch and set user data
-        const userUid = user.uid;
-        const userRef = firebase.database().ref(`users/${userUid}`);
+        const userUid = user.uid
+        const userRef = firebase.database().ref(`users/${userUid}`)
 
         userRef.on('value', (snapshot) => {
-          const userData = snapshot.val();
-          setUserFullName(userData.fullName || '');
-          setUserEmail(userData.email || '');
-          setUserBio(userData.userBio || '');
-          setUserLocation(userData.location || '');
-        });
+          const userData = snapshot.val()
+          setUserFullName(userData.fullName || '')
+          setUserEmail(userData.email || '')
+          setUserBio(userData.userBio || '')
+          setUserLocation(userData.location || '')
+        })
       } else {
         // User is signed out, clear user data
-        setUserFullName('');
-        setUserEmail('');
+        setUserFullName('')
+        setUserEmail('')
       }
-    });
+    })
 
     return () => {
       // Clean up the subscription when the component unmounts
-      unsubscribe();
-    };
-  }, []);
+      unsubscribe()
+    }
+  }, [])
 
   const value = {
     userFullName,
@@ -52,11 +50,11 @@ export const UserProvider = ({ children }) => {
     setUserEmail,
     userBio,
     setUserBio,
-    userPassword,  
-    setUserPassword,  
-    userLocation, 
+    userPassword,
+    setUserPassword,
+    userLocation,
     setUserLocation,
-  };
+  }
 
-  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
-};
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>
+}

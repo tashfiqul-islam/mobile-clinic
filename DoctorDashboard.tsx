@@ -1,72 +1,72 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
-import firebase from 'firebase/compat/app';
-import { useNavigation } from '@react-navigation/native';
-import 'firebase/compat/auth';
-import 'firebase/compat/database';
-import ProfileTab from './ProfileTab';
-import { useUser } from './UserContext';  // Import the useUser hook
+import React, { useEffect } from 'react'
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
+import { Ionicons } from '@expo/vector-icons'
+import firebase from 'firebase/compat/app'
+import { useNavigation } from '@react-navigation/native'
+import 'firebase/compat/auth'
+import 'firebase/compat/database'
+import ProfileTab from './ProfileTab'
+import { useUser } from './UserContext'
 
 const HomeTab = () => (
   <View style={styles.screenContainer}>
     <Text>Home Screen</Text>
   </View>
-);
+)
 
 const AppointmentTab = () => (
   <View style={styles.screenContainer}>
     <Text>Appointment Screen</Text>
   </View>
-);
+)
 
 const MessageTab = () => (
   <View style={styles.screenContainer}>
     <Text>Message Screen</Text>
   </View>
-);
+)
 
-const Tab = createMaterialBottomTabNavigator();
+const Tab = createMaterialBottomTabNavigator()
 
 const DoctorDashboard = ({ route }) => {
-  const { userFullName, setUserFullName } = useUser();  // Use the useUser hook
-  const navigation = useNavigation();
+  const { userFullName, setUserFullName } = useUser()
+  const navigation = useNavigation()
 
   useEffect(() => {
-    const unsubscribe = firebase.auth().onAuthStateChanged(user => {
+    const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        const userUid = user.uid;
-        const userRef = firebase.database().ref(`users/${userUid}`);
+        const userUid = user.uid
+        const userRef = firebase.database().ref(`users/${userUid}`)
         userRef
           .once('value')
-          .then(snapshot => {
+          .then((snapshot) => {
             if (snapshot.exists()) {
-              const userData = snapshot.val();
-              const fullName = userData.fullName;
-              setUserFullName(fullName);
+              const userData = snapshot.val()
+              const fullName = userData.fullName
+              setUserFullName(fullName)
             } else {
-              console.log('User data does not exist');
+              console.log('User data does not exist')
             }
           })
-          .catch(error => {
-            console.error('Error fetching user data:', error);
-          });
+          .catch((error) => {
+            console.error('Error fetching user data:', error)
+          })
       } else {
         // User is signed out
       }
-    });
+    })
 
-    return () => unsubscribe();
-  }, []);
+    return () => unsubscribe()
+  }, [])
 
   const handleProfileNavigation = () => {
-    navigation.navigate('Profile');
-  };
+    navigation.navigate('Profile')
+  }
 
   const handleNotificationPress = () => {
     // Implement the logic for when the notification icon is pressed
-  };
+  }
 
   return (
     <View style={styles.container}>
@@ -88,19 +88,20 @@ const DoctorDashboard = ({ route }) => {
         </View>
       </View>
       <Tab.Navigator
-        shifting={false}
+        shifting={true}
         initialRouteName="Home"
         activeColor="#1069AD"
         inactiveColor="#898989"
         barStyle={{
-          position: 'absolute',
           backgroundColor: '#fff',
+          position: 'absolute',
           borderRadius: 20,
-          marginRight: 5,
-          marginLeft: 5,
-          marginBottom: 5,
-          marginTop: 5,
-        }}>
+          marginRight: 0,
+          marginLeft: 0,
+          marginBottom: 0,
+          marginTop: 0,
+        }}
+      >
         <Tab.Screen
           name="Home"
           component={HomeTab}
@@ -148,8 +149,8 @@ const DoctorDashboard = ({ route }) => {
         />
       </Tab.Navigator>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -201,7 +202,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#E5E5E5',
   },
-});
+})
 
-export default DoctorDashboard;
+export default DoctorDashboard

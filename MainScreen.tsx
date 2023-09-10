@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import {
   View,
   Text,
@@ -6,12 +6,12 @@ import {
   Dimensions,
   StyleSheet,
   StatusBar,
-} from 'react-native';
-import * as Animatable from 'react-native-animatable';
-import {LinearGradient} from 'expo-linear-gradient';
-import {useTheme} from '@react-navigation/native';
-import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
-import Footer from './Footer';
+} from 'react-native'
+import * as Animatable from 'react-native-animatable'
+import { LinearGradient } from 'expo-linear-gradient'
+import { useTheme } from '@react-navigation/native'
+import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper'
+import Footer from './Footer'
 
 const theme = {
   ...DefaultTheme,
@@ -19,10 +19,10 @@ const theme = {
     ...DefaultTheme.colors,
     primary: '#1069AD',
   },
-};
+}
 
-const SplashScreen = ({navigation}) => {
-  const {colors} = useTheme();
+const SplashScreen = ({ navigation }) => {
+  const { colors } = useTheme()
 
   return (
     <PaperProvider theme={theme}>
@@ -38,9 +38,12 @@ const SplashScreen = ({navigation}) => {
           />
         </View>
         <Animatable.View
-          style={[styles.footer, {backgroundColor: colors.background}]}
-          animation="fadeInUpBig">
-          <Text style={[styles.title, {color: colors.text}]}>Mobile Clinic</Text>
+          style={[styles.footer, { backgroundColor: colors.background }]}
+          animation="fadeInUpBig"
+        >
+          <Text style={[styles.title, { color: colors.text }]}>
+            Mobile Clinic
+          </Text>
           <View style={styles.textContainer}>
             <Text style={styles.text}>... Revolutionizing </Text>
             <Text style={styles.text}>Healthcare</Text>
@@ -49,7 +52,8 @@ const SplashScreen = ({navigation}) => {
             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
               <LinearGradient
                 colors={['#1987D8', '#0F6FB6']}
-                style={styles.signIn}>
+                style={styles.signIn}
+              >
                 <Text style={styles.textSign}>Login</Text>
               </LinearGradient>
             </TouchableOpacity>
@@ -64,8 +68,9 @@ const SplashScreen = ({navigation}) => {
                   borderWidth: 1.5,
                   marginTop: 15,
                 },
-              ]}>
-              <Text style={[styles.textSign, {color: '#1069AD'}]}>
+              ]}
+            >
+              <Text style={[styles.textSign, { color: '#1069AD' }]}>
                 Register
               </Text>
             </TouchableOpacity>
@@ -74,13 +79,13 @@ const SplashScreen = ({navigation}) => {
         <Footer />
       </View>
     </PaperProvider>
-  );
-};
+  )
+}
 
-export default SplashScreen;
+export default SplashScreen
 
-const {height} = Dimensions.get('screen');
-const height_logo = height * 0.28;
+const { height } = Dimensions.get('screen')
+const height_logo = height * 0.28
 
 const styles = StyleSheet.create({
   container: {
@@ -142,4 +147,4 @@ const styles = StyleSheet.create({
   button2: {
     alignItems: 'center',
   },
-});
+})

@@ -1,5 +1,5 @@
-import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import React from 'react'
+import { View, Text, StyleSheet } from 'react-native'
 
 const Footer: React.FC = () => {
   return (
@@ -8,8 +8,8 @@ const Footer: React.FC = () => {
         © {new Date().getFullYear()} Mobile Clinic v0.0.1. All rights reserved.
       </Text>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   footerContainer: {
@@ -28,6 +28,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: 'grey',
   },
-});
+})
 
-export default Footer;
+export default Footer

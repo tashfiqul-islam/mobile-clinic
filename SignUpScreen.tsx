@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react'
 import {
   View,
   Text,
@@ -9,26 +9,26 @@ import {
   ScrollView,
   ActivityIndicator,
   StatusBar,
-} from 'react-native';
-import * as Animatable from 'react-native-animatable';
-import {LinearGradient} from 'expo-linear-gradient';
-import {Feather, FontAwesome} from '@expo/vector-icons';
-import {Dropdown} from 'react-native-element-dropdown';
-import * as Burnt from 'burnt';
-import Footer from './Footer';
-import * as Crypto from 'expo-crypto';
-import 'firebase/compat/auth';
-import 'firebase/compat/database';
-import {signupHandle} from './Auth';
-import auth from '@react-native-firebase/auth';
+} from 'react-native'
+import * as Animatable from 'react-native-animatable'
+import { LinearGradient } from 'expo-linear-gradient'
+import { Feather, FontAwesome } from '@expo/vector-icons'
+import { Dropdown } from 'react-native-element-dropdown'
+import * as Burnt from 'burnt'
+import Footer from './Footer'
+import * as Crypto from 'expo-crypto'
+import 'firebase/compat/auth'
+import 'firebase/compat/database'
+import { signupHandle } from './Auth'
+import auth from '@react-native-firebase/auth'
 
 const UserTypeData = [
-  {label: 'Doctor', value: 'Doctor'},
-  {label: 'Patient', value: 'Patient'},
-];
+  { label: 'Doctor', value: 'Doctor' },
+  { label: 'Patient', value: 'Patient' },
+]
 
-const SignUpScreen = ({navigation}) => {
-  const [isLoading, setIsLoading] = useState(false); // Move this line inside the component
+const SignUpScreen = ({ navigation }) => {
+  const [isLoading, setIsLoading] = useState(false) // Move this line inside the component
 
   const [data, setData] = useState({
     fullName: '',
@@ -40,32 +40,32 @@ const SignUpScreen = ({navigation}) => {
     userType: null,
     emailError: '',
     passwordError: '',
-  });
+  })
 
-  const [agreeCheckbox, setAgreeCheckbox] = useState(false);
+  const [agreeCheckbox, setAgreeCheckbox] = useState(false)
 
-  const fullNameInputChange = val => {
+  const fullNameInputChange = (val) => {
     if (val.length !== 0) {
       setData({
         ...data,
         fullName: val,
         check_fullNameInputChange: true,
-      });
+      })
     } else {
       setData({
         ...data,
         fullName: val,
         check_fullNameInputChange: false,
-      });
+      })
     }
-  };
+  }
 
-  const validateEmail = email => {
-    const pattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-    return pattern.test(email);
-  };
+  const validateEmail = (email) => {
+    const pattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
+    return pattern.test(email)
+  }
 
-  const emailInputChange = val => {
+  const emailInputChange = (val) => {
     if (val.length !== 0) {
       if (validateEmail(val)) {
         setData({
@@ -73,14 +73,14 @@ const SignUpScreen = ({navigation}) => {
           email: val,
           check_emailInputChange: true,
           emailError: '',
-        });
+        })
       } else {
         setData({
           ...data,
           email: val,
           check_emailInputChange: false,
           emailError: 'Invalid email format',
-        });
+        })
       }
     } else {
       setData({
@@ -88,135 +88,136 @@ const SignUpScreen = ({navigation}) => {
         email: val,
         check_emailInputChange: false,
         emailError: '',
-      });
+      })
     }
-  };
+  }
 
-  const validatePassword = password => {
-    const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
-    return pattern.test(password);
-  };
+  const validatePassword = (password) => {
+    const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/
+    return pattern.test(password)
+  }
 
-  const handlePasswordChange = val => {
+  const handlePasswordChange = (val) => {
     if (val.length !== 0) {
       if (validatePassword(val)) {
         setData({
           ...data,
           password: val,
           passwordError: '',
-        });
+        })
       } else {
         setData({
           ...data,
           password: val,
           passwordError:
             'Password should be 8+ characters with at least 1 uppercase, 1 lowercase, and 1 digit.',
-        });
+        })
       }
     } else {
       setData({
         ...data,
         password: val,
         passwordError: '',
-      });
+      })
     }
-  };
+  }
 
-  const handleUserTypeChange = item => {
+  const handleUserTypeChange = (item) => {
     setData({
       ...data,
       userType: item.value,
-    });
-  };
+    })
+  }
 
   const updateSecureTextEntry = () => {
     setData({
       ...data,
       secureTextEntry: !data.secureTextEntry,
-    });
-  };
+    })
+  }
 
   // Helper function to navigate based on the user type
-const navigateByUserType = (userType) => {
-  if (userType === 'Doctor') {
-      navigation.navigate('DocDashboard');
-  } else if (userType === 'Patient') {
-      navigation.navigate('PatDashboard');
+  const navigateByUserType = (userType) => {
+    if (userType === 'Doctor') {
+      navigation.navigate('DocDashboard')
+    } else if (userType === 'Patient') {
+      navigation.navigate('PatDashboard')
+    }
   }
-};
 
-// Helper function to handle specific errors
-const handleError = (error) => {
-  if (error.code === 'auth/email-already-in-use') {
+  // Helper function to handle specific errors
+  const handleError = (error) => {
+    if (error.code === 'auth/email-already-in-use') {
       Burnt.toast({
-          title: 'Email is already in use. Please use another email address!',
-          preset: 'error',
-          from: 'bottom',
-          haptic: 'error',
-          duration: 5,
-      });
-  } else {
+        title: 'Email is already in use. Please use another email address!',
+        preset: 'error',
+        from: 'bottom',
+        haptic: 'error',
+        duration: 5,
+      })
+    } else {
       Burnt.toast({
-          title: 'An error occurred during registration. Please try again later.',
-          preset: 'none',
-          from: 'bottom',
-          duration: 5,
-      });
+        title: 'An error occurred during registration. Please try again later.',
+        preset: 'none',
+        from: 'bottom',
+        duration: 5,
+      })
+    }
   }
-};
 
-// Main sign up handler
-const handleSignUp = async () => {
-  setIsLoading(true);
+  // Main sign up handler
+  const handleSignUp = async () => {
+    setIsLoading(true)
 
-  if (
+    if (
       data.fullName &&
       data.email &&
       data.password &&
       data.userType &&
       agreeCheckbox
-  ) {
+    ) {
       try {
-          const result = await signupHandle(
-              data.fullName,
-              data.email,
-              data.password,
-              data.userType
-          );
+        const result = await signupHandle(
+          data.fullName,
+          data.email,
+          data.password,
+          data.userType,
+        )
 
-          if (result.success) {
-              Burnt.toast({
-                  title: 'Registration successful!',
-                  preset: 'done',
-                  from: 'bottom',
-                  duration: 5,
-              });
-              navigateByUserType(result.userType);
-          } else {
-              handleError(result.error);
-          }
-      } catch (error) {
-          console.error('Error during registration:', error);
+        if (result.success) {
           Burnt.toast({
-              title: 'An error occurred during registration. Please try again later.',
-              preset: 'none',
-              from: 'bottom',
-              duration: 5,
-          });
-      } finally {
-          setIsLoading(false);
-      }
-  } else {
-      console.log('Incomplete registration data');
-      Burnt.toast({
-          title: 'Incomplete registration data!',
+            title: 'Registration successful!',
+            preset: 'done',
+            from: 'bottom',
+            duration: 5,
+          })
+          navigateByUserType(result.userType)
+        } else {
+          handleError(result.error)
+        }
+      } catch (error) {
+        console.error('Error during registration:', error)
+        Burnt.toast({
+          title:
+            'An error occurred during registration. Please try again later.',
           preset: 'none',
           from: 'bottom',
           duration: 5,
-      });
-      setIsLoading(false);
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    } else {
+      console.log('Incomplete registration data')
+      Burnt.toast({
+        title: 'Incomplete registration data!',
+        preset: 'none',
+        from: 'bottom',
+        duration: 5,
+      })
+      setIsLoading(false)
+    }
   }
-};
 
   return (
     <View style={styles.container}>
@@ -232,9 +233,9 @@ const handleSignUp = async () => {
             <FontAwesome name="user-o" color="#05375a" size={20} />
             <TextInput
               placeholder="Your Full Name"
-              style={[styles.textInput, {fontFamily: 'Roboto'}]}
+              style={[styles.textInput, { fontFamily: 'Roboto' }]}
               autoCapitalize="none"
-              onChangeText={val => fullNameInputChange(val)}
+              onChangeText={(val) => fullNameInputChange(val)}
             />
             {data.check_fullNameInputChange ? (
               <Animatable.View animation="bounceIn">
@@ -244,14 +245,14 @@ const handleSignUp = async () => {
           </View>
 
           {/* Email */}
-          <Text style={[styles.text_footer, {marginTop: 35}]}>Email</Text>
+          <Text style={[styles.text_footer, { marginTop: 35 }]}>Email</Text>
           <View style={styles.action}>
             <Feather name="mail" color="#05375a" size={20} />
             <TextInput
               placeholder="Your Email"
-              style={[styles.textInput, {fontFamily: 'Roboto'}]}
+              style={[styles.textInput, { fontFamily: 'Roboto' }]}
               autoCapitalize="none"
-              onChangeText={val => emailInputChange(val)}
+              onChangeText={(val) => emailInputChange(val)}
             />
             {data.check_emailInputChange ? (
               <Animatable.View animation="bounceIn">
@@ -260,21 +261,21 @@ const handleSignUp = async () => {
             ) : null}
           </View>
           {data.emailError ? (
-            <Text style={[styles.errorText, {fontFamily: 'Roboto'}]}>
+            <Text style={[styles.errorText, { fontFamily: 'Roboto' }]}>
               {data.emailError}
             </Text>
           ) : null}
 
           {/* Password */}
-          <Text style={[styles.text_footer, {marginTop: 35}]}>Password</Text>
+          <Text style={[styles.text_footer, { marginTop: 35 }]}>Password</Text>
           <View style={styles.action}>
             <FontAwesome name="lock" color="#05375a" size={20} />
             <TextInput
               placeholder="Your Password"
               secureTextEntry={data.secureTextEntry ? true : false}
-              style={[styles.textInput, {fontFamily: 'Roboto'}]}
+              style={[styles.textInput, { fontFamily: 'Roboto' }]}
               autoCapitalize="none"
-              onChangeText={val => handlePasswordChange(val)}
+              onChangeText={(val) => handlePasswordChange(val)}
             />
             <TouchableOpacity onPress={updateSecureTextEntry}>
               {data.secureTextEntry ? (
@@ -285,28 +286,28 @@ const handleSignUp = async () => {
             </TouchableOpacity>
           </View>
           {data.passwordError ? (
-            <Text style={[styles.errorText, {fontFamily: 'Roboto'}]}>
+            <Text style={[styles.errorText, { fontFamily: 'Roboto' }]}>
               {data.passwordError}
             </Text>
           ) : null}
 
           {/* User Type */}
-          <Text style={[styles.text_footer, {marginTop: 35}]}>User Type</Text>
+          <Text style={[styles.text_footer, { marginTop: 35 }]}>User Type</Text>
           <View style={styles.action}>
             <Feather name="users" color="#05375a" size={20} />
             <Dropdown
-              style={[styles.dropdown, {fontFamily: 'Roboto'}]}
+              style={[styles.dropdown, { fontFamily: 'Roboto' }]}
               placeholderStyle={[
                 styles.placeholderStyle,
-                {fontFamily: 'Roboto'},
+                { fontFamily: 'Roboto' },
               ]}
               selectedTextStyle={[
                 styles.selectedTextStyle,
-                {fontFamily: 'Roboto'},
+                { fontFamily: 'Roboto' },
               ]}
               inputSearchStyle={[
                 styles.inputSearchStyle,
-                {fontFamily: 'Roboto'},
+                { fontFamily: 'Roboto' },
               ]}
               iconStyle={styles.iconStyle}
               data={UserTypeData}
@@ -322,7 +323,8 @@ const handleSignUp = async () => {
           <View style={styles.checkBoxContainer}>
             <TouchableOpacity
               style={styles.checkBox}
-              onPress={() => setAgreeCheckbox(!agreeCheckbox)}>
+              onPress={() => setAgreeCheckbox(!agreeCheckbox)}
+            >
               {agreeCheckbox ? (
                 <Feather name="check-square" color="#1069AD" size={20} />
               ) : (
@@ -330,26 +332,30 @@ const handleSignUp = async () => {
               )}
               <View style={styles.textPrivate}>
                 <Text
-                  style={[styles.color_textPrivate, {fontFamily: 'Roboto'}]}>
+                  style={[styles.color_textPrivate, { fontFamily: 'Roboto' }]}
+                >
                   By signing up you agree to our
                 </Text>
                 <Text
                   style={[
                     styles.color_textPrivate,
-                    {fontWeight: 'bold', fontFamily: 'Roboto'},
-                  ]}>
+                    { fontWeight: 'bold', fontFamily: 'Roboto' },
+                  ]}
+                >
                   {' '}
                   Terms of service
                 </Text>
                 <Text
-                  style={[styles.color_textPrivate, {fontFamily: 'Roboto'}]}>
+                  style={[styles.color_textPrivate, { fontFamily: 'Roboto' }]}
+                >
                   {' '}
                 </Text>
                 <Text
                   style={[
                     styles.color_textPrivate,
-                    {fontWeight: 'bold', fontFamily: 'Roboto'},
-                  ]}>
+                    { fontWeight: 'bold', fontFamily: 'Roboto' },
+                  ]}
+                >
                   {' '}
                   Privacy policy
                 </Text>
@@ -361,15 +367,17 @@ const handleSignUp = async () => {
           <TouchableOpacity style={styles.signIn} onPress={handleSignUp}>
             <LinearGradient
               colors={['#1069AD', '#0C5A97']}
-              style={[styles.signIn, {fontFamily: 'Roboto'}]}>
+              style={[styles.signIn, { fontFamily: 'Roboto' }]}
+            >
               {isLoading ? (
                 <ActivityIndicator size="small" color="#fff" />
               ) : (
                 <Text
                   style={[
                     styles.textSign,
-                    {color: '#fff', fontFamily: 'Roboto'},
-                  ]}>
+                    { color: '#fff', fontFamily: 'Roboto' },
+                  ]}
+                >
                   Sign Up
                 </Text>
               )}
@@ -384,12 +392,14 @@ const handleSignUp = async () => {
                 borderWidth: 1,
                 marginTop: 15,
               },
-            ]}>
+            ]}
+          >
             <Text
               style={[
                 styles.textSign,
-                {color: '#1069AD', fontFamily: 'Roboto'},
-              ]}>
+                { color: '#1069AD', fontFamily: 'Roboto' },
+              ]}
+            >
               Sign In
             </Text>
           </TouchableOpacity>
@@ -397,8 +407,8 @@ const handleSignUp = async () => {
       </Animatable.View>
       <Footer />
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -443,7 +453,6 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     color: '#05375a',
     fontFamily: 'Roboto',
-    
   },
   signIn: {
     width: '100%',
@@ -508,6 +517,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Roboto',
   },
-});
+})
 
-export default SignUpScreen;
+export default SignUpScreen

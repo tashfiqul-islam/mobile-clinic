@@ -1,7 +1,7 @@
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/database';
-import {useEffect} from 'react';
+import firebase from 'firebase/app'
+import 'firebase/auth'
+import 'firebase/database'
+import { useEffect } from 'react'
 
 // Initialize Firebase
 export const firebaseConfig = {
@@ -13,16 +13,16 @@ export const firebaseConfig = {
   storageBucket: 'mclinic-df2b5.appspot.com',
   messagingSenderId: '469820537224',
   appId: '1:469820537224:android:78c9d971bd803ea4ebe23d',
-};
+}
 
 function FirebaseInitializer() {
   useEffect(() => {
     // Initialize Firebase using the imported configuration
-    firebase.initializeApp(firebaseConfig);
-  }, []);
+    firebase.initializeApp(firebaseConfig)
+  }, [])
 
   // You can render something here if needed
-  return null;
+  return null
 }
 
-export default FirebaseInitializer;
+export default FirebaseInitializer
