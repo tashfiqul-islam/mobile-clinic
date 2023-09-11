@@ -7,13 +7,8 @@ import {useNavigation} from '@react-navigation/native'
 import 'firebase/compat/auth'
 import 'firebase/compat/database'
 import ProfileTab from './ProfileTab'
+import HomeTab from './HomeTab'
 import {useUser} from './UserContext'
-
-const HomeTab = () => (
-  <View style={styles.screenContainer}>
-    <Text>Home Screen</Text>
-  </View>
-)
 
 const AppointmentTab = () => (
   <View style={styles.screenContainer}>
@@ -26,6 +21,9 @@ const MessageTab = () => (
     <Text>Message Screen</Text>
   </View>
 )
+
+const DEFAULT_IMAGE_URL =
+  'https://firebasestorage.googleapis.com/v0/b/mclinic-df2b5.appspot.com/o/profile_images%2FdefaultProfile.png?alt=media&token=600ebca7-a028-428c-9199-3bd7464cf216'
 
 const Tab = createMaterialBottomTabNavigator()
 
@@ -46,36 +44,37 @@ const DoctorDashboard = ({route}) => {
   }
 
   useEffect(() => {
-    const unsubscribe = firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        const userUid = user.uid
-        const userRef = firebase.database().ref(`users/${userUid}`)
-        userRef
-          .once('value')
-          .then(snapshot => {
-            if (snapshot.exists()) {
-              const userData = snapshot.val()
-              const fullName = userData.fullName
-              const imageUrl = userData.profileImage || null // <-- Get the profile image URL
-              setUserFullName(fullName)
-              setUserImage(imageUrl) // <-- Set the profile image URL
-            } else {
-              console.log('User data does not exist')
-            }
-          })
-          .catch(error => {
-            console.error('Error fetching user data:', error)
-          })
-      } else {
-        // User is signed out
-      }
-    })
+    const user = firebase.auth().currentUser
 
-    return () => unsubscribe()
-  }, [])
+    if (user) {
+      const userUid = user.uid
+      const userRef = firebase.database().ref(`users/${userUid}/profileImage`) // path to profile image
+
+      // Firebase listener
+      const handleDataChange = (snapshot: {
+        exists: () => any
+        val: () => React.SetStateAction<null>
+      }) => {
+        if (snapshot.exists()) {
+          setUserImage(snapshot.val()) // Update the local state
+        }
+      }
+
+      userRef.on('value', handleDataChange)
+
+      // Return a cleanup function to detach the listener when the component unmounts
+      return () => {
+        userRef.off('value', handleDataChange)
+      }
+    }
+  }, []) // Empty dependency array means this effect runs once when the component mounts
 
   const handleProfileNavigation = () => {
     navigation.navigate('Profile')
+  }
+
+  const handleHomeNavigation = () => {
+    navigation.navigate('Home')
   }
 
   const handleNotificationPress = () => {
@@ -93,11 +92,7 @@ const DoctorDashboard = ({route}) => {
       <View style={styles.header}>
         <View style={styles.profileImageContainer}>
           <Image
-            source={
-              userImage
-                ? {uri: userImage}
-                : require('./assets/images/head-2.jpg')
-            } // Use the defaultProfile.png image if userImage is null
+            source={userImage ? {uri: userImage} : {uri: DEFAULT_IMAGE_URL}} // Use the defaultProfile.png image if userImage is null
             style={styles.profileImage}
           />
         </View>
@@ -124,13 +119,14 @@ const DoctorDashboard = ({route}) => {
         <Tab.Screen
           name="Home"
           component={HomeTab}
-          options={{
+          options={({route}) => ({
             tabBarIcon: ({color}) => (
               <Ionicons name="ios-home" size={24} color={color} />
             ),
             tabBarLabel: 'Home',
             tabBarAccessibilityLabel: 'Home Tab',
-          }}
+            onPress: handleHomeNavigation,
+          })}
         />
         <Tab.Screen
           name="Appointment"
@@ -186,6 +182,7 @@ const styles = StyleSheet.create({
   profileImageContainer: {
     width: 55,
     height: 55,
+    backgroundColor: 'white',
     borderRadius: 60,
     overflow: 'hidden',
     marginRight: 10,

@@ -10,13 +10,14 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native'
 import {useNavigation} from '@react-navigation/native'
 import * as Animatable from 'react-native-animatable'
 import {Feather} from '@expo/vector-icons'
 import {useTheme, TextInput as PaperTextInput} from 'react-native-paper'
 import * as Burnt from 'burnt'
-import * as ImagePicker from 'expo-image-picker';
+import * as ImagePicker from 'expo-image-picker'
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
 import 'firebase/compat/database'
@@ -140,6 +141,7 @@ const ProfileTab = () => {
   const [isEditingPassword, setIsEditingPassword] = useState(false)
   const [isEditingLocation, setIsEditingLocation] = useState(false)
   const [editingLocation, setEditingLocation] = useState(userLocation)
+  const [isUploading, setIsUploading] = useState(false)
 
   const handleEditBio = () => {
     setEditingBio(userBio || '')
@@ -175,6 +177,9 @@ const ProfileTab = () => {
     setIsEditingLocation(false)
   }
 
+  const DEFAULT_IMAGE_URL =
+    'https://firebasestorage.googleapis.com/v0/b/mclinic-df2b5.appspot.com/o/profile_images%2FdefaultProfile.png?alt=media&token=600ebca7-a028-428c-9199-3bd7464cf216'
+
   const handleLogout = async () => {
     try {
       await firebase.auth().signOut()
@@ -194,15 +199,15 @@ const ProfileTab = () => {
   }
 
   useEffect(() => {
-    (async () => {
-      if (Platform.OS !== "web") {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== "granted") {
-          alert("Sorry, we need camera roll permissions to make this work!");
+    ;(async () => {
+      if (Platform.OS !== 'web') {
+        const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync()
+        if (status !== 'granted') {
+          alert('Sorry, we need camera roll permissions to make this work!')
         }
       }
-    })();
-  }, []);
+    })()
+  }, [])
 
   const pickImage = async () => {
     try {
@@ -211,19 +216,19 @@ const ProfileTab = () => {
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,
-      });
-  
-      if (!result.cancelled && result.assets) {
-        const source = { uri: result.assets[0].uri };
-        uploadImage(source.uri);
+      })
+
+      if (!result.canceled && result.assets) {
+        uploadImage(result.assets[0].uri)
       }
     } catch (error) {
-      console.error("Error picking image:", error);
+      console.error('Error picking image:', error)
     }
-  };
+  }
 
   const uploadImage = async uri => {
     try {
+      setIsUploading(true)
       const response = await fetch(uri)
       const blob = await response.blob()
       const user = firebase.auth().currentUser
@@ -237,7 +242,8 @@ const ProfileTab = () => {
       updateUserImageURLInFirebase(url)
     } catch (error) {
       console.error('Image upload error:', error.message)
-      // Maybe show a user-friendly message too.
+
+      // Error message for users
       Burnt.toast({
         from: 'bottom',
         title: 'Failed to upload image!',
@@ -246,6 +252,8 @@ const ProfileTab = () => {
         haptic: 'error',
         duration: 5,
       })
+    } finally {
+      setIsUploading(false)
     }
   }
 
@@ -259,7 +267,7 @@ const ProfileTab = () => {
       if (url && url.trim() !== '') {
         setUserImage(url)
       } else {
-        setUserImage(require('./assets/images/head-2.jpg'))
+        setUserImage(require('./assets/images/defaultProfile.png'))
       }
 
       Burnt.toast({
@@ -427,7 +435,7 @@ const ProfileTab = () => {
     }
   }
 
-  const defaultImage = require('./assets/images/head-2.jpg')
+  const defaultImage = {uri: DEFAULT_IMAGE_URL}
 
   return (
     <KeyboardAvoidingView
@@ -436,23 +444,31 @@ const ProfileTab = () => {
       enabled>
       <StatusBar backgroundColor="#1069AD" barStyle="light-content" />
       <View style={styles.header}>
-      <View style={styles.profileImageContainer}>
-      <Image
-        source={
-          userImage &&
-          typeof userImage === 'string' &&
-          userImage.trim() !== ''
-            ? {uri: userImage}
-            : defaultImage
-        }
-        style={styles.profileImage}
-      />
-      <TouchableOpacity
-        style={styles.editIconContainer}
-        onPress={pickImage}>
-        <Feather name="edit" size={14} color="grey" />
-      </TouchableOpacity>
-    </View>
+        <View style={styles.profileImageContainer}>
+          <Image
+            source={
+              userImage &&
+              typeof userImage === 'string' &&
+              userImage.trim() !== ''
+                ? {uri: userImage}
+                : defaultImage
+            }
+            style={styles.profileImage}
+          />
+          {isUploading ? (
+            <ActivityIndicator
+              size="large"
+              color="#1069AD"
+              style={styles.loader}
+            />
+          ) : (
+            <TouchableOpacity
+              style={styles.editIconContainer}
+              onPress={pickImage}>
+              <Feather name="edit" size={14} color="grey" />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
       <Animatable.View
         animation="fadeInUpBig"
@@ -464,7 +480,7 @@ const ProfileTab = () => {
         ]}>
         <Text style={styles.primaryText}>Dr. {userFullName}</Text>
         <Text style={styles.secondaryText}>
-        📍 {userLocation || 'Update location'}
+          📍 {userLocation || 'Update location'}
         </Text>
 
         <View
@@ -580,13 +596,19 @@ const styles = StyleSheet.create({
     top: Platform.OS === 'ios' ? -15 : -10,
     left: 30,
     zIndex: 1,
-    overflow: 'visible', // This ensures the edit button is visible outside the profile image
+    overflow: 'visible',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-
+  loader: {
+    position: 'absolute',
+    zIndex: 2, // Ensure it's above the image
+  },
   profileImage: {
     flex: 1,
     width: '100%',
     height: '100%',
+    backgroundColor: 'white',
     resizeMode: 'cover',
     borderRadius: 100,
     borderWidth: 3,
