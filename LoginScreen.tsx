@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, {useState, useEffect} from 'react'
 import {
   View,
   Text,
@@ -8,26 +8,26 @@ import {
   StatusBar,
   ActivityIndicator,
 } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import {useNavigation} from '@react-navigation/native'
 import * as Animatable from 'react-native-animatable'
-import { LinearGradient } from 'expo-linear-gradient'
-import { Feather } from '@expo/vector-icons'
-import { useTheme } from 'react-native-paper'
+import {LinearGradient} from 'expo-linear-gradient'
+import {Feather} from '@expo/vector-icons'
+import {useTheme} from 'react-native-paper'
 import Footer from './Footer'
 import * as Burnt from 'burnt'
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
 import 'firebase/compat/database'
-import { firebaseConfig } from './firebaseConfig'
-import { loginHandle } from './Auth'
-import { useFonts } from 'expo-font'
+import {firebaseConfig} from './firebaseConfig'
+import {loginHandle} from './Auth'
+import {useFonts} from 'expo-font'
 
 const LoginScreen = () => {
   const [fontsLoaded] = useFonts({
     Feather: require('@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Feather.ttf'),
   })
   const navigation = useNavigation()
-  const { colors } = useTheme()
+  const {colors} = useTheme()
   const [data, setData] = useState({
     username: '',
     password: '',
@@ -44,7 +44,7 @@ const LoginScreen = () => {
     firebase.initializeApp(firebaseConfig)
   }, [])
 
-  const textInputChange = (val) => {
+  const textInputChange = val => {
     if (val.trim().length >= 4) {
       setData({
         ...data,
@@ -62,7 +62,7 @@ const LoginScreen = () => {
     }
   }
 
-  const handlePasswordChange = (val) => {
+  const handlePasswordChange = val => {
     if (val.trim().length >= 8) {
       setData({
         ...data,
@@ -85,7 +85,7 @@ const LoginScreen = () => {
     })
   }
 
-  const handleValidUser = (val) => {
+  const handleValidUser = val => {
     if (val.trim().length >= 4) {
       setData({
         ...data,
@@ -143,7 +143,7 @@ const LoginScreen = () => {
     }
   }
 
-  const navigateByUserType = (userType) => {
+  const navigateByUserType = userType => {
     if (userType === 'Doctor') {
       navigation.navigate('DocDashboard')
     } else if (userType === 'Patient') {
@@ -152,7 +152,7 @@ const LoginScreen = () => {
     // Add more conditions for other user types if needed.
   }
 
-  const handleError = (error) => {
+  const handleError = error => {
     console.error('Error:', error)
 
     if (error === 'auth/email-already-in-use') {
@@ -189,11 +189,8 @@ const LoginScreen = () => {
           {
             backgroundColor: colors.background,
           },
-        ]}
-      >
-        <Text style={[styles.text_footer, { color: colors.text }]}>
-          Username
-        </Text>
+        ]}>
+        <Text style={[styles.text_footer, {color: colors.text}]}>Username</Text>
         <View style={styles.action}>
           <Feather name="user" color="black" size={20} />
           <TextInput
@@ -201,11 +198,11 @@ const LoginScreen = () => {
             placeholderTextColor="#666666"
             style={[
               styles.textInput,
-              { color: colors.text, fontFamily: 'Roboto', marginTop: -5 },
+              {color: colors.text, fontFamily: 'Roboto', marginTop: -5},
             ]}
             autoCapitalize="none"
-            onChangeText={(val) => textInputChange(val)}
-            onEndEditing={(e) => handleValidUser(e.nativeEvent.text)}
+            onChangeText={val => textInputChange(val)}
+            onEndEditing={e => handleValidUser(e.nativeEvent.text)}
           />
           {data.check_textInputChange ? (
             <Animatable.View animation="bounceIn">
@@ -221,9 +218,7 @@ const LoginScreen = () => {
           </Animatable.View>
         )}
 
-        <Text
-          style={[styles.text_footer, { color: colors.text, marginTop: 35 }]}
-        >
+        <Text style={[styles.text_footer, {color: colors.text, marginTop: 35}]}>
           Password
         </Text>
         <View style={styles.action}>
@@ -234,10 +229,10 @@ const LoginScreen = () => {
             secureTextEntry={data.secureTextEntry}
             style={[
               styles.textInput,
-              { color: colors.text, fontFamily: 'Roboto', marginTop: -5 },
+              {color: colors.text, fontFamily: 'Roboto', marginTop: -5},
             ]}
             autoCapitalize="none"
-            onChangeText={(val) => handlePasswordChange(val)}
+            onChangeText={val => handlePasswordChange(val)}
           />
           <TouchableOpacity onPress={updateSecureTextEntry}>
             {data.secureTextEntry ? (
@@ -256,7 +251,7 @@ const LoginScreen = () => {
         )}
 
         <TouchableOpacity>
-          <Text style={{ color: '#1069AD', marginTop: 15 }}>
+          <Text style={{color: '#1069AD', marginTop: 15}}>
             Forgot password?
           </Text>
         </TouchableOpacity>
@@ -265,19 +260,15 @@ const LoginScreen = () => {
             style={styles.signIn}
             onPress={() => {
               handleLogin(data.username, data.password)
-            }}
-          >
+            }}>
             <LinearGradient
               colors={['#1069AD', '#0C5A97']}
-              style={styles.signIn}
-            >
+              style={styles.signIn}>
               {/* Show ActivityIndicator if isLoading is true, otherwise show "Sign In" */}
               {isLoading ? (
                 <ActivityIndicator color="#fff" size="small" />
               ) : (
-                <Text style={[styles.textSign, { color: '#fff' }]}>
-                  Sign In
-                </Text>
+                <Text style={[styles.textSign, {color: '#fff'}]}>Sign In</Text>
               )}
             </LinearGradient>
           </TouchableOpacity>
@@ -291,11 +282,8 @@ const LoginScreen = () => {
                 borderWidth: 1,
                 marginTop: 15,
               },
-            ]}
-          >
-            <Text style={[styles.textSign, { color: '#1069AD' }]}>
-              Register
-            </Text>
+            ]}>
+            <Text style={[styles.textSign, {color: '#1069AD'}]}>Register</Text>
           </TouchableOpacity>
         </View>
       </Animatable.View>

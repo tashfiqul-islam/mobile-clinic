@@ -1,256 +1,279 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef} from 'react'
 import {
-    View,
-    Text,
-    TouchableOpacity,
-    StyleSheet,
-    TouchableWithoutFeedback,
-    Keyboard,
-    StatusBar,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import * as Animatable from 'react-native-animatable';
-import { Feather } from '@expo/vector-icons';
-import { useTheme, TextInput as PaperTextInput } from 'react-native-paper';
-import { LinearGradient } from 'expo-linear-gradient';
-import * as Burnt from 'burnt';
-import * as ImagePicker from 'expo-image-picker';
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/auth';
-import 'firebase/compat/database';
-import 'firebase/compat/storage';
-import { firebaseConfig } from './firebaseConfig';
-import { useUser } from './UserContext';
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  Keyboard,
+  StatusBar,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native'
+import {useNavigation} from '@react-navigation/native'
+import * as Animatable from 'react-native-animatable'
+import {Feather} from '@expo/vector-icons'
+import {useTheme, TextInput as PaperTextInput} from 'react-native-paper'
+import {LinearGradient} from 'expo-linear-gradient'
+import * as Burnt from 'burnt'
+import * as ImagePicker from 'expo-image-picker'
+import firebase from 'firebase/compat/app'
+import 'firebase/compat/auth'
+import 'firebase/compat/database'
+import 'firebase/compat/storage'
+import {firebaseConfig} from './firebaseConfig'
+import {useUser} from './UserContext'
+import { map } from '@firebase/util'
 
 if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
+  firebase.initializeApp(firebaseConfig)
 }
 
 const EditableField = ({
-    icon,
-    value,
-    onEdit,
-    editable,
-    onUpdate,
-    showHelperText,
-    isPassword,
+  icon,
+  value,
+  onEdit,
+  editable,
+  onUpdate,
+  showHelperText,
+  isPassword,
+  showEditIcon = true, // Default value is true
 }) => {
-    const [isEditing, setIsEditing] = useState(false);
-    const [fieldValue, setFieldValue] = useState(value);
-    const inputRef = useRef(null);
-    const shouldShowHelperText = showHelperText && !fieldValue && !isEditing;
+  const [isEditing, setIsEditing] = useState(false)
+  const [fieldValue, setFieldValue] = useState(value)
+  const inputRef = useRef(null)
+  const shouldShowHelperText = showHelperText && !fieldValue
 
-    const handleEdit = () => {
-        if (isEditing) {
-            handleUpdate();
-        } else {
-            setIsEditing(true);
-        }
-    };
+  const handleEdit = () => {
+    if (isEditing) {
+      handleUpdate()
+    } else {
+      setIsEditing(true)
+    }
+  }
 
-    const handleChange = (text) => {
-        setFieldValue(text);
-    };
+  const handleChange = text => {
+    setFieldValue(text)
+  }
 
-    const handleUpdate = async () => {
-        setIsEditing(false);
-        await onUpdate(fieldValue);
-    };
+  const handleUpdate = async () => {
+    setIsEditing(false)
+    await onUpdate(fieldValue)
+  }
 
+  if (icon === "log-out") {
     return (
-        <TouchableWithoutFeedback
-            onPress={() => inputRef.current && inputRef.current.blur()}
-        >
-            <View style={styles.inputContainer}>
-                <View style={styles.iconContainer}>
-                    <Feather name={icon} size={20} color="grey" />
-                </View>
-                <View style={styles.textInputContainer}>
-                    {isEditing ? (
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <PaperTextInput
-                                ref={inputRef}
-                                style={[styles.textInput, { height: 40 }]}
-                                value={fieldValue}
-                                onChangeText={handleChange}
-                                onBlur={handleUpdate}
-                                textAlignVertical="top"
-                                secureTextEntry={isPassword}
-                            />
-                        </View>
-                    ) : (
-                        <Text style={styles.fieldText}>
-                            {isPassword ? '********' : fieldValue}
-                        </Text>
-                    )}
-                </View>
-                <TouchableOpacity style={styles.editIcon} onPress={handleEdit}>
-                    <Feather name={isEditing ? 'check' : 'edit'} size={20} color="grey" />
-                </TouchableOpacity>
-                {shouldShowHelperText && (
-                    <Text style={styles.helperText}>Add a location</Text>
-                )}
-            </View>
-        </TouchableWithoutFeedback>
+      <TouchableOpacity onPress={handleUpdate} style={styles.inputContainer}>
+        <View style={styles.iconContainer}>
+          <Feather name={icon} size={20} color="grey" />
+        </View>
+        <View style={styles.textInputContainer}>
+          <Text style={styles.fieldText}>
+            {isPassword ? '********' : fieldValue}
+          </Text>
+        </View>
+      </TouchableOpacity>
     );
-};
+  } else {
+    return (
+      <TouchableWithoutFeedback
+        onPress={() => inputRef.current && inputRef.current.blur()}>
+        <View style={styles.inputContainer}>
+          <View style={styles.iconContainer}>
+            <Feather name={icon} size={20} color="grey" />
+          </View>
+          <View style={styles.textInputContainer}>
+            {isEditing ? (
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <PaperTextInput
+                  ref={inputRef}
+                  style={[styles.textInput, {height: 40}]}
+                  value={fieldValue}
+                  onChangeText={handleChange}
+                  onBlur={handleUpdate}
+                  textAlignVertical="top"
+                  secureTextEntry={isPassword}
+                />
+              </View>
+            ) : (
+              <Text style={styles.fieldText}>
+                {isPassword ? '********' : fieldValue}
+              </Text>
+            )}
+          </View>
+          {showEditIcon && (
+            <TouchableOpacity style={styles.editIcon} onPress={handleEdit}>
+              <Feather
+                name={isEditing ? 'check' : 'edit'}
+                size={20}
+                color="grey"
+              />
+            </TouchableOpacity>
+          )}
+          {shouldShowHelperText && (
+            <Text style={styles.helperText}>Add a location</Text>
+          )}
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  }  
+}
 
 const ProfileTab = () => {
-    const {
-        userFullName,
-        setUserFullName,
-        userEmail,
-        setUserEmail,
-        userBio,
-        setUserBio,
-        userLocation,
-        setUserLocation,
-        userImage,
-        setUserImage
-    } = useUser();
+  const {
+    userFullName,
+    setUserFullName,
+    userEmail,
+    setUserEmail,
+    userBio,
+    setUserBio,
+    userLocation,
+    setUserLocation,
+    userImage,
+    setUserImage,
+  } = useUser()
 
-    const navigation = useNavigation();
-    const { colors } = useTheme();
+  const navigation = useNavigation()
+  const {colors} = useTheme()
 
-    const [isEditingBio, setIsEditingBio] = useState(false);
-    const [editingBio, setEditingBio] = useState(userBio);
-    const [isEditingPassword, setIsEditingPassword] = useState(false);
-    const [isEditingLocation, setIsEditingLocation] = useState(false);
-    const [editingLocation, setEditingLocation] = useState(userLocation);
+  const [isEditingBio, setIsEditingBio] = useState(false)
+  const [editingBio, setEditingBio] = useState(userBio)
+  const [isEditingPassword, setIsEditingPassword] = useState(false)
+  const [isEditingLocation, setIsEditingLocation] = useState(false)
+  const [editingLocation, setEditingLocation] = useState(userLocation)
 
-    const pickImage = async () => {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== 'granted') {
-            alert('Sorry, we need camera roll permissions to make this work!');
-            return;
-        }
+  const handleEditBio = () => {
+    setEditingBio(userBio || '')
+    setIsEditingBio(true)
+  }
 
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-        });
+  const handleUpdateBio = async () => {
+    if (editingBio) {
+      await updateUserBio(editingBio)
+    }
+    setIsEditingBio(false)
+  }
 
-        if (!result.cancelled) {
-            uploadImage(result.uri);
-        }
-    };
+  const handleEditPassword = () => {
+    setIsEditingPassword(true)
+  }
 
-    const uploadImage = async (uri) => {
-      try {
-          const response = await fetch(uri);
-          const blob = await response.blob();
-          const user = firebase.auth().currentUser;
-          if (!user) return;
-  
-          const ref = firebase.storage().ref().child(`profile_images/${user.uid}`);
-          await ref.put(blob);
-          const url = await ref.getDownloadURL();
-          
-          setUserImage({ uri: url });
-          updateUserImageURLInFirebase(url);
-      } catch (error) {
-          console.error("Image upload error:", error.message);
-          // Maybe show a user-friendly message too.
-          Burnt.toast({
-              from: 'bottom',
-              title: 'Failed to upload image!',
-              shouldDismissByDrag: true,
-              preset: 'error',
-              haptic: 'error',
-              duration: 5,
-          });
+  const handleUpdatePassword = async () => {
+    if (editingPassword) {
+      await updatePassword(editingPassword)
+    }
+    setIsEditingPassword(false)
+  }
+
+  const handleEditLocation = () => {
+    setIsEditingLocation(true)
+  }
+
+  const handleUpdateLocation = async () => {
+    if (editingLocation) {
+      await updateLocation(editingLocation)
+    }
+    setIsEditingLocation(false)
+  }
+
+  const handleLogout = async () => {
+    try {
+      await firebase.auth().signOut()
+
+      setUserFullName('')
+      setUserEmail('')
+      setUserBio('')
+      setUserLocation('')
+
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'Login'}],
+      })
+    } catch (error) {
+      console.error('Error while logging out:', error.message)
+    }
+  }
+
+  const pickImage = async () => {
+    const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync()
+
+    if (status !== 'granted') {
+      alert('Sorry, we need camera roll permissions to make this work!')
+      return
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    })
+
+    if (!result.cancelled) {
+      const source = {uri: result.uri}
+      uploadImage(source.uri)
+    }
+  }
+
+  const uploadImage = async uri => {
+    try {
+      const response = await fetch(uri)
+      const blob = await response.blob()
+      const user = firebase.auth().currentUser
+      if (!user) return
+
+      const ref = firebase.storage().ref().child(`profile_images/${user.uid}`)
+      await ref.put(blob)
+      const url = await ref.getDownloadURL()
+
+      setUserImage({uri: url})
+      updateUserImageURLInFirebase(url)
+    } catch (error) {
+      console.error('Image upload error:', error.message)
+      // Maybe show a user-friendly message too.
+      Burnt.toast({
+        from: 'bottom',
+        title: 'Failed to upload image!',
+        shouldDismissByDrag: true,
+        preset: 'error',
+        haptic: 'error',
+        duration: 5,
+      })
+    }
+  }
+
+  const updateUserImageURLInFirebase = async url => {
+    const user = firebase.auth().currentUser
+    if (user) {
+      const userUid = user.uid
+      const userRef = firebase.database().ref(`users/${userUid}`)
+      await userRef.update({profileImage: url})
+
+      if (url && url.trim() !== '') {
+        setUserImage(url)
+      } else {
+        setUserImage(require('./assets/images/head-2.jpg'))
       }
-  };
-  
 
-    const updateUserImageURLInFirebase = async (url) => {
-        const user = firebase.auth().currentUser;
-        if (user) {
-            const userUid = user.uid;
-            const userRef = firebase.database().ref(`users/${userUid}`);
-            await userRef.update({ profileImage: url });
+      Burnt.toast({
+        from: 'bottom',
+        title: 'Picture updated successfully!',
+        shouldDismissByDrag: true,
+        preset: 'done',
+        haptic: 'success',
+        duration: 5,
+      })
+    }
+  }
 
-            if (url && url.trim() !== "") {
-                setUserImage(url);
-            } else {
-                setUserImage(require('./assets/images/defaultProfile.png'));
-            }
-
-            Burnt.toast({
-                from: 'bottom',
-                title: 'Picture updated successfully!',
-                shouldDismissByDrag: true,
-                preset: 'done',
-                haptic: 'success',
-                duration: 5,
-            });
-        }
-    };
-
-    const handleEditBio = () => {
-        setEditingBio(userBio || '');
-        setIsEditingBio(true);
-    };
-
-    const handleUpdateBio = async () => {
-        if (editingBio) {
-            await updateUserBio(editingBio);
-        }
-        setIsEditingBio(false);
-    };
-
-    const handleEditPassword = () => {
-        setIsEditingPassword(true);
-    };
-
-    const handleUpdatePassword = async () => {
-        if (editingPassword) {
-            await updatePassword(editingPassword);
-        }
-        setIsEditingPassword(false);
-    };
-
-    const handleEditLocation = () => {
-        setIsEditingLocation(true);
-    };
-
-    const handleUpdateLocation = async () => {
-        if (editingLocation) {
-            await updateLocation(editingLocation);
-        }
-        setIsEditingLocation(false);
-    };
-
-    const handleLogout = async () => {
-        try {
-            await firebase.auth().signOut();
-
-            setUserFullName('');
-            setUserEmail('');
-            setUserBio('');
-            setUserLocation('');
-
-            navigation.reset({
-                index: 0,
-                routes: [{ name: 'Login' }],
-            });
-        } catch (error) {
-            console.error('Error while logging out:', error.message);
-        }
-    };
-
-  const updateFullName = async (newFullName) => {
+  const updateFullName = async newFullName => {
     try {
       const user = firebase.auth().currentUser
       if (user) {
         const userUid = user.uid
         const userRef = firebase.database().ref(`users/${userUid}`)
-        await userRef.update({ fullName: newFullName })
+        await userRef.update({fullName: newFullName})
 
         setUserFullName(newFullName)
 
@@ -263,9 +286,9 @@ const ProfileTab = () => {
           duration: 5,
         })
 
-        return { success: true, message: 'Full name updated successfully' }
+        return {success: true, message: 'Full name updated successfully'}
       } else {
-        return { success: false, message: 'User is not signed in' }
+        return {success: false, message: 'User is not signed in'}
       }
     } catch (error) {
       return {
@@ -275,14 +298,14 @@ const ProfileTab = () => {
     }
   }
 
-  const updateEmail = async (newEmail) => {
+  const updateEmail = async newEmail => {
     try {
       const user = firebase.auth().currentUser
       if (user) {
         await user.updateEmail(newEmail)
         const userUid = user.uid
         const userRef = firebase.database().ref(`users/${userUid}`)
-        await userRef.update({ email: newEmail })
+        await userRef.update({email: newEmail})
 
         setUserEmail(newEmail)
 
@@ -295,9 +318,9 @@ const ProfileTab = () => {
           duration: 5,
         })
 
-        return { success: true, message: 'Email updated successfully' }
+        return {success: true, message: 'Email updated successfully'}
       } else {
-        return { success: false, message: 'User is not signed in' }
+        return {success: false, message: 'User is not signed in'}
       }
     } catch (error) {
       return {
@@ -307,13 +330,13 @@ const ProfileTab = () => {
     }
   }
 
-  const updateUserBio = async (newBio) => {
+  const updateUserBio = async newBio => {
     try {
       const user = firebase.auth().currentUser
       if (user) {
         const userUid = user.uid
         const userRef = firebase.database().ref(`users/${userUid}`)
-        await userRef.update({ userBio: newBio })
+        await userRef.update({userBio: newBio})
 
         setUserBio(newBio)
 
@@ -326,9 +349,9 @@ const ProfileTab = () => {
           duration: 5,
         })
 
-        return { success: true, message: 'Bio updated successfully' }
+        return {success: true, message: 'Bio updated successfully'}
       } else {
-        return { success: false, message: 'User is not signed in' }
+        return {success: false, message: 'User is not signed in'}
       }
     } catch (error) {
       return {
@@ -338,7 +361,7 @@ const ProfileTab = () => {
     }
   }
 
-  const updatePassword = async (newPassword) => {
+  const updatePassword = async newPassword => {
     try {
       const user = firebase.auth().currentUser
       if (user) {
@@ -353,9 +376,9 @@ const ProfileTab = () => {
           duration: 5,
         })
 
-        return { success: true, message: 'Password updated successfully' }
+        return {success: true, message: 'Password updated successfully'}
       } else {
-        return { success: false, message: 'User is not signed in' }
+        return {success: false, message: 'User is not signed in'}
       }
     } catch (error) {
       console.log('Firebase Error:', error.message) // Log the specific Firebase error
@@ -366,13 +389,13 @@ const ProfileTab = () => {
     }
   }
 
-  const updateLocation = async (newLocation) => {
+  const updateLocation = async newLocation => {
     try {
       const user = firebase.auth().currentUser
       if (user) {
         const userUid = user.uid
         const userRef = firebase.database().ref(`users/${userUid}`)
-        await userRef.update({ location: newLocation })
+        await userRef.update({location: newLocation})
 
         // Set the newLocation in the user context
         setUserLocation(newLocation)
@@ -386,9 +409,9 @@ const ProfileTab = () => {
           duration: 5,
         })
 
-        return { success: true, message: 'Location updated successfully' }
+        return {success: true, message: 'Location updated successfully'}
       } else {
-        return { success: false, message: 'User is not signed in' }
+        return {success: false, message: 'User is not signed in'}
       }
     } catch (error) {
       return {
@@ -398,27 +421,33 @@ const ProfileTab = () => {
     }
   }
 
-  const defaultImage = require('./assets/images/defaultProfile.png');
+  const defaultImage = require('./assets/images/head-2.jpg')
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      enabled
-    >
+      enabled>
       <StatusBar backgroundColor="#1069AD" barStyle="light-content" />
       <View style={styles.header}>
-      <View style={styles.profileImageContainer}>
-    <Image
-    source={userImage && typeof userImage === 'string' && userImage.trim() !== "" ? { uri: userImage } : defaultImage}
-    style={styles.profileImage}
-    />
+        <View style={styles.profileImageContainer}>
+          <Image
+            source={
+              userImage &&
+              typeof userImage === 'string' &&
+              userImage.trim() !== ''
+                ? {uri: userImage}
+                : defaultImage
+            }
+            style={styles.profileImage}
+          />
 
-    <TouchableOpacity style={styles.editIconContainer} onPress={pickImage}>
-        <Feather name="edit" size={14} color="grey" />
-    </TouchableOpacity>
-</View>
-
+          <TouchableOpacity
+            style={styles.editIconContainer}
+            onPress={pickImage}>
+            <Feather name="edit" size={14} color="grey" />
+          </TouchableOpacity>
+        </View>
       </View>
       <Animatable.View
         animation="fadeInUpBig"
@@ -427,8 +456,8 @@ const ProfileTab = () => {
           {
             backgroundColor: '#E5E5E5',
           },
-        ]}
-      >
+        ]}>
+
         <Text style={styles.primaryText}>{userFullName}</Text>
         <Text style={styles.secondaryText}>
           {userLocation || 'Update location'}
@@ -441,8 +470,7 @@ const ProfileTab = () => {
             alignItems: 'center',
             justifyContent: 'center',
             marginTop: 10,
-          }}
-        >
+          }}>
           {isEditingBio ? (
             <>
               <PaperTextInput
@@ -468,7 +496,7 @@ const ProfileTab = () => {
         <EditableField
           icon="user"
           value={userFullName}
-          onUpdate={async (newFullName) => {
+          onUpdate={async newFullName => {
             const response = await updateFullName(newFullName)
             if (!response.success) {
               console.log('Failed to update full name in the UI')
@@ -478,7 +506,7 @@ const ProfileTab = () => {
         <EditableField
           icon="mail"
           value={userEmail}
-          onUpdate={async (newEmail) => {
+          onUpdate={async newEmail => {
             const response = await updateEmail(newEmail)
             if (!response.success) {
               console.log('Failed to update email in the UI')
@@ -488,7 +516,7 @@ const ProfileTab = () => {
         <EditableField
           icon="lock"
           value="********" // placeholder value
-          onUpdate={async (newPassword) => {
+          onUpdate={async newPassword => {
             const response = await updatePassword(newPassword)
             if (!response.success) {
               console.log('Failed to update password in the UI')
@@ -500,7 +528,7 @@ const ProfileTab = () => {
         <EditableField
           icon="map-pin"
           value={userLocation}
-          onUpdate={async (newLocation) => {
+          onUpdate={async newLocation => {
             const response = await updateLocation(newLocation)
             if (!response.success) {
               console.log('Failed to update location in the UI')
@@ -508,17 +536,14 @@ const ProfileTab = () => {
           }}
           showHelperText={!userLocation} // Show the helper text only if there's no location set
         />
+        <EditableField
+          icon="log-out"
+          value="Logout"
+          onUpdate={handleLogout}
+          editable={false}
+        />
 
-        <View style={styles.button1}>
-          <TouchableOpacity onPress={() => handleLogout()}>
-            <LinearGradient
-              colors={['#1987D8', '#0F6FB6']}
-              style={styles.signIn}
-            >
-              <Text style={styles.textSign}>Logout</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
+
       </Animatable.View>
     </KeyboardAvoidingView>
   )
@@ -546,20 +571,24 @@ const styles = StyleSheet.create({
     marginTop: -25,
   },
   profileImageContainer: {
-    width: 160,
-    height: 160,
-    borderRadius: 100,
-    overflow: 'visible',
+    width: 170,
+    height: 170,
+    borderRadius: 80,
     position: 'absolute',
-    top: Platform.OS === 'ios' ? -15 : -10, // Adjust the top position for iOS and Android
-    alignSelf: 'center',
+    top: Platform.OS === 'ios' ? -15 : -10,
+    left: 30,
     zIndex: 1,
+    overflow: 'visible', // This ensures the edit button is visible outside the profile image
   },
+
   profileImage: {
     flex: 1,
-    width: null,
-    height: null,
+    width: '100%',
+    height: '100%',
     resizeMode: 'cover',
+    borderRadius: 100,
+    borderWidth: 3,
+    borderColor: '#FFFFFF', // Color of the border, change as needed
   },
   editIconContainer: {
     position: 'absolute',
@@ -568,19 +597,22 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 25,
     padding: 10,
-},  
+  },
   primaryText: {
     color: 'black',
-    textAlign: 'center',
+    textAlign: 'right',
     fontSize: 24,
-    marginTop: 50,
+    bottom: 40,
+    paddingRight: 30,
     fontWeight: 'bold',
+    marginTop: 10,
   },
   secondaryText: {
     color: 'grey',
-    textAlign: 'center',
+    textAlign: 'right',
     fontSize: 16,
-    marginTop: 10,
+    bottom: 40,
+    paddingRight: 38,
   },
   secondaryText2: {
     color: 'black',
@@ -644,7 +676,7 @@ const styles = StyleSheet.create({
   },
   button1: {
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 12,
   },
   signIn: {
     width: 150,
@@ -656,4 +688,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default ProfileTab
+export default ProfileTab;

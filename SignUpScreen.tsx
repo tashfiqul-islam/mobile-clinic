@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, {useState} from 'react'
 import {
   View,
   Text,
@@ -11,23 +11,23 @@ import {
   StatusBar,
 } from 'react-native'
 import * as Animatable from 'react-native-animatable'
-import { LinearGradient } from 'expo-linear-gradient'
-import { Feather, FontAwesome } from '@expo/vector-icons'
-import { Dropdown } from 'react-native-element-dropdown'
+import {LinearGradient} from 'expo-linear-gradient'
+import {Feather, FontAwesome} from '@expo/vector-icons'
+import {Dropdown} from 'react-native-element-dropdown'
 import * as Burnt from 'burnt'
 import Footer from './Footer'
 import * as Crypto from 'expo-crypto'
 import 'firebase/compat/auth'
 import 'firebase/compat/database'
-import { signupHandle } from './Auth'
+import {signupHandle} from './Auth'
 import auth from '@react-native-firebase/auth'
 
 const UserTypeData = [
-  { label: 'Doctor', value: 'Doctor' },
-  { label: 'Patient', value: 'Patient' },
+  {label: 'Doctor', value: 'Doctor'},
+  {label: 'Patient', value: 'Patient'},
 ]
 
-const SignUpScreen = ({ navigation }) => {
+const SignUpScreen = ({navigation}) => {
   const [isLoading, setIsLoading] = useState(false) // Move this line inside the component
 
   const [data, setData] = useState({
@@ -44,7 +44,7 @@ const SignUpScreen = ({ navigation }) => {
 
   const [agreeCheckbox, setAgreeCheckbox] = useState(false)
 
-  const fullNameInputChange = (val) => {
+  const fullNameInputChange = val => {
     if (val.length !== 0) {
       setData({
         ...data,
@@ -60,12 +60,12 @@ const SignUpScreen = ({ navigation }) => {
     }
   }
 
-  const validateEmail = (email) => {
+  const validateEmail = email => {
     const pattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
     return pattern.test(email)
   }
 
-  const emailInputChange = (val) => {
+  const emailInputChange = val => {
     if (val.length !== 0) {
       if (validateEmail(val)) {
         setData({
@@ -92,12 +92,12 @@ const SignUpScreen = ({ navigation }) => {
     }
   }
 
-  const validatePassword = (password) => {
+  const validatePassword = password => {
     const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/
     return pattern.test(password)
   }
 
-  const handlePasswordChange = (val) => {
+  const handlePasswordChange = val => {
     if (val.length !== 0) {
       if (validatePassword(val)) {
         setData({
@@ -122,7 +122,7 @@ const SignUpScreen = ({ navigation }) => {
     }
   }
 
-  const handleUserTypeChange = (item) => {
+  const handleUserTypeChange = item => {
     setData({
       ...data,
       userType: item.value,
@@ -137,7 +137,7 @@ const SignUpScreen = ({ navigation }) => {
   }
 
   // Helper function to navigate based on the user type
-  const navigateByUserType = (userType) => {
+  const navigateByUserType = userType => {
     if (userType === 'Doctor') {
       navigation.navigate('DocDashboard')
     } else if (userType === 'Patient') {
@@ -146,7 +146,7 @@ const SignUpScreen = ({ navigation }) => {
   }
 
   // Helper function to handle specific errors
-  const handleError = (error) => {
+  const handleError = error => {
     if (error.code === 'auth/email-already-in-use') {
       Burnt.toast({
         title: 'Email is already in use. Please use another email address!',
@@ -233,9 +233,9 @@ const SignUpScreen = ({ navigation }) => {
             <FontAwesome name="user-o" color="#05375a" size={20} />
             <TextInput
               placeholder="Your Full Name"
-              style={[styles.textInput, { fontFamily: 'Roboto' }]}
+              style={[styles.textInput, {fontFamily: 'Roboto'}]}
               autoCapitalize="none"
-              onChangeText={(val) => fullNameInputChange(val)}
+              onChangeText={val => fullNameInputChange(val)}
             />
             {data.check_fullNameInputChange ? (
               <Animatable.View animation="bounceIn">
@@ -245,14 +245,14 @@ const SignUpScreen = ({ navigation }) => {
           </View>
 
           {/* Email */}
-          <Text style={[styles.text_footer, { marginTop: 35 }]}>Email</Text>
+          <Text style={[styles.text_footer, {marginTop: 35}]}>Email</Text>
           <View style={styles.action}>
             <Feather name="mail" color="#05375a" size={20} />
             <TextInput
               placeholder="Your Email"
-              style={[styles.textInput, { fontFamily: 'Roboto' }]}
+              style={[styles.textInput, {fontFamily: 'Roboto'}]}
               autoCapitalize="none"
-              onChangeText={(val) => emailInputChange(val)}
+              onChangeText={val => emailInputChange(val)}
             />
             {data.check_emailInputChange ? (
               <Animatable.View animation="bounceIn">
@@ -261,21 +261,21 @@ const SignUpScreen = ({ navigation }) => {
             ) : null}
           </View>
           {data.emailError ? (
-            <Text style={[styles.errorText, { fontFamily: 'Roboto' }]}>
+            <Text style={[styles.errorText, {fontFamily: 'Roboto'}]}>
               {data.emailError}
             </Text>
           ) : null}
 
           {/* Password */}
-          <Text style={[styles.text_footer, { marginTop: 35 }]}>Password</Text>
+          <Text style={[styles.text_footer, {marginTop: 35}]}>Password</Text>
           <View style={styles.action}>
             <FontAwesome name="lock" color="#05375a" size={20} />
             <TextInput
               placeholder="Your Password"
               secureTextEntry={data.secureTextEntry ? true : false}
-              style={[styles.textInput, { fontFamily: 'Roboto' }]}
+              style={[styles.textInput, {fontFamily: 'Roboto'}]}
               autoCapitalize="none"
-              onChangeText={(val) => handlePasswordChange(val)}
+              onChangeText={val => handlePasswordChange(val)}
             />
             <TouchableOpacity onPress={updateSecureTextEntry}>
               {data.secureTextEntry ? (
@@ -286,28 +286,28 @@ const SignUpScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
           {data.passwordError ? (
-            <Text style={[styles.errorText, { fontFamily: 'Roboto' }]}>
+            <Text style={[styles.errorText, {fontFamily: 'Roboto'}]}>
               {data.passwordError}
             </Text>
           ) : null}
 
           {/* User Type */}
-          <Text style={[styles.text_footer, { marginTop: 35 }]}>User Type</Text>
+          <Text style={[styles.text_footer, {marginTop: 35}]}>User Type</Text>
           <View style={styles.action}>
             <Feather name="users" color="#05375a" size={20} />
             <Dropdown
-              style={[styles.dropdown, { fontFamily: 'Roboto' }]}
+              style={[styles.dropdown, {fontFamily: 'Roboto'}]}
               placeholderStyle={[
                 styles.placeholderStyle,
-                { fontFamily: 'Roboto' },
+                {fontFamily: 'Roboto'},
               ]}
               selectedTextStyle={[
                 styles.selectedTextStyle,
-                { fontFamily: 'Roboto' },
+                {fontFamily: 'Roboto'},
               ]}
               inputSearchStyle={[
                 styles.inputSearchStyle,
-                { fontFamily: 'Roboto' },
+                {fontFamily: 'Roboto'},
               ]}
               iconStyle={styles.iconStyle}
               data={UserTypeData}
@@ -323,8 +323,7 @@ const SignUpScreen = ({ navigation }) => {
           <View style={styles.checkBoxContainer}>
             <TouchableOpacity
               style={styles.checkBox}
-              onPress={() => setAgreeCheckbox(!agreeCheckbox)}
-            >
+              onPress={() => setAgreeCheckbox(!agreeCheckbox)}>
               {agreeCheckbox ? (
                 <Feather name="check-square" color="#1069AD" size={20} />
               ) : (
@@ -332,30 +331,26 @@ const SignUpScreen = ({ navigation }) => {
               )}
               <View style={styles.textPrivate}>
                 <Text
-                  style={[styles.color_textPrivate, { fontFamily: 'Roboto' }]}
-                >
+                  style={[styles.color_textPrivate, {fontFamily: 'Roboto'}]}>
                   By signing up you agree to our
                 </Text>
                 <Text
                   style={[
                     styles.color_textPrivate,
-                    { fontWeight: 'bold', fontFamily: 'Roboto' },
-                  ]}
-                >
+                    {fontWeight: 'bold', fontFamily: 'Roboto'},
+                  ]}>
                   {' '}
                   Terms of service
                 </Text>
                 <Text
-                  style={[styles.color_textPrivate, { fontFamily: 'Roboto' }]}
-                >
+                  style={[styles.color_textPrivate, {fontFamily: 'Roboto'}]}>
                   {' '}
                 </Text>
                 <Text
                   style={[
                     styles.color_textPrivate,
-                    { fontWeight: 'bold', fontFamily: 'Roboto' },
-                  ]}
-                >
+                    {fontWeight: 'bold', fontFamily: 'Roboto'},
+                  ]}>
                   {' '}
                   Privacy policy
                 </Text>
@@ -367,17 +362,15 @@ const SignUpScreen = ({ navigation }) => {
           <TouchableOpacity style={styles.signIn} onPress={handleSignUp}>
             <LinearGradient
               colors={['#1069AD', '#0C5A97']}
-              style={[styles.signIn, { fontFamily: 'Roboto' }]}
-            >
+              style={[styles.signIn, {fontFamily: 'Roboto'}]}>
               {isLoading ? (
                 <ActivityIndicator size="small" color="#fff" />
               ) : (
                 <Text
                   style={[
                     styles.textSign,
-                    { color: '#fff', fontFamily: 'Roboto' },
-                  ]}
-                >
+                    {color: '#fff', fontFamily: 'Roboto'},
+                  ]}>
                   Sign Up
                 </Text>
               )}
@@ -392,14 +385,12 @@ const SignUpScreen = ({ navigation }) => {
                 borderWidth: 1,
                 marginTop: 15,
               },
-            ]}
-          >
+            ]}>
             <Text
               style={[
                 styles.textSign,
-                { color: '#1069AD', fontFamily: 'Roboto' },
-              ]}
-            >
+                {color: '#1069AD', fontFamily: 'Roboto'},
+              ]}>
               Sign In
             </Text>
           </TouchableOpacity>

@@ -1,7 +1,7 @@
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
 import 'firebase/compat/database'
-import { firebaseConfig } from './firebaseConfig'
+import {firebaseConfig} from './firebaseConfig'
 
 firebase.initializeApp(firebaseConfig)
 
@@ -20,12 +20,12 @@ export const loginHandle = async (email, password) => {
 
       const userType = userSnapshot.val().userType
 
-      return { success: true, userType }
+      return {success: true, userType}
     } else {
       throw new Error('Authentication failed')
     }
   } catch (error) {
-    return { success: false, error: error.message }
+    return {success: false, error: error.message}
   }
 }
 
@@ -51,7 +51,7 @@ export const signupHandle = async (fullName, email, password, userType) => {
         userBio: '',
       })
 
-    return { success: true, userType }
+    return {success: true, userType}
   } catch (error) {
     console.error('Registration error:', error)
 

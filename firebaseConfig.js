@@ -1,7 +1,7 @@
 import firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/database'
-import { useEffect } from 'react'
+import {useEffect} from 'react'
 
 // Initialize Firebase
 export const firebaseConfig = {

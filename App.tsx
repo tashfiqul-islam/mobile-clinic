@@ -1,19 +1,19 @@
 import 'react-native-gesture-handler'
-import React, { useEffect, useState, useRef } from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import * as Font from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen'
-import { NavigationContainer } from '@react-navigation/native'
-import { createStackNavigator } from '@react-navigation/stack'
+import {NavigationContainer} from '@react-navigation/native'
+import {createStackNavigator} from '@react-navigation/stack'
 import MainScreen from './MainScreen'
 import LoginScreen from './LoginScreen'
 import SignUpScreen from './SignUpScreen'
 import DoctorDashboard from './DoctorDashboard'
 import PatientDashboard from './PatientDashboard'
-import { firebaseConfig } from './firebaseConfig'
+import {firebaseConfig} from './firebaseConfig'
 import ProfileTab from './ProfileTab'
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
-import { UserProvider } from './UserContext'
+import {UserProvider} from './UserContext'
 
 const Stack = createStackNavigator()
 
@@ -21,7 +21,7 @@ const App: React.FC = () => {
   const [initialRouteName, setInitialRouteName] = useState('Home')
   const [dashboardTitle, setDashboardTitle] = useState('Dashboard')
   const [isAppReady, setAppReady] = useState(false)
-  const navigationRef = useRef(null);
+  const navigationRef = useRef(null)
 
   useEffect(() => {
     async function prepareApp() {
@@ -31,7 +31,7 @@ const App: React.FC = () => {
         if (!firebase.apps.length) {
           firebase.initializeApp(firebaseConfig)
         }
-        const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
+        const unsubscribe = firebase.auth().onAuthStateChanged(async user => {
           if (user) {
             const userType = await getUserTypeFromDatabase(user.uid)
             if (userType === 'Doctor') {
@@ -61,7 +61,7 @@ const App: React.FC = () => {
     }
   }, [isAppReady])
 
-  const getUserTypeFromDatabase = async (userId) => {
+  const getUserTypeFromDatabase = async userId => {
     try {
       const userRef = firebase.database().ref(`users/${userId}`)
       const snapshot = await userRef.once('value')
@@ -97,32 +97,32 @@ const App: React.FC = () => {
           <Stack.Screen
             name="Home"
             component={MainScreen}
-            options={{ title: 'Home' }}
+            options={{title: 'Home'}}
           />
           <Stack.Screen
             name="Login"
             component={LoginScreen}
-            options={{ title: 'Login' }}
+            options={{title: 'Login'}}
           />
           <Stack.Screen
             name="Registration"
             component={SignUpScreen}
-            options={{ title: 'Registration' }}
+            options={{title: 'Registration'}}
           />
           <Stack.Screen
             name="DocDashboard"
             component={DoctorDashboard}
-            options={{ title: dashboardTitle, headerShown: false }}
+            options={{title: dashboardTitle, headerShown: false}}
           />
           <Stack.Screen
             name="PatDashboard"
             component={PatientDashboard}
-            options={{ title: dashboardTitle, headerShown: false }}
+            options={{title: dashboardTitle, headerShown: false}}
           />
           <Stack.Screen
             name="Profile"
             component={ProfileTab}
-            options={{ title: 'Profile' }}
+            options={{title: 'Profile'}}
           />
         </Stack.Navigator>
       </NavigationContainer>
