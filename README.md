@@ -82,7 +82,7 @@ To be updated while in development
     1. IDE: Android Studio, WebStorm
     2. Database: MongoDB
     3. Product backlog: Jira, Trello
-    4. Version Control System: Github
+    4. Version Control System: Git
 
 ## Developers:
 
