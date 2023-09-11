@@ -24,7 +24,7 @@ import 'firebase/compat/database'
 import 'firebase/compat/storage'
 import {firebaseConfig} from './firebaseConfig'
 import {useUser} from './UserContext'
-import { map } from '@firebase/util'
+import {map} from '@firebase/util'
 
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig)
@@ -62,7 +62,7 @@ const EditableField = ({
     await onUpdate(fieldValue)
   }
 
-  if (icon === "log-out") {
+  if (icon === 'log-out') {
     return (
       <TouchableOpacity onPress={handleUpdate} style={styles.inputContainer}>
         <View style={styles.iconContainer}>
@@ -74,7 +74,7 @@ const EditableField = ({
           </Text>
         </View>
       </TouchableOpacity>
-    );
+    )
   } else {
     return (
       <TouchableWithoutFeedback
@@ -116,8 +116,8 @@ const EditableField = ({
           )}
         </View>
       </TouchableWithoutFeedback>
-    );
-  }  
+    )
+  }
 }
 
 const ProfileTab = () => {
@@ -457,8 +457,7 @@ const ProfileTab = () => {
             backgroundColor: '#E5E5E5',
           },
         ]}>
-
-        <Text style={styles.primaryText}>{userFullName}</Text>
+        <Text style={styles.primaryText}>Dr. {userFullName}</Text>
         <Text style={styles.secondaryText}>
           {userLocation || 'Update location'}
         </Text>
@@ -542,8 +541,6 @@ const ProfileTab = () => {
           onUpdate={handleLogout}
           editable={false}
         />
-
-
       </Animatable.View>
     </KeyboardAvoidingView>
   )
@@ -603,7 +600,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     fontSize: 24,
     bottom: 40,
-    paddingRight: 30,
+    paddingRight: 0,
     fontWeight: 'bold',
     marginTop: 10,
   },
@@ -611,8 +608,8 @@ const styles = StyleSheet.create({
     color: 'grey',
     textAlign: 'right',
     fontSize: 16,
-    bottom: 40,
-    paddingRight: 38,
+    bottom: 35,
+    paddingRight: 24,
   },
   secondaryText2: {
     color: 'black',
@@ -688,4 +685,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default ProfileTab;
+export default ProfileTab

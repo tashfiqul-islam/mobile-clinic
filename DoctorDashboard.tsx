@@ -35,15 +35,15 @@ const DoctorDashboard = ({route}) => {
   const [userImage, setUserImage] = useState(null) // <-- Add this state
 
   const getGreetingMessage = () => {
-    const currentHour = new Date().getHours();
+    const currentHour = new Date().getHours()
     if (currentHour >= 0 && currentHour < 12) {
-        return "Good Morning!";
+      return 'Good Morning!'
     } else if (currentHour >= 12 && currentHour < 16) {
-        return "Good Afternoon!";
+      return 'Good Afternoon!'
     } else {
-        return "Good Evening!";
+      return 'Good Evening!'
     }
-};
+  }
 
   useEffect(() => {
     const unsubscribe = firebase.auth().onAuthStateChanged(user => {
@@ -82,12 +82,11 @@ const DoctorDashboard = ({route}) => {
     // Implement the logic for when the notification icon is pressed
   }
 
-  const [greeting, setGreeting] = useState(getGreetingMessage());
+  const [greeting, setGreeting] = useState(getGreetingMessage())
 
   useEffect(() => {
-    setGreeting(getGreetingMessage());
-}, []);
-
+    setGreeting(getGreetingMessage())
+  }, [])
 
   return (
     <View style={styles.container}>
@@ -103,8 +102,8 @@ const DoctorDashboard = ({route}) => {
           />
         </View>
         <View style={styles.textContainer}>
-        <Text style={styles.headerText}>{greeting}</Text>
-          <Text style={styles.subHeaderText}>{userFullName}</Text>
+          <Text style={styles.headerText}>{greeting}</Text>
+          <Text style={styles.subHeaderText}>Dr. {userFullName}</Text>
         </View>
         <View style={styles.notificationIconContainer}>
           <TouchableOpacity onPress={() => handleNotificationPress()}>
