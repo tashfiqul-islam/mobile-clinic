@@ -15,16 +15,14 @@ import {useNavigation} from '@react-navigation/native'
 import * as Animatable from 'react-native-animatable'
 import {Feather} from '@expo/vector-icons'
 import {useTheme, TextInput as PaperTextInput} from 'react-native-paper'
-import {LinearGradient} from 'expo-linear-gradient'
 import * as Burnt from 'burnt'
-import * as ImagePicker from 'expo-image-picker'
+import * as ImagePicker from 'expo-image-picker';
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
 import 'firebase/compat/database'
 import 'firebase/compat/storage'
 import {firebaseConfig} from './firebaseConfig'
 import {useUser} from './UserContext'
-import {map} from '@firebase/util'
 
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig)
@@ -195,26 +193,34 @@ const ProfileTab = () => {
     }
   }
 
+  useEffect(() => {
+    (async () => {
+      if (Platform.OS !== "web") {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== "granted") {
+          alert("Sorry, we need camera roll permissions to make this work!");
+        }
+      }
+    })();
+  }, []);
+
   const pickImage = async () => {
-    const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync()
-
-    if (status !== 'granted') {
-      alert('Sorry, we need camera roll permissions to make this work!')
-      return
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+  
+      if (!result.cancelled && result.assets) {
+        const source = { uri: result.assets[0].uri };
+        uploadImage(source.uri);
+      }
+    } catch (error) {
+      console.error("Error picking image:", error);
     }
-
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    })
-
-    if (!result.cancelled) {
-      const source = {uri: result.uri}
-      uploadImage(source.uri)
-    }
-  }
+  };
 
   const uploadImage = async uri => {
     try {
@@ -430,24 +436,23 @@ const ProfileTab = () => {
       enabled>
       <StatusBar backgroundColor="#1069AD" barStyle="light-content" />
       <View style={styles.header}>
-        <View style={styles.profileImageContainer}>
-          <Image
-            source={
-              userImage &&
-              typeof userImage === 'string' &&
-              userImage.trim() !== ''
-                ? {uri: userImage}
-                : defaultImage
-            }
-            style={styles.profileImage}
-          />
-
-          <TouchableOpacity
-            style={styles.editIconContainer}
-            onPress={pickImage}>
-            <Feather name="edit" size={14} color="grey" />
-          </TouchableOpacity>
-        </View>
+      <View style={styles.profileImageContainer}>
+      <Image
+        source={
+          userImage &&
+          typeof userImage === 'string' &&
+          userImage.trim() !== ''
+            ? {uri: userImage}
+            : defaultImage
+        }
+        style={styles.profileImage}
+      />
+      <TouchableOpacity
+        style={styles.editIconContainer}
+        onPress={pickImage}>
+        <Feather name="edit" size={14} color="grey" />
+      </TouchableOpacity>
+    </View>
       </View>
       <Animatable.View
         animation="fadeInUpBig"
@@ -459,7 +464,7 @@ const ProfileTab = () => {
         ]}>
         <Text style={styles.primaryText}>Dr. {userFullName}</Text>
         <Text style={styles.secondaryText}>
-          {userLocation || 'Update location'}
+        📍 {userLocation || 'Update location'}
         </Text>
 
         <View
@@ -609,7 +614,6 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     fontSize: 16,
     bottom: 35,
-    paddingRight: 24,
   },
   secondaryText2: {
     color: 'black',
