@@ -79,8 +79,8 @@ To be updated while in development
 
 ## Softwares used to complete the project:
 
-    1. IDE: Android Studio, WebStorm
-    2. Database: MongoDB
+    1. IDE: Android Studio, WebStorm, VS Code
+    2. Database: Firebase (BaaS)
     3. Product backlog: Jira, Trello
     4. Version Control System: Git
 
