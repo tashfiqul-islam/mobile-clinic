@@ -13,7 +13,6 @@ import * as Animatable from 'react-native-animatable'
 import {LinearGradient} from 'expo-linear-gradient'
 import {Feather} from '@expo/vector-icons'
 import {useTheme} from 'react-native-paper'
-import Footer from './Footer'
 import * as Burnt from 'burnt'
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
@@ -287,7 +286,6 @@ const LoginScreen = () => {
           </TouchableOpacity>
         </View>
       </Animatable.View>
-      <Footer />
     </View>
   )
 }

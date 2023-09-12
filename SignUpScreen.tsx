@@ -15,12 +15,9 @@ import {LinearGradient} from 'expo-linear-gradient'
 import {Feather, FontAwesome} from '@expo/vector-icons'
 import {Dropdown} from 'react-native-element-dropdown'
 import * as Burnt from 'burnt'
-import Footer from './Footer'
-import * as Crypto from 'expo-crypto'
 import 'firebase/compat/auth'
 import 'firebase/compat/database'
 import {signupHandle} from './Auth'
-import auth from '@react-native-firebase/auth'
 
 const UserTypeData = [
   {label: 'Doctor', value: 'Doctor'},
@@ -329,33 +326,31 @@ const SignUpScreen = ({navigation}) => {
               ) : (
                 <Feather name="square" color="#1069AD" size={20} />
               )}
-              <View style={styles.textPrivate}>
-                <Text
-                  style={[styles.color_textPrivate, {fontFamily: 'Roboto'}]}>
-                  By signing up you agree to our
-                </Text>
-                <Text
-                  style={[
-                    styles.color_textPrivate,
-                    {fontWeight: 'bold', fontFamily: 'Roboto'},
-                  ]}>
-                  {' '}
-                  Terms of service
-                </Text>
-                <Text
-                  style={[styles.color_textPrivate, {fontFamily: 'Roboto'}]}>
-                  {' '}
-                </Text>
-                <Text
-                  style={[
-                    styles.color_textPrivate,
-                    {fontWeight: 'bold', fontFamily: 'Roboto'},
-                  ]}>
-                  {' '}
-                  Privacy policy
-                </Text>
-              </View>
             </TouchableOpacity>
+            <View style={styles.textPrivate}>
+              <Text style={[styles.color_textPrivate, {fontFamily: 'Roboto'}]}>
+                By signing up you agree to our
+              </Text>
+              <Text
+                style={[
+                  styles.color_textPrivate,
+                  {fontWeight: 'bold', fontFamily: 'Roboto'},
+                ]}>
+                {' '}
+                Terms of service
+              </Text>
+              <Text style={[styles.color_textPrivate, {fontFamily: 'Roboto'}]}>
+                {' '}
+                and{'\n'}
+              </Text>
+              <Text
+                style={[
+                  styles.color_textPrivate,
+                  {fontWeight: 'bold', fontFamily: 'Roboto'},
+                ]}>
+                Privacy policy.
+              </Text>
+            </View>
           </View>
 
           {/* Buttons */}
@@ -396,7 +391,6 @@ const SignUpScreen = ({navigation}) => {
           </TouchableOpacity>
         </ScrollView>
       </Animatable.View>
-      <Footer />
     </View>
   )
 }
@@ -451,7 +445,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
-    marginTop: 10,
+    marginTop: 15,
     fontFamily: 'Roboto',
   },
   textSign: {
@@ -462,13 +456,16 @@ const styles = StyleSheet.create({
   textPrivate: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginLeft: 5,
-    marginTop: 15,
+    marginLeft: 25,
+    marginTop: -5, // Adjust this value
     fontFamily: 'Roboto',
   },
   color_textPrivate: {
     color: 'grey',
     fontFamily: 'Roboto',
+    marginBottom: -18,
+    marginTop: -5,
+    paddingBottom: 10,
   },
   dropdown: {
     flex: 1,
@@ -497,11 +494,15 @@ const styles = StyleSheet.create({
   checkBoxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center', // Add this line
     marginTop: 20,
   },
   checkBox: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 10,
+    marginRight: -20, // Adjust this to shift checkbox slightly upward
+    marginTop: -5,
   },
   errorText: {
     color: '#FF0000',

@@ -9,11 +9,33 @@ import {
   ScrollView,
   FlatList,
   TouchableOpacity,
+  TouchableNativeFeedback,
+  TouchableHighlight,
+  Platform,
 } from 'react-native'
 import {Ionicons, MaterialCommunityIcons} from '@expo/vector-icons'
 import {LinearGradient} from 'expo-linear-gradient'
+import {useNavigation} from '@react-navigation/native'
 
 const SCREEN_WIDTH = Dimensions.get('window').width
+
+const Touchable = ({children, style, ...props}) => {
+  if (Platform.OS === 'android' && Platform.Version >= 21) {
+    return (
+      <TouchableNativeFeedback
+        {...props}
+        useForeground
+        background={TouchableNativeFeedback.Ripple('#80adadad', false)}>
+        <View style={style}>{children}</View>
+      </TouchableNativeFeedback>
+    )
+  }
+  return (
+    <TouchableHighlight {...props} underlayColor="#adadad" style={style}>
+      {children}
+    </TouchableHighlight>
+  )
+}
 
 const SearchBar = () => (
   <View style={styles.searchBarContainer}>
@@ -22,75 +44,95 @@ const SearchBar = () => (
   </View>
 )
 
-const UpcomingScheduleHeader = () => (
+const UpcomingScheduleHeader = ({count}) => (
   <View style={styles.upcomingScheduleHeader}>
     <Text style={styles.upcomingText}>Upcoming Schedule</Text>
     <View style={styles.countCircle}>
-      <Text style={styles.countText}>3</Text>
+      <Text style={styles.countText}>{count}</Text>
     </View>
     <Text style={styles.seeAllText}>View All</Text>
   </View>
 )
 
-const UpcomingAppointmentCard = ({item}) => (
-  <LinearGradient
-    colors={['#1069AD', '#0C5A97']}
-    start={[0, 0]}
-    end={[1, 1]}
-    style={styles.appointmentCard}>
-    <View style={styles.appointmentContent}>
-      <View style={styles.appointmentTop}>
-        <Image source={item.image} style={styles.patientImage} />
-        <View style={styles.textContainer}>
-          <Text style={[styles.patientName, {color: '#FFFFFF'}]}>
-            {item.name}
-          </Text>
-          <Text style={[styles.appointmentType, {color: '#FFFFFF'}]}>
-            {item.type}
-          </Text>
+export const UpcomingAppointmentCard = ({item}) => {
+  const navigation = useNavigation()
+
+  const handleCardPress = () => {
+    // Navigate to the desired screen with the appointment's details.
+    // Replace 'AppointmentDetailScreen' with the name of the screen you want to navigate to.
+    // Optionally, pass the item data to the next screen for rendering details.
+    navigation.navigate('AppointmentOverview', {appointmentData: item})
+  }
+
+  return (
+    <Touchable onPress={handleCardPress}>
+      <LinearGradient
+        colors={['#1069AD', '#0C5A97']}
+        start={[0, 0]}
+        end={[1, 1]}
+        style={styles.appointmentCard}>
+        <View style={styles.appointmentContent}>
+          <View style={styles.appointmentTop}>
+            <Image source={item.image} style={styles.patientImage} />
+            <View style={styles.textContainer}>
+              <Text style={[styles.patientName, {color: '#FFFFFF'}]}>
+                {item.name}
+              </Text>
+              <Text style={[styles.appointmentType, {color: '#FFFFFF'}]}>
+                {item.type}
+              </Text>
+            </View>
+            <View style={styles.iconContainer}>
+              <Ionicons
+                name="ios-videocam"
+                size={24}
+                color="#FFFFFF"
+                style={[styles.icon, styles.icon3D]}
+              />
+              <Ionicons
+                name="ios-chatbubbles"
+                size={24}
+                color="#FFFFFF"
+                style={styles.icon3D}
+              />
+            </View>
+          </View>
+          <View
+            style={[
+              styles.appointmentDateContainer,
+              {backgroundColor: '#E4E4E4'},
+            ]}>
+            <View style={styles.leftAlign}>
+              <Ionicons name="ios-calendar" size={20} color="#000000" />
+              <Text style={[styles.appointmentDate, {color: '#000000'}]}>
+                {item.date}
+              </Text>
+            </View>
+            <Text
+              style={{
+                color: '#000000',
+                alignSelf: 'center',
+                marginHorizontal: 10,
+              }}>
+              |
+            </Text>
+            <View style={styles.rightAlign}>
+              <Ionicons
+                name="ios-time"
+                size={20}
+                color="#000000"
+                style={styles.icon}
+              />
+              <Text style={[styles.appointmentTime, {color: '#000000'}]}>
+                {item.time}
+              </Text>
+            </View>
+          </View>
         </View>
-        <View style={styles.iconContainer}>
-          <Ionicons
-            name="ios-videocam"
-            size={24}
-            color="#FFFFFF"
-            style={[styles.icon, styles.icon3D]}
-          />
-          <Ionicons
-            name="ios-chatbubbles"
-            size={24}
-            color="#FFFFFF"
-            style={styles.icon3D}
-          />
-        </View>
-      </View>
-      <View
-        style={[styles.appointmentDateContainer, {backgroundColor: '#E4E4E4'}]}>
-        <View style={styles.leftAlign}>
-          <Ionicons name="ios-calendar" size={20} color="#000000" />
-          <Text style={[styles.appointmentDate, {color: '#000000'}]}>
-            {item.date}
-          </Text>
-        </View>
-        <Text
-          style={{color: '#000000', alignSelf: 'center', marginHorizontal: 10}}>
-          |
-        </Text>
-        <View style={styles.rightAlign}>
-          <Ionicons
-            name="ios-time"
-            size={20}
-            color="#000000"
-            style={styles.icon}
-          />
-          <Text style={[styles.appointmentTime, {color: '#000000'}]}>
-            {item.time}
-          </Text>
-        </View>
-      </View>
-    </View>
-  </LinearGradient>
-)
+      </LinearGradient>
+    </Touchable>
+  )
+}
 
 const StatsCard = ({iconName, value, label}) => {
   return (
@@ -102,32 +144,129 @@ const StatsCard = ({iconName, value, label}) => {
   )
 }
 
-const CARDS_DATA = [
+const RecentAppointmentItem = ({item}) => {
+  const fullStars = Math.floor(item.rating)
+  const hasHalfStar = item.rating - fullStars > 0
+
+  return (
+    <View style={styles.recentAppointmentContainer}>
+      <Image source={item.image} style={styles.recentPatientImage} />
+      <View style={styles.recentInfoContainer}>
+        <Text style={styles.recentPatientName}>{item.name}</Text>
+        <Text style={styles.recentAppointmentType}>{item.type}</Text>
+        <Text style={styles.recentAppointmentDate}>
+          {item.date} | {item.time}
+        </Text>
+        <View style={styles.recentRatingContainer}>
+          {/* Display full stars */}
+          {Array.from({length: fullStars}).map((_, index) => (
+            <Ionicons key={index} name="ios-star" size={20} color="#1069AD" />
+          ))}
+          {/* Display half star if needed */}
+          {hasHalfStar && (
+            <Ionicons name="ios-star-half" size={20} color="#1069AD" />
+          )}
+          {/* Display empty stars */}
+          {Array.from({length: 5 - fullStars - (hasHalfStar ? 1 : 0)}).map(
+            (_, index) => (
+              <Ionicons
+                key={`empty-${index}`}
+                name="ios-star-outline"
+                size={20}
+                color="#1069AD"
+              />
+            ),
+          )}
+          <Text style={styles.recentReviewCount}>({item.reviews} reviews)</Text>
+        </View>
+      </View>
+      <Ionicons
+        name="ios-chatbubbles"
+        size={24}
+        color="#1069AD"
+        style={styles.recentMessageIcon}
+      />
+    </View>
+  )
+}
+
+export const UPCOMING_SCHEDULE_DATA = [
   {
     id: '1',
     name: 'Sara Jones',
     type: 'Regular Checkup',
-    date: 'Friday, 15 Sep',
+    date: 'Friday, 15 Sept',
     time: '09:00 - 10:00',
     image: require('./assets/images/head-4.jpg'),
+    rating: 4.3, // Added rating
+    reviews: 20, // example review count
   },
   {
     id: '2',
-    name: 'John Doe',
+    name: 'Jonathan Brister',
     type: 'Dental Cleaning',
-    date: 'Saturday, 16 Sep',
+    date: 'Saturday, 16 Sept',
     time: '11:00 - 12:00',
     image: require('./assets/images/pat-1.jpeg'),
+    rating: 5, // Added rating
+    reviews: 4, // example review count
   },
   {
     id: '3',
     name: 'Mike Smith',
     type: 'Eye Checkup',
-    date: 'Sunday, 17 Sep',
+    date: 'Sunday, 17 Sept',
     time: '14:00 - 15:00',
     image: require('./assets/images/pat-2.jpeg'),
+    rating: 3.9, // Added rating
+    reviews: 25, // example review count
   },
 ]
+
+export const RECENT_APPOINTMENTS_DATA = [
+  {
+    id: '1',
+    name: 'Josephine Costanza',
+    type: 'Eye Checkup',
+    date: 'Monday, 11 Sept',
+    time: '14:00 - 15:00',
+    image: require('./assets/images/pat-4.jpeg'),
+    rating: 4.5,
+    reviews: 20,
+  },
+  {
+    id: '2',
+    name: 'Mike Shinoda',
+    type: 'Physical Examination',
+    date: 'Sunday, 11 Sept',
+    time: '11:00 - 12:00',
+    image: require('./assets/images/pat-5.jpeg'),
+    rating: 4.0,
+    reviews: 15,
+  },
+
+  {
+    id: '4',
+    name: 'Jessica Parker',
+    type: 'Medicine Update',
+    date: 'Sunday, 10 Sept',
+    time: '11:00 - 12:00',
+    image: require('./assets/images/pat-3.jpeg'),
+    rating: 4.3, // Added rating
+    reviews: 30, // example review count
+  },
+  {
+    id: '5',
+    name: 'Ishan Kishan',
+    type: 'Urgent Care',
+    date: 'Tuesday, 8 Sept',
+    time: '9:00 - 10:00',
+    image: require('./assets/images/pat-6.jpeg'), // Please add the image path for Juan Garcia
+    rating: 4.5, // Added rating
+    reviews: 35, // example review count
+  },
+]
+;<UpcomingScheduleHeader count={UPCOMING_SCHEDULE_DATA.length} />
 
 const DoctorDashboardContent = () => {
   const flatListRef = useRef(null)
@@ -137,7 +276,7 @@ const DoctorDashboardContent = () => {
   useEffect(() => {
     if (!isUserInteracting) {
       const slideShowInterval = setInterval(() => {
-        if (currentSlideIndex < CARDS_DATA.length - 1) {
+        if (currentSlideIndex < UPCOMING_SCHEDULE_DATA.length - 1) {
           setCurrentSlideIndex(currentSlideIndex + 1)
           flatListRef.current?.scrollToOffset({
             offset: (currentSlideIndex + 1) * SCREEN_WIDTH,
@@ -156,17 +295,35 @@ const DoctorDashboardContent = () => {
     }
   }, [currentSlideIndex, isUserInteracting])
 
+  const CarouselIndicator = ({total, activeIndex}) => {
+    return (
+      <View style={styles.indicatorContainer}>
+        {Array.from({length: total}).map((_, index) => (
+          <View
+            key={index}
+            style={[
+              styles.dot,
+              activeIndex === index ? styles.activeDot : styles.inactiveDot,
+            ]}
+          />
+        ))}
+      </View>
+    )
+  }
+
   return (
     <ScrollView style={styles.dashboardContainer}>
       <SearchBar />
-      <UpcomingScheduleHeader />
+      <UpcomingScheduleHeader count={UPCOMING_SCHEDULE_DATA.length} />
       <FlatList
         style={{marginBottom: 10}}
         ref={flatListRef}
-        data={CARDS_DATA}
+        data={UPCOMING_SCHEDULE_DATA}
         horizontal
         pagingEnabled
-        contentContainerStyle={{width: `${100 * CARDS_DATA.length}%`}}
+        contentContainerStyle={{
+          width: `${100 * UPCOMING_SCHEDULE_DATA.length}%`,
+        }}
         showsHorizontalScrollIndicator={false}
         keyExtractor={item => item.id}
         renderItem={({item}) => (
@@ -176,6 +333,16 @@ const DoctorDashboardContent = () => {
         )}
         onScrollBeginDrag={() => setIsUserInteracting(true)}
         onScrollEndDrag={() => setIsUserInteracting(false)}
+        onMomentumScrollEnd={event => {
+          const newIndex = Math.round(
+            event.nativeEvent.contentOffset.x / SCREEN_WIDTH,
+          )
+          setCurrentSlideIndex(newIndex)
+        }}
+      />
+      <CarouselIndicator
+        total={UPCOMING_SCHEDULE_DATA.length}
+        activeIndex={currentSlideIndex}
       />
       <View style={styles.quickStatsHeader}>
         <Text style={styles.quickStatsTitle}>Recent Week Overview</Text>
@@ -189,6 +356,13 @@ const DoctorDashboardContent = () => {
         <StatsCard iconName="ios-call" value="3" label="ER Calls" />
         <StatsCard iconName="ios-time" value="2" label="Appointments" />
       </View>
+      <View style={styles.recentAppointmentsHeader}>
+        <Text style={styles.recentAppointmentsTitle}>Recent Appointments</Text>
+      </View>
+      {RECENT_APPOINTMENTS_DATA.map(item => (
+        <RecentAppointmentItem key={item.id} item={item} />
+      ))}
+      <View style={styles.bottomSpacer}></View>
     </ScrollView>
   )
 }
@@ -242,7 +416,7 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     color: '#1069AD',
-    left: 150,
+    marginLeft: 'auto',
   },
   card: {
     backgroundColor: '#fff',
@@ -339,6 +513,24 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#E4E4E4',
   },
+  indicatorContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginHorizontal: 4,
+  },
+  activeDot: {
+    backgroundColor: '#1069AD',
+  },
+  inactiveDot: {
+    backgroundColor: '#d3d3d3',
+  },
   quickStatsHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -363,7 +555,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 3,
   },
-
   statsCard: {
     width: (SCREEN_WIDTH - 55 - 4 * 5 * 2) / 4, // Adjusted width calculation
     height: (SCREEN_WIDTH - 80 - 4 * 5 * 2) / 4, // Adjusted height calculation
@@ -380,22 +571,73 @@ const styles = StyleSheet.create({
     shadowRadius: 4.65,
     elevation: 8,
   },
-
   statsIcon: {
     color: '#1069AD',
     marginBottom: 3, // Further reduced margin
     fontSize: 24, // Further reduced icon size
   },
-
   statsValue: {
     fontSize: 16, // Further reduced font size
     fontWeight: 'bold',
   },
-
   statsLabel: {
     marginTop: 2, // Further reduced margin
     color: '#888',
     fontSize: 10, // Further reduced font size
+  },
+  recentAppointmentsHeader: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#d3d3d3',
+    marginTop: -20,
+  },
+  recentAppointmentsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  recentAppointmentContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#d3d3d3',
+  },
+  recentPatientImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+  recentInfoContainer: {
+    flex: 1,
+  },
+  recentPatientName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  recentAppointmentType: {
+    fontSize: 14,
+    color: '#888',
+  },
+  recentAppointmentDate: {
+    fontSize: 12,
+    color: '#aaa',
+  },
+  recentRatingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 5,
+  },
+  recentReviewCount: {
+    marginLeft: 5,
+    fontSize: 12,
+    color: '#888',
+  },
+  recentMessageIcon: {
+    marginLeft: 15,
+  },
+  bottomSpacer: {
+    height: 75, // adjust this value based on the height of your bottom tabs
   },
 })
 

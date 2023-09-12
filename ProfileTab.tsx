@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native'
 import {useNavigation} from '@react-navigation/native'
 import * as Animatable from 'react-native-animatable'
@@ -34,6 +35,7 @@ const EditableField = ({
   value,
   onEdit,
   editable,
+  onFocus,
   onUpdate,
   showHelperText,
   isPassword,
@@ -86,6 +88,7 @@ const EditableField = ({
             {isEditing ? (
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <PaperTextInput
+                  onFocus={onFocus}
                   ref={inputRef}
                   style={[styles.textInput, {height: 40}]}
                   value={fieldValue}
@@ -512,56 +515,67 @@ const ProfileTab = () => {
             </>
           )}
         </View>
+        <ScrollView>
+          <EditableField
+            icon="user"
+            value={userFullName}
+            onUpdate={async newFullName => {
+              const response = await updateFullName(newFullName)
+              if (!response.success) {
+                console.log('Failed to update full name in the UI')
+              }
+            }}
+          />
+          <EditableField
+            icon="mail"
+            value={userEmail}
+            onUpdate={async newEmail => {
+              const response = await updateEmail(newEmail)
+              if (!response.success) {
+                console.log('Failed to update email in the UI')
+              }
+            }}
+          />
+          <EditableField
+            icon="lock"
+            value="********" // placeholder value
+            onUpdate={async newPassword => {
+              const response = await updatePassword(newPassword)
+              if (!response.success) {
+                console.log('Failed to update password in the UI')
+              }
+            }}
+            isPassword={true}
+          />
 
-        <EditableField
-          icon="user"
-          value={userFullName}
-          onUpdate={async newFullName => {
-            const response = await updateFullName(newFullName)
-            if (!response.success) {
-              console.log('Failed to update full name in the UI')
-            }
-          }}
-        />
-        <EditableField
-          icon="mail"
-          value={userEmail}
-          onUpdate={async newEmail => {
-            const response = await updateEmail(newEmail)
-            if (!response.success) {
-              console.log('Failed to update email in the UI')
-            }
-          }}
-        />
-        <EditableField
-          icon="lock"
-          value="********" // placeholder value
-          onUpdate={async newPassword => {
-            const response = await updatePassword(newPassword)
-            if (!response.success) {
-              console.log('Failed to update password in the UI')
-            }
-          }}
-          isPassword={true}
-        />
-
-        <EditableField
-          icon="map-pin"
-          value={userLocation}
-          onUpdate={async newLocation => {
-            const response = await updateLocation(newLocation)
-            if (!response.success) {
-              console.log('Failed to update location in the UI')
-            }
-          }}
-          showHelperText={!userLocation} // Show the helper text only if there's no location set
-        />
-        <EditableField
-          icon="log-out"
-          value="Logout"
-          onUpdate={handleLogout}
-          editable={false}
-        />
+          <EditableField
+            icon="map-pin"
+            value={userLocation}
+            onFocus={() => {
+              setIsEditingLocation(true)
+            }}
+            onUpdate={async newLocation => {
+              const response = await updateLocation(newLocation)
+              if (!response.success) {
+                console.log('Failed to update location in the UI')
+              }
+            }}
+            showHelperText={!userLocation} // Show the helper text only if there's no location set
+          />
+          <EditableField
+            icon="log-out"
+            value="Logout"
+            onUpdate={handleLogout}
+            editable={false}
+          />
+          {isEditingLocation && (
+            <View
+              style={{
+                height: '30%',
+              }}
+            />
+          )}
+        </ScrollView>
       </Animatable.View>
     </KeyboardAvoidingView>
   )

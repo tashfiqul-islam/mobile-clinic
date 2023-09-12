@@ -9,6 +9,7 @@ import LoginScreen from './LoginScreen'
 import SignUpScreen from './SignUpScreen'
 import DoctorDashboard from './DoctorDashboard'
 import PatientDashboard from './PatientDashboard'
+import AppointmentOverview from './AppointmentOverview'
 import {firebaseConfig} from './firebaseConfig'
 import ProfileTab from './ProfileTab'
 import firebase from 'firebase/compat/app'
@@ -123,6 +124,11 @@ const App: React.FC = () => {
             name="Profile"
             component={ProfileTab}
             options={{title: 'Profile'}}
+          />
+          <Stack.Screen
+            name="AppointmentOverview"
+            component={AppointmentOverview}
+            options={{title: 'Appointment Overview'}}
           />
         </Stack.Navigator>
       </NavigationContainer>

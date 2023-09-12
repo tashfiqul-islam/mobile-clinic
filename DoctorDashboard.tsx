@@ -8,13 +8,8 @@ import 'firebase/compat/auth'
 import 'firebase/compat/database'
 import ProfileTab from './ProfileTab'
 import HomeTab from './HomeTab'
+import AppointmentList from './AppointmentList'
 import {useUser} from './UserContext'
-
-const AppointmentTab = () => (
-  <View style={styles.screenContainer}>
-    <Text>Appointment Screen</Text>
-  </View>
-)
 
 const MessageTab = () => (
   <View style={styles.screenContainer}>
@@ -77,6 +72,10 @@ const DoctorDashboard = ({route}) => {
     navigation.navigate('Home')
   }
 
+  const handleAppointmentNavigation = () => {
+    navigation.navigate('AppointmentList')
+  }
+
   const handleNotificationPress = () => {
     // Implement the logic for when the notification icon is pressed
   }
@@ -119,24 +118,30 @@ const DoctorDashboard = ({route}) => {
         <Tab.Screen
           name="Home"
           component={HomeTab}
-          options={({route}) => ({
+          options={{
             tabBarIcon: ({color}) => (
               <Ionicons name="ios-home" size={24} color={color} />
             ),
             tabBarLabel: 'Home',
             tabBarAccessibilityLabel: 'Home Tab',
-            onPress: handleHomeNavigation,
-          })}
+          }}
         />
         <Tab.Screen
-          name="Appointment"
-          component={AppointmentTab}
+          name="AppointmentList"
+          component={AppointmentList}
           options={{
             tabBarIcon: ({color}) => (
               <Ionicons name="ios-calendar" size={24} color={color} />
             ),
             tabBarLabel: 'Appointment',
             tabBarAccessibilityLabel: 'Appointment Tab',
+          }}
+          listeners={{
+            tabPress: e => {
+              // Prevent the default action
+              e.preventDefault()
+              handleAppointmentNavigation()
+            },
           }}
         />
         <Tab.Screen
@@ -153,14 +158,13 @@ const DoctorDashboard = ({route}) => {
         <Tab.Screen
           name="Profile"
           component={ProfileTab}
-          options={({route}) => ({
+          options={{
             tabBarIcon: ({color}) => (
               <Ionicons name="ios-person" size={24} color={color} />
             ),
             tabBarLabel: 'Profile',
             tabBarAccessibilityLabel: 'Profile Tab',
-            onPress: handleProfileNavigation,
-          })}
+          }}
         />
       </Tab.Navigator>
     </View>
