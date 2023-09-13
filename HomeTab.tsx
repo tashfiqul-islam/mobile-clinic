@@ -426,7 +426,9 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     color: '#1069AD',
-    marginLeft: 150,
+    textAlign: 'right',
+    flexDirection: 'row',
+    flex: 1,
   },
   card: {
     backgroundColor: '#fff',
