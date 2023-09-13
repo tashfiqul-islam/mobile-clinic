@@ -44,15 +44,25 @@ const SearchBar = () => (
   </View>
 )
 
-const UpcomingScheduleHeader = ({count}) => (
-  <View style={styles.upcomingScheduleHeader}>
-    <Text style={styles.upcomingText}>Upcoming Schedule</Text>
-    <View style={styles.countCircle}>
-      <Text style={styles.countText}>{count}</Text>
+const UpcomingScheduleHeader = ({count}) => {
+  const navigation = useNavigation()
+
+  const handleViewAllPress = () => {
+    navigation.navigate('AppointmentList')
+  }
+
+  return (
+    <View style={styles.upcomingScheduleHeader}>
+      <Text style={styles.upcomingText}>Upcoming Schedule</Text>
+      <View style={styles.countCircle}>
+        <Text style={styles.countText}>{count}</Text>
+      </View>
+      <TouchableOpacity onPress={handleViewAllPress}>
+        <Text style={styles.seeAllText}>View All</Text>
+      </TouchableOpacity>
     </View>
-    <Text style={styles.seeAllText}>View All</Text>
-  </View>
-)
+  )
+}
 
 export const UpcomingAppointmentCard = ({item}) => {
   const navigation = useNavigation()
@@ -416,7 +426,7 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     color: '#1069AD',
-    marginLeft: 'auto',
+    marginLeft: 150,
   },
   card: {
     backgroundColor: '#fff',
@@ -637,7 +647,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
   bottomSpacer: {
-    height: 75, // adjust this value based on the height of your bottom tabs
+    height: 65, // adjust this value based on the height of your bottom tabs
   },
 })
 

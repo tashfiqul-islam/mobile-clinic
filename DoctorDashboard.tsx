@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native'
-import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs'
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
 import {Ionicons} from '@expo/vector-icons'
 import firebase from 'firebase/compat/app'
 import {useNavigation} from '@react-navigation/native'
@@ -17,10 +17,60 @@ const MessageTab = () => (
   </View>
 )
 
+const CustomTabLabel = ({title, focused}) => {
+  return (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingBottom: focused ? 7.5 : 0,
+      }}>
+      {focused ? <Text style={{color: '#1069AD'}}>{title}</Text> : null}
+    </View>
+  )
+}
+
+const renderIcon = (name, color, size) => {
+  const circleDiameter = 48
+  const iconSize = 28
+  const isFocused = color === '#1069AD'
+
+  const inactiveOffset = (circleDiameter - iconSize) / 2
+
+  return (
+    <View
+      style={{
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: isFocused ? 20 : 0,
+        marginTop: isFocused ? 0 : inactiveOffset,
+      }}>
+      <View
+        style={{
+          width: circleDiameter,
+          height: circleDiameter,
+          borderRadius: circleDiameter / 2,
+          backgroundColor: isFocused ? '#1069AD' : 'transparent',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginBottom: isFocused ? 5 : 0,
+        }}>
+        <Ionicons
+          name={name}
+          size={iconSize}
+          color={isFocused ? 'white' : color}
+          style={{marginTop: isFocused ? -2 : 15}}
+        />
+      </View>
+    </View>
+  )
+}
+
 const DEFAULT_IMAGE_URL =
   'https://firebasestorage.googleapis.com/v0/b/mclinic-df2b5.appspot.com/o/profile_images%2FdefaultProfile.png?alt=media&token=600ebca7-a028-428c-9199-3bd7464cf216'
 
-const Tab = createMaterialBottomTabNavigator()
+const Tab = createBottomTabNavigator()
 
 const DoctorDashboard = ({route}) => {
   const {userFullName, setUserFullName} = useUser()
@@ -46,10 +96,7 @@ const DoctorDashboard = ({route}) => {
       const userRef = firebase.database().ref(`users/${userUid}/profileImage`) // path to profile image
 
       // Firebase listener
-      const handleDataChange = (snapshot: {
-        exists: () => any
-        val: () => React.SetStateAction<null>
-      }) => {
+      const handleDataChange = snapshot => {
         if (snapshot.exists()) {
           setUserImage(snapshot.val()) // Update the local state
         }
@@ -89,81 +136,88 @@ const DoctorDashboard = ({route}) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.profileImageContainer}>
+        <TouchableOpacity
+          style={styles.profileImageContainer}
+          onPress={handleProfileNavigation}>
           <Image
-            source={userImage ? {uri: userImage} : {uri: DEFAULT_IMAGE_URL}} // Use the defaultProfile.png image if userImage is null
+            source={{uri: userImage || DEFAULT_IMAGE_URL}}
             style={styles.profileImage}
           />
-        </View>
+        </TouchableOpacity>
         <View style={styles.textContainer}>
           <Text style={styles.headerText}>{greeting}</Text>
-          <Text style={styles.subHeaderText}>Dr. {userFullName}</Text>
+          <Text style={styles.subHeaderText}>{userFullName}</Text>
         </View>
-        <View style={styles.notificationIconContainer}>
-          <TouchableOpacity onPress={() => handleNotificationPress()}>
-            <Ionicons name="ios-notifications" size={24} color="#FFF" />
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={styles.notificationIconContainer}
+          onPress={handleNotificationPress}>
+          <Ionicons name="ios-notifications" size={24} color="white" />
+        </TouchableOpacity>
       </View>
       <Tab.Navigator
-        shifting={true}
-        initialRouteName="Home"
-        activeColor="#1069AD"
-        inactiveColor="#898989"
-        barStyle={{
-          backgroundColor: '#fff',
-          position: 'absolute',
-          marginBottom: -12,
+        screenOptions={{
+          tabBarActiveTintColor: '#1069AD',
+          tabBarInactiveTintColor: '#898989',
+          tabBarStyle: {
+            position: 'absolute',
+            bottom: 7.5,
+            left: 7.5,
+            right: 7.5,
+            backgroundColor: '#fff',
+            height: 55,
+            borderRadius: 8,
+            elevation: 8,
+            alignItems: 'center', // Center icons and labels vertically
+          },
+          tabBarIconStyle: {
+            height: 30,
+          },
+          tabBarLabelStyle: {
+            paddingTop: 20, // Increase this value to move the label up
+          },
+          headerShown: false,
         }}>
         <Tab.Screen
           name="Home"
           component={HomeTab}
           options={{
-            tabBarIcon: ({color}) => (
-              <Ionicons name="ios-home" size={24} color={color} />
+            tabBarIcon: ({color, size}) => renderIcon('ios-home', color, size),
+            tabBarLabel: ({focused}) => (
+              <CustomTabLabel title="Home" focused={focused} />
             ),
-            tabBarLabel: 'Home',
-            tabBarAccessibilityLabel: 'Home Tab',
           }}
         />
         <Tab.Screen
           name="AppointmentList"
           component={AppointmentList}
           options={{
-            tabBarIcon: ({color}) => (
-              <Ionicons name="ios-calendar" size={24} color={color} />
+            tabBarIcon: ({color, size}) =>
+              renderIcon('ios-calendar', color, size),
+            tabBarLabel: ({focused}) => (
+              <CustomTabLabel title="Appointment" focused={focused} />
             ),
-            tabBarLabel: 'Appointment',
-            tabBarAccessibilityLabel: 'Appointment Tab',
-          }}
-          listeners={{
-            tabPress: e => {
-              // Prevent the default action
-              e.preventDefault()
-              handleAppointmentNavigation()
-            },
           }}
         />
         <Tab.Screen
           name="Message"
           component={MessageTab}
           options={{
-            tabBarIcon: ({color}) => (
-              <Ionicons name="ios-chatbubbles" size={24} color={color} />
+            tabBarIcon: ({color, size}) =>
+              renderIcon('ios-chatbubbles', color, size),
+            tabBarLabel: ({focused}) => (
+              <CustomTabLabel title="Message" focused={focused} />
             ),
-            tabBarLabel: 'Message',
-            tabBarAccessibilityLabel: 'Message Tab',
           }}
         />
         <Tab.Screen
           name="Profile"
           component={ProfileTab}
           options={{
-            tabBarIcon: ({color}) => (
-              <Ionicons name="ios-person" size={24} color={color} />
+            tabBarIcon: ({color, size}) =>
+              renderIcon('ios-person', color, size),
+            tabBarLabel: ({focused}) => (
+              <CustomTabLabel title="Profile" focused={focused} />
             ),
-            tabBarLabel: 'Profile',
-            tabBarAccessibilityLabel: 'Profile Tab',
           }}
         />
       </Tab.Navigator>
