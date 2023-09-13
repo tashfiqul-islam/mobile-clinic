@@ -24,7 +24,7 @@ const CustomTabLabel = ({title, focused}) => {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingBottom: focused ? 7.5 : 0,
+        paddingBottom: focused ? 5 : 0,
       }}>
       {focused ? <Text style={{color: '#1069AD'}}>{title}</Text> : null}
     </View>
@@ -43,7 +43,7 @@ const renderIcon = (name, color, size) => {
       style={{
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: isFocused ? 20 : 0,
+        marginBottom: isFocused ? 10 : 0,
         marginTop: isFocused ? 0 : inactiveOffset,
       }}>
       <View
@@ -54,7 +54,7 @@ const renderIcon = (name, color, size) => {
           backgroundColor: isFocused ? '#1069AD' : 'transparent',
           justifyContent: 'center',
           alignItems: 'center',
-          marginBottom: isFocused ? 5 : 0,
+          marginBottom: isFocused ? 5 : -5,
         }}>
         <Ionicons
           name={name}
@@ -164,7 +164,7 @@ const DoctorDashboard = ({route}) => {
             left: 7.5,
             right: 7.5,
             backgroundColor: '#fff',
-            height: 55,
+            height: 60,
             borderRadius: 8,
             elevation: 8,
             alignItems: 'center', // Center icons and labels vertically
@@ -218,6 +218,9 @@ const DoctorDashboard = ({route}) => {
             tabBarLabel: ({focused}) => (
               <CustomTabLabel title="Profile" focused={focused} />
             ),
+            tabBarItemStyle: {
+              borderRightWidth: 0, // Remove border for the last tab
+            },
           }}
         />
       </Tab.Navigator>
