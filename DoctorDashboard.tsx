@@ -219,7 +219,7 @@ const DoctorDashboard = ({route}) => {
               <CustomTabLabel title="Profile" focused={focused} />
             ),
             tabBarItemStyle: {
-              borderRightWidth: 0, // Remove border for the last tab
+              borderRightWidth: 0, 
             },
           }}
         />
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     borderRadius: 100,
     borderWidth: 2,
-    borderColor: '#FFFFFF', // Color of the border, change as needed
+    borderColor: '#FFFFFF', 
   },
   textContainer: {
     flexDirection: 'column',

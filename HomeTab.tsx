@@ -68,9 +68,6 @@ export const UpcomingAppointmentCard = ({item}) => {
   const navigation = useNavigation()
 
   const handleCardPress = () => {
-    // Navigate to the desired screen with the appointment's details.
-    // Replace 'AppointmentDetailScreen' with the name of the screen you want to navigate to.
-    // Optionally, pass the item data to the next screen for rendering details.
     navigation.navigate('AppointmentOverview', {appointmentData: item})
   }
 
@@ -262,8 +259,8 @@ export const RECENT_APPOINTMENTS_DATA = [
     date: 'Sunday, 10 Sept',
     time: '11:00 - 12:00',
     image: require('./assets/images/pat-3.jpeg'),
-    rating: 4.3, // Added rating
-    reviews: 30, // example review count
+    rating: 4.3, 
+    reviews: 30, 
   },
   {
     id: '5',
@@ -271,9 +268,9 @@ export const RECENT_APPOINTMENTS_DATA = [
     type: 'Urgent Care',
     date: 'Tuesday, 8 Sept',
     time: '9:00 - 10:00',
-    image: require('./assets/images/pat-6.jpeg'), // Please add the image path for Juan Garcia
-    rating: 4.5, // Added rating
-    reviews: 35, // example review count
+    image: require('./assets/images/pat-6.jpeg'), 
+    rating: 4.5, 
+    reviews: 35,
   },
 ]
 ;<UpcomingScheduleHeader count={UPCOMING_SCHEDULE_DATA.length} />
