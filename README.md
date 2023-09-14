@@ -5,8 +5,9 @@
 
 ## Tech Stack
 
-![logo](https://img.shields.io/badge/Made_with-React_Native-blue?style=flat-square&logo=react)
+![logo](https://img.shields.io/badge/Frontend-React_Native-blue?style=flat-square&logo=react) ![logo](https://img.shields.io/badge/Backend-Firebase-yellow?style=flat-square&logo=firebase)
 
+## Project Manager
 
 [![runs with Expo Go](https://img.shields.io/badge/Runs%20with%20Expo%20Go-000.svg?style=flat-square&logo=EXPO&labelColor=f3f3f3&logoColor=000)](https://expo.dev/client)
 
