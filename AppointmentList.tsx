@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   spacer: {
-    height: 75, // height of the bottom tabs 
+    height: 75, // height of the bottom tabs
   },
 })
 

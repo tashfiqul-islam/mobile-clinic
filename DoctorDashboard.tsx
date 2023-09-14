@@ -9,13 +9,8 @@ import 'firebase/compat/database'
 import ProfileTab from './ProfileTab'
 import HomeTab from './HomeTab'
 import AppointmentList from './AppointmentList'
+import MessageTab from './MessageTab'
 import {useUser} from './UserContext'
-
-const MessageTab = () => (
-  <View style={styles.screenContainer}>
-    <Text>Message Screen</Text>
-  </View>
-)
 
 const CustomTabLabel = ({title, focused}) => {
   return (
@@ -219,7 +214,7 @@ const DoctorDashboard = ({route}) => {
               <CustomTabLabel title="Profile" focused={focused} />
             ),
             tabBarItemStyle: {
-              borderRightWidth: 0, 
+              borderRightWidth: 0,
             },
           }}
         />
@@ -255,7 +250,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     borderRadius: 100,
     borderWidth: 2,
-    borderColor: '#FFFFFF', 
+    borderColor: '#FFFFFF',
   },
   textContainer: {
     flexDirection: 'column',

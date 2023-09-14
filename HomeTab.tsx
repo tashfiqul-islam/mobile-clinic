@@ -259,8 +259,8 @@ export const RECENT_APPOINTMENTS_DATA = [
     date: 'Sunday, 10 Sept',
     time: '11:00 - 12:00',
     image: require('./assets/images/pat-3.jpeg'),
-    rating: 4.3, 
-    reviews: 30, 
+    rating: 4.3,
+    reviews: 30,
   },
   {
     id: '5',
@@ -268,8 +268,8 @@ export const RECENT_APPOINTMENTS_DATA = [
     type: 'Urgent Care',
     date: 'Tuesday, 8 Sept',
     time: '9:00 - 10:00',
-    image: require('./assets/images/pat-6.jpeg'), 
-    rating: 4.5, 
+    image: require('./assets/images/pat-6.jpeg'),
+    rating: 4.5,
     reviews: 35,
   },
 ]
