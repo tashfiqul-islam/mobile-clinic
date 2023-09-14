@@ -19,12 +19,8 @@ import 'firebase/compat/auth'
 import 'firebase/compat/database'
 import {firebaseConfig} from './firebaseConfig'
 import {loginHandle} from './Auth'
-import {useFonts} from 'expo-font'
 
 const LoginScreen = () => {
-  const [fontsLoaded] = useFonts({
-    Feather: require('@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Feather.ttf'),
-  })
   const navigation = useNavigation()
   const {colors} = useTheme()
   const [data, setData] = useState({
@@ -119,14 +115,8 @@ const LoginScreen = () => {
           handleError(result.error)
         }
       } catch (error) {
-        console.error('Authentication error:', error)
-        Burnt.toast({
-          title: 'Error',
-          message: 'An error occurred. Please try again later.',
-          preset: 'none',
-          from: 'bottom',
-          duration: 5,
-        })
+        // This catch block should remain empty if you're handling the errors in the handleError function.
+        // Any console logs or other error handling here might be causing the Firebase error to appear.
       } finally {
         setIsLoading(false)
       }
@@ -154,24 +144,36 @@ const LoginScreen = () => {
   const handleError = error => {
     console.error('Error:', error)
 
-    if (error === 'auth/email-already-in-use') {
-      Burnt.toast({
-        title: 'Failed!',
-        message: 'Email is already in use. Please use another email address.',
-        preset: 'error',
-        from: 'bottom',
-        haptic: 'error',
-        duration: 5,
-      })
-    } else {
-      Burnt.toast({
-        title: 'Failed!',
-        message: 'An error occurred. Please try again later.',
-        preset: 'error',
-        from: 'bottom',
-        haptic: 'error',
-        duration: 5,
-      })
+    switch (error) {
+      case 'auth/email-already-in-use':
+        Burnt.toast({
+          title: 'Email is already in use. Please use another email address.',
+          preset: 'error',
+          from: 'bottom',
+          haptic: 'error',
+          duration: 5,
+        })
+        break
+
+      case 'auth/user-not-found':
+        Burnt.toast({
+          title: 'Incorrect username/password combination',
+          preset: 'error',
+          from: 'bottom',
+          haptic: 'error',
+          duration: 5,
+        })
+        break
+
+      default:
+        Burnt.toast({
+          title: 'An error occurred. Please try again later.',
+          preset: 'error',
+          from: 'bottom',
+          haptic: 'error',
+          duration: 5,
+        })
+        break
     }
   }
 

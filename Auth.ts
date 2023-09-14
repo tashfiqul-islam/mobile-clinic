@@ -22,10 +22,22 @@ export const loginHandle = async (email, password) => {
 
       return {success: true, userType}
     } else {
-      throw new Error('Authentication failed')
+      return {success: false, error: 'Authentication failed'}
     }
   } catch (error) {
-    return {success: false, error: error.message}
+    // Handle specific errors here
+    switch (error.code) {
+      case 'auth/user-not-found':
+        return {success: false, error: 'User not found'}
+      case 'auth/wrong-password':
+        return {success: false, error: 'Incorrect password'}
+      // ... handle other specific error codes
+      default:
+        return {
+          success: false,
+          error: 'An error occurred. Please try again later.',
+        }
+    }
   }
 }
 
