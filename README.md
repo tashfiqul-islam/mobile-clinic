@@ -7,6 +7,9 @@
 
 ![logo](https://img.shields.io/badge/Made_with-React_Native-blue?style=flat-square&logo=react)
 
+
+[![runs with Expo Go](https://img.shields.io/badge/Runs%20with%20Expo%20Go-000.svg?style=flat-square&logo=EXPO&labelColor=f3f3f3&logoColor=000)](https://expo.dev/client)
+
 ## Stats
 
 ![logo](https://img.shields.io/badge/Release-November_2023-red?style=flat-square)
@@ -69,9 +72,10 @@
 ## Written in:
 
     1. Frontend: React Native
-    2. Backend: Express (Node.js)
-    3. Frameworks: React Native (Fontend), Express (Backend)
-    4. Database: MongoDB
+    2. Backend: Firebase (BaaS)
+    3. Frameworks: React Native (Fontend), Firebase (Backend)
+    4. Database: Firebase
+    5. Managed by: Expo
 
 ## References:
 
