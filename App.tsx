@@ -12,7 +12,7 @@ import PatientDashboard from './PatientDashboard'
 import AppointmentOverview from './AppointmentOverview'
 import {firebaseConfig} from './firebaseConfig'
 import ProfileTab from './ProfileTab'
-import DoctorDashboardNavigator from './DoctorDashboardNavigator';
+import DoctorDashboardNavigator from './DoctorDashboardNavigator'
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
 import {UserProvider} from './UserContext'
@@ -112,10 +112,10 @@ const App: React.FC = () => {
             options={{title: 'Registration'}}
           />
           <Stack.Screen
-  name="DocDashboard"
-  component={DoctorDashboardNavigator}  // <-- This is the new nested navigator
-  options={{title: dashboardTitle, headerShown: false}}
-/>
+            name="DocDashboard"
+            component={DoctorDashboardNavigator} // <-- This is the new nested navigator
+            options={{title: dashboardTitle, headerShown: false}}
+          />
           <Stack.Screen
             name="PatDashboard"
             component={PatientDashboard}

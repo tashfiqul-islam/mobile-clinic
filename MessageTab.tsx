@@ -1,43 +1,75 @@
-import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React from 'react'
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+} from 'react-native'
+import {Ionicons} from '@expo/vector-icons'
 
 // Dummy Data
 const chats = [
-  { id: '1', name: 'Dr. John Doe', lastMessage: 'Hello, how can I assist you?', timestamp: '2:30 PM', unread: true, online: true, avatar: 'https://via.placeholder.com/50' },
-  { id: '2', name: 'Dr. Jane Smith', lastMessage: 'Your report looks fine.', timestamp: 'Yesterday', unread: false, online: false, avatar: 'https://via.placeholder.com/50' },
+  {
+    id: '1',
+    name: 'Dr. John Doe',
+    lastMessage: 'Hello, how can I assist you?',
+    timestamp: '2:30 PM',
+    unread: true,
+    online: true,
+    avatar: 'https://via.placeholder.com/50',
+  },
+  {
+    id: '2',
+    name: 'Dr. Jane Smith',
+    lastMessage: 'Your report looks fine.',
+    timestamp: 'Yesterday',
+    unread: false,
+    online: false,
+    avatar: 'https://via.placeholder.com/50',
+  },
   // ... (more dummy data can be added here)
-];
+]
 
-const MessageTab = ({ navigation }) => {
+const MessageTab = ({navigation}) => {
   return (
     <View style={styles.container}>
       <FlatList
         data={chats}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <ChatItem chat={item} navigation={navigation} />}
+        keyExtractor={item => item.id}
+        renderItem={({item}) => (
+          <ChatItem chat={item} navigation={navigation} />
+        )}
       />
     </View>
-  );
-};
+  )
+}
 
-const ChatItem = ({ chat, navigation }) => {
+const ChatItem = ({chat, navigation}) => {
   return (
-    <TouchableOpacity style={styles.chatItem} onPress={() => navigation.navigate('ChatScreen')}>
+    <TouchableOpacity
+      style={styles.chatItem}
+      onPress={() => navigation.navigate('ChatScreen')}>
       <View style={styles.avatarContainer}>
         <View style={styles.avatarBorder}>
-          <Image source={{ uri: chat.avatar }} style={styles.avatar} />
+          <Image source={{uri: chat.avatar}} style={styles.avatar} />
         </View>
         {chat.online && <View style={styles.onlineIndicator}></View>}
       </View>
       <View style={styles.chatInfo}>
-        <Text style={[styles.name, chat.unread ? styles.boldText : null]}>{chat.name}</Text>
-        <Text style={[styles.lastMessage, chat.unread ? styles.boldText : null]}>{chat.lastMessage}</Text>
+        <Text style={[styles.name, chat.unread ? styles.boldText : null]}>
+          {chat.name}
+        </Text>
+        <Text
+          style={[styles.lastMessage, chat.unread ? styles.boldText : null]}>
+          {chat.lastMessage}
+        </Text>
       </View>
       <Text style={styles.timestamp}>{chat.timestamp}</Text>
     </TouchableOpacity>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -74,7 +106,7 @@ const styles = StyleSheet.create({
     right: 2,
     borderRadius: 5,
     borderWidth: 2,
-    borderColor: '#F5F5F5',  // This will give the 3D effect by adding a border to the online indicator
+    borderColor: '#F5F5F5', // This will give the 3D effect by adding a border to the online indicator
   },
   chatInfo: {
     flex: 1,
@@ -95,6 +127,6 @@ const styles = StyleSheet.create({
   boldText: {
     fontWeight: 'bold',
   },
-});
+})
 
-export default MessageTab;
+export default MessageTab
