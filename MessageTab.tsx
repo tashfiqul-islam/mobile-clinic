@@ -74,7 +74,7 @@ const ChatItem = ({chat, navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#E4E4E4',
   },
   chatItem: {
     flexDirection: 'row',

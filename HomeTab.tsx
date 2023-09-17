@@ -12,8 +12,13 @@ import {
   TouchableNativeFeedback,
   TouchableHighlight,
   Platform,
+  Modal,
 } from 'react-native'
-import {Ionicons, MaterialCommunityIcons} from '@expo/vector-icons'
+import {
+  Ionicons,
+  MaterialCommunityIcons,
+  MaterialIcons,
+} from '@expo/vector-icons'
 import {LinearGradient} from 'expo-linear-gradient'
 import {useNavigation} from '@react-navigation/native'
 
@@ -44,6 +49,151 @@ const SearchBar = () => (
   </View>
 )
 
+const VerticalStatusPill = ({day, date, isActive}) => {
+  const backgroundColor = isActive ? '#1069AD' : 'rgba(255, 255, 255, 0.8)'
+  const textColor = isActive ? '#fff' : '#000'
+
+  return (
+    <View
+      style={{
+        ...styles.statusPillContainer,
+        backgroundColor: backgroundColor,
+      }}>
+      <Text style={{...styles.statusPillDay, color: textColor}}>{day}</Text>
+      <Text style={{...styles.statusPillDate, color: textColor}}>{date}</Text>
+    </View>
+  )
+}
+
+const AppointmentTimelineTab = () => {
+  const startDate = new Date(2023, 8, 18)
+  const filterOptions = [
+    {label: 'This week', value: 'this_week'},
+    {label: 'Previous week', value: 'prev_week'},
+    {label: 'Next week', value: 'next_week'},
+  ]
+
+  const [selectedFilter, setSelectedFilter] = useState('this_week')
+  const [showFilterModal, setShowFilterModal] = useState(false)
+
+  const calculateDaysAndDates = filter => {
+    const now = new Date()
+    const days = []
+    const dates = []
+
+    switch (filter) {
+      case 'this_week':
+        for (let i = 0; i < 7; i++) {
+          const date = new Date(now)
+          date.setDate(now.getDate() + i)
+          days.push(
+            date.toLocaleString('en-us', {weekday: 'short'}).substring(0, 1),
+          )
+          dates.push(date.getDate().toString().padStart(2, '0'))
+        }
+        break
+      case 'prev_week':
+        const prevWeekStartDate = new Date()
+        prevWeekStartDate.setDate(
+          prevWeekStartDate.getDate() - prevWeekStartDate.getDay() - 7,
+        )
+
+        for (let i = 0; i < 7; i++) {
+          const date = new Date(prevWeekStartDate)
+          date.setDate(prevWeekStartDate.getDate() + i)
+          days.push(
+            date.toLocaleString('en-us', {weekday: 'short'}).substring(0, 1),
+          )
+          dates.push(date.getDate().toString().padStart(2, '0'))
+        }
+        break
+      case 'next_week':
+        const nextWeekStartDate = new Date()
+        nextWeekStartDate.setDate(
+          nextWeekStartDate.getDate() - nextWeekStartDate.getDay() + 7,
+        )
+
+        for (let i = 0; i < 7; i++) {
+          const date = new Date(nextWeekStartDate)
+          date.setDate(nextWeekStartDate.getDate() + i)
+          days.push(
+            date.toLocaleString('en-us', {weekday: 'short'}).substring(0, 1),
+          )
+          dates.push(date.getDate().toString().padStart(2, '0'))
+        }
+        break
+    }
+
+    return {days, dates}
+  }
+
+  const {days, dates} = calculateDaysAndDates(selectedFilter)
+
+  const isDayActive = (day, date) => {
+    const now = new Date()
+    return (
+      day === now.toLocaleString('en-us', {weekday: 'short'}).substring(0, 1) &&
+      parseInt(date) === now.getDate()
+    )
+  }
+
+  return (
+    <View style={styles.appointmentTimelineContainer}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.appointmentTimelineHeader}>
+          Appointment Timeline
+        </Text>
+        <TouchableOpacity onPress={() => setShowFilterModal(true)}>
+          <View style={styles.filterPill}>
+            <Text style={styles.filterText}>
+              {filterOptions.find(option => option.value === selectedFilter)
+                ?.label || ''}
+            </Text>
+            <Text style={styles.filterSeparator}>|</Text>
+            <MaterialIcons
+              name="keyboard-arrow-down"
+              color="black"
+              size={24}
+              style={styles.filterIcon}
+            />
+          </View>
+        </TouchableOpacity>
+        <Modal
+          transparent={true}
+          animationType="slide"
+          visible={showFilterModal}
+          onRequestClose={() => setShowFilterModal(false)}>
+          <View style={styles.filterModal}>
+            {filterOptions.map(option => (
+              <TouchableOpacity
+                key={option.value}
+                style={styles.filterOption}
+                onPress={() => {
+                  setSelectedFilter(option.value)
+                  setShowFilterModal(false)
+                }}>
+                <Text style={styles.filterOptionText}>{option.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </Modal>
+      </View>
+      <View style={styles.pillContainer}>
+        {days.map((day, index) => (
+          <VerticalStatusPill
+            key={index}
+            day={day}
+            date={dates[index]}
+            isActive={isDayActive(day, dates[index])}
+          />
+        ))}
+        {/* Add an extra empty view to push Sunday to the next line */}
+        <View style={styles.statusPillContainer} />
+      </View>
+    </View>
+  )
+}
+
 const UpcomingScheduleHeader = ({count}) => {
   const navigation = useNavigation()
 
@@ -53,7 +203,7 @@ const UpcomingScheduleHeader = ({count}) => {
 
   return (
     <View style={styles.upcomingScheduleHeader}>
-      <Text style={styles.upcomingText}>Upcoming Schedule</Text>
+      <Text style={styles.upcomingText}>Upcoming Appointments</Text>
       <View style={styles.countCircle}>
         <Text style={styles.countText}>{count}</Text>
       </View>
@@ -321,6 +471,7 @@ const DoctorDashboardContent = () => {
   return (
     <ScrollView style={styles.dashboardContainer}>
       <SearchBar />
+      <AppointmentTimelineTab />
       <UpcomingScheduleHeader count={UPCOMING_SCHEDULE_DATA.length} />
       <FlatList
         style={{marginBottom: 10}}
@@ -395,6 +546,100 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     flex: 1,
   },
+  appointmentTimelineContainer: {
+    marginBottom: 10,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+    paddingHorizontal: 20,
+  },
+  appointmentTimelineHeader: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  pillContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+    paddingHorizontal: 10,
+  },
+  statusPillContainer: {
+    width: (SCREEN_WIDTH - 2 * 30 - 6 * 5) / 7,
+    height: 65,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    marginHorizontal: 5,
+    flexDirection: 'column',
+  },
+  statusPillDay: {
+    fontWeight: 'bold',
+    marginBottom: 2.5,
+  },
+  statusPillDate: {
+    fontSize: 12,
+    color: '#888',
+    marginTop: 2.5,
+  },
+  statusPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    borderRadius: 15,
+    padding: 5,
+    marginRight: 5,
+  },
+  filterPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    borderRadius: 15,
+    padding: 5,
+    marginRight: -5,
+  },
+  filterText: {
+    marginRight: 5,
+  },
+  filterModal: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  filterOption: {
+    backgroundColor: 'white',
+    padding: 20,
+    marginVertical: 10,
+    borderRadius: 15,
+  },
+  filterOptionText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1069AD',
+  },
+  filterIcon: {
+    marginLeft: 1, // Push the icon 1 pixel to the right
+  },
+  filterSeparatorContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+    position: 'absolute',
+    left: '50%',
+    transform: [{translateX: -3}], // Adjust as needed for spacing
+  },
+
+  filterSeparator: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'grey',
+  },
   upcomingScheduleHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -423,7 +668,7 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     color: '#1069AD',
-    marginLeft: 150,
+    marginLeft: 110,
   },
   card: {
     backgroundColor: '#fff',

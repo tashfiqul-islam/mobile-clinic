@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import {
   SafeAreaView,
   View,
@@ -8,11 +8,12 @@ import {
   ScrollView,
   StyleSheet,
   Platform,
-  Alert,
+  Keyboard,
   Image,
 } from 'react-native'
-import Icon from 'react-native-vector-icons/Ionicons'
 import * as ImagePicker from 'expo-image-picker'
+import {useNavigation} from '@react-navigation/native'
+import {Ionicons} from '@expo/vector-icons'
 
 const dummyData = [
   {
@@ -70,9 +71,12 @@ const dummyData = [
 ]
 
 const ChatScreen = () => {
+  const MAX_HEIGHT = 140
   const [text, setText] = useState('')
   const [messages, setMessages] = useState(dummyData)
   const [attachment, setAttachment] = useState(null)
+  const scrollViewRef = useRef(null)
+  const [inputHeight, setInputHeight] = useState(35)
 
   const handleSend = () => {
     if (text.trim() !== '' || attachment) {
@@ -91,6 +95,10 @@ const ChatScreen = () => {
       setMessages([...messages, newMessage])
       setText('')
       setAttachment(null)
+
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({animated: true})
+      }, 100)
     }
   }
 
@@ -117,30 +125,65 @@ const ChatScreen = () => {
     setAttachment(null)
   }
 
+  const navigation = useNavigation()
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      _keyboardDidShow,
+    )
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      _keyboardDidHide,
+    )
+
+    return () => {
+      keyboardDidShowListener.remove()
+      keyboardDidHideListener.remove()
+    }
+  }, [])
+
+  const _keyboardDidShow = () => {
+    scrollViewRef.current?.scrollToEnd({animated: true})
+  }
+
+  const _keyboardDidHide = () => {
+    // Logic if needed when keyboard hides
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Icon name="arrow-back" size={30} color="#1069AD" style={styles.icon} />
+        <Ionicons
+          name="arrow-back-sharp"
+          size={30}
+          color="#1069AD"
+          style={styles.iconLeft}
+          onPress={() => navigation.goBack()}
+        />
         <Text style={styles.name}>John Doe</Text>
         <View style={styles.statusPill}>
-          <Icon name="ellipse" size={8} color="green" />
+          <Ionicons name="ellipse-sharp" size={8} color="green" />
           <Text style={styles.statusText}>Online</Text>
         </View>
-        <Icon
-          name="videocam-outline"
+        <Ionicons
+          name="ios-videocam-outline"
           size={30}
           color="#1069AD"
-          style={styles.icon}
+          style={styles.iconRight}
         />
-        <Icon
-          name="call-outline"
-          size={30}
+        <Ionicons
+          name="ios-call-outline"
+          size={25}
           color="#1069AD"
-          style={styles.icon}
+          style={styles.iconRight}
         />
       </View>
 
-      <ScrollView style={styles.chatContainer}>
+      <ScrollView
+        style={styles.chatContainer}
+        ref={scrollViewRef}
+        keyboardShouldPersistTaps="handled">
         {messages.map(item => (
           <View
             key={item.id}
@@ -172,9 +215,11 @@ const ChatScreen = () => {
             </View>
             <View style={styles.timestampContainer}>
               {item.user === 'Doctor' && (
-                <Icon
+                <Ionicons
                   name={
-                    item.status === 'sent' ? 'checkmark' : 'ios-checkmark-done'
+                    item.status === 'sent'
+                      ? 'ios-checkmark'
+                      : 'ios-checkmark-done'
                   }
                   size={16}
                   color="#1069AD"
@@ -196,36 +241,47 @@ const ChatScreen = () => {
             <TouchableOpacity
               style={styles.removeAttachment}
               onPress={removeAttachment}>
-              <Icon name="close-circle" size={20} color="red" />
+              <Ionicons
+                name="ios-close-circle-outline"
+                size={25}
+                color="#1069AD"
+              />
             </TouchableOpacity>
           </View>
         )}
-        <Icon
-          name="attach-outline"
+        <Ionicons
+          name="ios-attach-outline"
           size={30}
           color="#1069AD"
-          style={styles.icon}
+          style={styles.iconLeft}
           onPress={handleAttachment}
         />
         <TextInput
-          style={styles.input}
+          style={[styles.input, {height: Math.min(MAX_HEIGHT, inputHeight)}]} // Don't allow the height to exceed MAX_HEIGHT.
           placeholder="Type your message..."
           placeholderTextColor="#1069AD"
           value={text}
           onChangeText={setText}
+          multiline={true}
+          onContentSize={e => {
+            const newHeight = e.nativeEvent.contentSize.height
+            setInputHeight(newHeight)
+          }}
+          numberOfLines={4}
         />
-        <Icon
-          name="mic-outline"
+
+        <Ionicons
+          name="ios-mic-outline"
           size={30}
           color="#1069AD"
-          style={styles.icon}
+          style={styles.iconRight}
           onPress={handleVoice}
         />
-        <Icon
-          name="send"
+        <Ionicons
+          name="ios-send-sharp"
           size={30}
           color="#1069AD"
-          style={styles.icon}
+          style={styles.iconRight}
           onPress={handleSend}
         />
       </View>
@@ -272,7 +328,10 @@ const styles = StyleSheet.create({
     color: 'green',
     marginRight: 5,
   },
-  icon: {
+  iconLeft: {
+    marginLeft: 5, // 5px less than the original 10px
+  },
+  iconRight: {
     marginLeft: 10,
   },
   name: {
@@ -385,7 +444,7 @@ const styles = StyleSheet.create({
         backdropFilter: 'blur(10px)', // Actual glass effect on iOS
       },
     }),
-    marginHorizontal: 10,
+    marginHorizontal: 5,
   },
 })
 
