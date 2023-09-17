@@ -145,16 +145,16 @@ const AppointmentTimelineTab = () => {
         </Text>
         <TouchableOpacity onPress={() => setShowFilterModal(true)}>
           <View style={styles.filterPill}>
-            <Text style={styles.filterText}>
+            <Text style={{...styles.filterText, marginTop: -1}}>
               {filterOptions.find(option => option.value === selectedFilter)
                 ?.label || ''}
             </Text>
-            <Text style={styles.filterSeparator}>|</Text>
+            <Text style={{...styles.filterSeparator, marginTop: -4}}>|</Text>
             <MaterialIcons
               name="keyboard-arrow-down"
               color="black"
               size={24}
-              style={styles.filterIcon}
+              style={{...styles.filterIcon, marginTop: -4}} // Adjust marginTop
             />
           </View>
         </TouchableOpacity>
@@ -164,17 +164,25 @@ const AppointmentTimelineTab = () => {
           visible={showFilterModal}
           onRequestClose={() => setShowFilterModal(false)}>
           <View style={styles.filterModal}>
-            {filterOptions.map(option => (
-              <TouchableOpacity
-                key={option.value}
-                style={styles.filterOption}
-                onPress={() => {
-                  setSelectedFilter(option.value)
-                  setShowFilterModal(false)
-                }}>
-                <Text style={styles.filterOptionText}>{option.label}</Text>
-              </TouchableOpacity>
-            ))}
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setShowFilterModal(false)}>
+              <Text style={styles.closeButtonText}>X</Text>
+            </TouchableOpacity>
+            {filterOptions.map(
+              option =>
+                option.value !== selectedFilter && (
+                  <TouchableOpacity
+                    key={option.value}
+                    style={styles.filterOption}
+                    onPress={() => {
+                      setSelectedFilter(option.value)
+                      setShowFilterModal(false)
+                    }}>
+                    <Text style={styles.filterOptionText}>{option.label}</Text>
+                  </TouchableOpacity>
+                ),
+            )}
           </View>
         </Modal>
       </View>
@@ -601,7 +609,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.5)',
     borderRadius: 15,
     padding: 5,
+    paddingRight: 1,
+    paddingLeft: 10,
     marginRight: -5,
+    height: 25,
   },
   filterText: {
     marginRight: 5,
@@ -634,11 +645,22 @@ const styles = StyleSheet.create({
     left: '50%',
     transform: [{translateX: -3}], // Adjust as needed for spacing
   },
-
   filterSeparator: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: 'grey',
+    color: '#CCCCCC',
+    marginBottom: 1,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 5,
+    right: 10,
+    zIndex: 1,
+  },
+  closeButtonText: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    color: '#1069AD',
   },
   upcomingScheduleHeader: {
     flexDirection: 'row',
