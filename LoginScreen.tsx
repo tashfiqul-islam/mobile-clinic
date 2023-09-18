@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   View,
   Text,
@@ -8,21 +8,21 @@ import {
   StatusBar,
   ActivityIndicator,
 } from 'react-native'
-import {useNavigation} from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 import * as Animatable from 'react-native-animatable'
-import {LinearGradient} from 'expo-linear-gradient'
-import {Feather} from '@expo/vector-icons'
-import {useTheme} from 'react-native-paper'
+import { LinearGradient } from 'expo-linear-gradient'
+import { Feather } from '@expo/vector-icons'
+import { useTheme } from 'react-native-paper'
 import * as Burnt from 'burnt'
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
 import 'firebase/compat/database'
-import {firebaseConfig} from './firebaseConfig'
-import {loginHandle} from './Auth'
+import { firebaseConfig } from './firebaseConfig'
+import { loginHandle } from './Auth'
 
 const LoginScreen = () => {
   const navigation = useNavigation()
-  const {colors} = useTheme()
+  const { colors } = useTheme()
   const [data, setData] = useState({
     username: '',
     password: '',
@@ -179,72 +179,75 @@ const LoginScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#1069AD" barStyle="light-content" />
+      <StatusBar backgroundColor='#1069AD' barStyle='light-content' />
       <View style={styles.header}>
         <Text style={styles.text_header}>Welcome!</Text>
       </View>
       <Animatable.View
-        animation="fadeInUpBig"
+        animation='fadeInUpBig'
         style={[
           styles.footer,
           {
             backgroundColor: colors.background,
           },
         ]}>
-        <Text style={[styles.text_footer, {color: colors.text}]}>Username</Text>
+        <Text style={[styles.text_footer, { color: colors.text }]}>
+          Username
+        </Text>
         <View style={styles.action}>
-          <Feather name="user" color="black" size={20} />
+          <Feather name='user' color='black' size={20} />
           <TextInput
-            placeholder="Your Username"
-            placeholderTextColor="#666666"
+            placeholder='Your Username'
+            placeholderTextColor='#666666'
             style={[
               styles.textInput,
-              {color: colors.text, fontFamily: 'Roboto', marginTop: -5},
+              { color: colors.text, fontFamily: 'Roboto', marginTop: -5 },
             ]}
-            autoCapitalize="none"
+            autoCapitalize='none'
             onChangeText={val => textInputChange(val)}
             onEndEditing={e => handleValidUser(e.nativeEvent.text)}
           />
           {data.check_textInputChange ? (
-            <Animatable.View animation="bounceIn">
-              <Feather name="check-circle" color="#15A00C" size={20} />
+            <Animatable.View animation='bounceIn'>
+              <Feather name='check-circle' color='#15A00C' size={20} />
             </Animatable.View>
           ) : null}
         </View>
         {data.isValidUser ? null : (
-          <Animatable.View animation="fadeInLeft" duration={500}>
+          <Animatable.View animation='fadeInLeft' duration={500}>
             <Text style={styles.errorMsg}>
               Username must be 4 characters long.
             </Text>
           </Animatable.View>
         )}
 
-        <Text style={[styles.text_footer, {color: colors.text, marginTop: 35}]}>
+        <Text
+          style={[styles.text_footer, { color: colors.text, marginTop: 35 }]}>
           Password
         </Text>
         <View style={styles.action}>
-          <Feather name="lock" color={colors.text} size={20} />
+          <Feather name='lock' color={colors.text} size={20} />
           <TextInput
-            placeholder="Your Password"
-            placeholderTextColor="#666666"
+            placeholder='Your Password'
+            placeholderTextColor='#666666'
             secureTextEntry={data.secureTextEntry}
             style={[
               styles.textInput,
-              {color: colors.text, fontFamily: 'Roboto', marginTop: -5},
+              { color: colors.text, fontFamily: 'Roboto', marginTop: -5 },
             ]}
-            autoCapitalize="none"
+            autoCapitalize='none'
             onChangeText={val => handlePasswordChange(val)}
           />
           <TouchableOpacity onPress={updateSecureTextEntry}>
             {data.secureTextEntry ? (
-              <Feather name="eye-off" color="grey" size={20} />
+              <Feather name='eye-off' color='grey' size={20} />
             ) : (
-              <Feather name="eye" color="grey" size={20} />
+              <Feather name='eye' color='grey' size={20} />
             )}
           </TouchableOpacity>
         </View>
         {data.isValidPassword ? null : (
-          <Animatable.View animation="fadeInLeft" duration={500}>
+          <Animatable.View animation='fadeInLeft' duration={500}>
             <Text style={styles.errorMsg}>
               Password must be 8 characters long.
             </Text>
@@ -252,7 +255,7 @@ const LoginScreen = () => {
         )}
 
         <TouchableOpacity>
-          <Text style={{color: '#1069AD', marginTop: 15}}>
+          <Text style={{ color: '#1069AD', marginTop: 15 }}>
             Forgot password?
           </Text>
         </TouchableOpacity>
@@ -267,9 +270,11 @@ const LoginScreen = () => {
               style={styles.signIn}>
               {/* Show ActivityIndicator if isLoading is true, otherwise show "Sign In" */}
               {isLoading ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <ActivityIndicator color='#fff' size='small' />
               ) : (
-                <Text style={[styles.textSign, {color: '#fff'}]}>Sign In</Text>
+                <Text style={[styles.textSign, { color: '#fff' }]}>
+                  Sign In
+                </Text>
               )}
             </LinearGradient>
           </TouchableOpacity>
@@ -284,7 +289,9 @@ const LoginScreen = () => {
                 marginTop: 15,
               },
             ]}>
-            <Text style={[styles.textSign, {color: '#1069AD'}]}>Register</Text>
+            <Text style={[styles.textSign, { color: '#1069AD' }]}>
+              Register
+            </Text>
           </TouchableOpacity>
         </View>
       </Animatable.View>

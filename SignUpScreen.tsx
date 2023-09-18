@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import {
   View,
   Text,
@@ -11,20 +11,20 @@ import {
   StatusBar,
 } from 'react-native'
 import * as Animatable from 'react-native-animatable'
-import {LinearGradient} from 'expo-linear-gradient'
-import {Feather, FontAwesome} from '@expo/vector-icons'
-import {Dropdown} from 'react-native-element-dropdown'
+import { LinearGradient } from 'expo-linear-gradient'
+import { Feather, FontAwesome } from '@expo/vector-icons'
+import { Dropdown } from 'react-native-element-dropdown'
 import * as Burnt from 'burnt'
 import 'firebase/compat/auth'
 import 'firebase/compat/database'
-import {signupHandle} from './Auth'
+import { signupHandle } from './Auth'
 
 const UserTypeData = [
-  {label: 'Doctor', value: 'Doctor'},
-  {label: 'Patient', value: 'Patient'},
+  { label: 'Doctor', value: 'Doctor' },
+  { label: 'Patient', value: 'Patient' },
 ]
 
-const SignUpScreen = ({navigation}) => {
+const SignUpScreen = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(false) // Move this line inside the component
 
   const [data, setData] = useState({
@@ -218,99 +218,99 @@ const SignUpScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#1069AD" barStyle="light-content" />
+      <StatusBar backgroundColor='#1069AD' barStyle='light-content' />
       <View style={styles.header}>
         <Text style={styles.text_header}>Register Now!</Text>
       </View>
-      <Animatable.View animation="fadeInUpBig" style={styles.footer}>
+      <Animatable.View animation='fadeInUpBig' style={styles.footer}>
         <ScrollView>
           {/* Full Name */}
           <Text style={styles.text_footer}>Full Name</Text>
           <View style={styles.action}>
-            <FontAwesome name="user-o" color="#05375a" size={20} />
+            <FontAwesome name='user-o' color='#05375a' size={20} />
             <TextInput
-              placeholder="Your Full Name"
-              style={[styles.textInput, {fontFamily: 'Roboto'}]}
-              autoCapitalize="none"
+              placeholder='Your Full Name'
+              style={[styles.textInput, { fontFamily: 'Roboto' }]}
+              autoCapitalize='none'
               onChangeText={val => fullNameInputChange(val)}
             />
             {data.check_fullNameInputChange ? (
-              <Animatable.View animation="bounceIn">
-                <Feather name="check-circle" color="green" size={20} />
+              <Animatable.View animation='bounceIn'>
+                <Feather name='check-circle' color='green' size={20} />
               </Animatable.View>
             ) : null}
           </View>
 
           {/* Email */}
-          <Text style={[styles.text_footer, {marginTop: 35}]}>Email</Text>
+          <Text style={[styles.text_footer, { marginTop: 35 }]}>Email</Text>
           <View style={styles.action}>
-            <Feather name="mail" color="#05375a" size={20} />
+            <Feather name='mail' color='#05375a' size={20} />
             <TextInput
-              placeholder="Your Email"
-              style={[styles.textInput, {fontFamily: 'Roboto'}]}
-              autoCapitalize="none"
+              placeholder='Your Email'
+              style={[styles.textInput, { fontFamily: 'Roboto' }]}
+              autoCapitalize='none'
               onChangeText={val => emailInputChange(val)}
             />
             {data.check_emailInputChange ? (
-              <Animatable.View animation="bounceIn">
-                <Feather name="check-circle" color="green" size={20} />
+              <Animatable.View animation='bounceIn'>
+                <Feather name='check-circle' color='green' size={20} />
               </Animatable.View>
             ) : null}
           </View>
           {data.emailError ? (
-            <Text style={[styles.errorText, {fontFamily: 'Roboto'}]}>
+            <Text style={[styles.errorText, { fontFamily: 'Roboto' }]}>
               {data.emailError}
             </Text>
           ) : null}
 
           {/* Password */}
-          <Text style={[styles.text_footer, {marginTop: 35}]}>Password</Text>
+          <Text style={[styles.text_footer, { marginTop: 35 }]}>Password</Text>
           <View style={styles.action}>
-            <FontAwesome name="lock" color="#05375a" size={20} />
+            <FontAwesome name='lock' color='#05375a' size={20} />
             <TextInput
-              placeholder="Your Password"
+              placeholder='Your Password'
               secureTextEntry={data.secureTextEntry ? true : false}
-              style={[styles.textInput, {fontFamily: 'Roboto'}]}
-              autoCapitalize="none"
+              style={[styles.textInput, { fontFamily: 'Roboto' }]}
+              autoCapitalize='none'
               onChangeText={val => handlePasswordChange(val)}
             />
             <TouchableOpacity onPress={updateSecureTextEntry}>
               {data.secureTextEntry ? (
-                <Feather name="eye-off" color="grey" size={20} />
+                <Feather name='eye-off' color='grey' size={20} />
               ) : (
-                <Feather name="eye" color="grey" size={20} />
+                <Feather name='eye' color='grey' size={20} />
               )}
             </TouchableOpacity>
           </View>
           {data.passwordError ? (
-            <Text style={[styles.errorText, {fontFamily: 'Roboto'}]}>
+            <Text style={[styles.errorText, { fontFamily: 'Roboto' }]}>
               {data.passwordError}
             </Text>
           ) : null}
 
           {/* User Type */}
-          <Text style={[styles.text_footer, {marginTop: 35}]}>User Type</Text>
+          <Text style={[styles.text_footer, { marginTop: 35 }]}>User Type</Text>
           <View style={styles.action}>
-            <Feather name="users" color="#05375a" size={20} />
+            <Feather name='users' color='#05375a' size={20} />
             <Dropdown
-              style={[styles.dropdown, {fontFamily: 'Roboto'}]}
+              style={[styles.dropdown, { fontFamily: 'Roboto' }]}
               placeholderStyle={[
                 styles.placeholderStyle,
-                {fontFamily: 'Roboto'},
+                { fontFamily: 'Roboto' },
               ]}
               selectedTextStyle={[
                 styles.selectedTextStyle,
-                {fontFamily: 'Roboto'},
+                { fontFamily: 'Roboto' },
               ]}
               inputSearchStyle={[
                 styles.inputSearchStyle,
-                {fontFamily: 'Roboto'},
+                { fontFamily: 'Roboto' },
               ]}
               iconStyle={styles.iconStyle}
               data={UserTypeData}
-              labelField="label"
-              valueField="value"
-              placeholder="Select User Type"
+              labelField='label'
+              valueField='value'
+              placeholder='Select User Type'
               value={data.userType}
               onChange={handleUserTypeChange}
             />
@@ -322,31 +322,33 @@ const SignUpScreen = ({navigation}) => {
               style={styles.checkBox}
               onPress={() => setAgreeCheckbox(!agreeCheckbox)}>
               {agreeCheckbox ? (
-                <Feather name="check-square" color="#1069AD" size={20} />
+                <Feather name='check-square' color='#1069AD' size={20} />
               ) : (
-                <Feather name="square" color="#1069AD" size={20} />
+                <Feather name='square' color='#1069AD' size={20} />
               )}
             </TouchableOpacity>
             <View style={styles.textPrivate}>
-              <Text style={[styles.color_textPrivate, {fontFamily: 'Roboto'}]}>
+              <Text
+                style={[styles.color_textPrivate, { fontFamily: 'Roboto' }]}>
                 By signing up you agree to our
               </Text>
               <Text
                 style={[
                   styles.color_textPrivate,
-                  {fontWeight: 'bold', fontFamily: 'Roboto'},
+                  { fontWeight: 'bold', fontFamily: 'Roboto' },
                 ]}>
                 {' '}
                 Terms of service
               </Text>
-              <Text style={[styles.color_textPrivate, {fontFamily: 'Roboto'}]}>
+              <Text
+                style={[styles.color_textPrivate, { fontFamily: 'Roboto' }]}>
                 {' '}
                 and{'\n'}
               </Text>
               <Text
                 style={[
                   styles.color_textPrivate,
-                  {fontWeight: 'bold', fontFamily: 'Roboto'},
+                  { fontWeight: 'bold', fontFamily: 'Roboto' },
                 ]}>
                 Privacy policy.
               </Text>
@@ -357,14 +359,14 @@ const SignUpScreen = ({navigation}) => {
           <TouchableOpacity style={styles.signIn} onPress={handleSignUp}>
             <LinearGradient
               colors={['#1069AD', '#0C5A97']}
-              style={[styles.signIn, {fontFamily: 'Roboto'}]}>
+              style={[styles.signIn, { fontFamily: 'Roboto' }]}>
               {isLoading ? (
-                <ActivityIndicator size="small" color="#fff" />
+                <ActivityIndicator size='small' color='#fff' />
               ) : (
                 <Text
                   style={[
                     styles.textSign,
-                    {color: '#fff', fontFamily: 'Roboto'},
+                    { color: '#fff', fontFamily: 'Roboto' },
                   ]}>
                   Sign Up
                 </Text>
@@ -384,7 +386,7 @@ const SignUpScreen = ({navigation}) => {
             <Text
               style={[
                 styles.textSign,
-                {color: '#1069AD', fontFamily: 'Roboto'},
+                { color: '#1069AD', fontFamily: 'Roboto' },
               ]}>
               Sign In
             </Text>

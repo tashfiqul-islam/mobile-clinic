@@ -1,15 +1,15 @@
-import React, {useState, useEffect} from 'react'
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native'
-import {useTheme, Drawer} from 'react-native-paper'
-import {SearchBar} from 'react-native-elements'
-import {Feather} from '@expo/vector-icons'
-import {useNavigation} from '@react-navigation/native'
+import React, { useState, useEffect } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { useTheme, Drawer } from 'react-native-paper'
+import { SearchBar } from 'react-native-elements'
+import { Feather } from '@expo/vector-icons'
+import { useNavigation } from '@react-navigation/native'
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
 import 'firebase/compat/database'
 
-const PatientDashboard = ({route}) => {
-  const {colors} = useTheme()
+const PatientDashboard = ({ route }) => {
+  const { colors } = useTheme()
   const [userFirstName, setUserFirstName] = useState('')
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [searchText, setSearchText] = useState('')
@@ -55,29 +55,29 @@ const PatientDashboard = ({route}) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.menuButton} onPress={toggleDrawer}>
-          <Feather name="menu" size={24} color="white" />
+          <Feather name='menu' size={24} color='white' />
         </TouchableOpacity>
-        <Text style={[styles.headerText, {fontFamily: 'Roboto'}]}>
+        <Text style={[styles.headerText, { fontFamily: 'Roboto' }]}>
           {`Hello ${userFirstName}`}
         </Text>
       </View>
       <SearchBar
-        placeholder="Search for something..."
+        placeholder='Search for something...'
         onChangeText={text => setSearchText(text)}
         value={searchText}
         lightTheme
         containerStyle={styles.searchContainer}
         inputContainerStyle={styles.searchInputContainer}
         inputStyle={styles.searchInput}
-        placeholderTextColor="#888"
-        searchIcon={{size: 24}}
+        placeholderTextColor='#888'
+        searchIcon={{ size: 24 }}
       />
       {/* ... rest of your component */}
-      <Drawer.Section title="Menu">
+      <Drawer.Section title='Menu'>
         <Drawer.Item
-          label="Sign Out"
-          icon={({color, size}) => (
-            <Feather name="log-out" size={size} color={color} />
+          label='Sign Out'
+          icon={({ color, size }) => (
+            <Feather name='log-out' size={size} color={color} />
           )}
           onPress={() => {
             closeDrawer()

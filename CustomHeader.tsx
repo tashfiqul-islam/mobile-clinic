@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react'
-import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native'
-import {Ionicons} from '@expo/vector-icons'
-import {useNavigation} from '@react-navigation/native'
+import React, { useEffect, useState } from 'react'
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
+import { useNavigation } from '@react-navigation/native'
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
 import 'firebase/compat/database'
@@ -9,7 +9,7 @@ import 'firebase/compat/database'
 const DEFAULT_IMAGE_URL =
   'https://firebasestorage.googleapis.com/v0/b/mclinic-df2b5.appspot.com/o/profile_images%2FdefaultProfile.png?alt=media&token=600ebca7-a028-428c-9199-3bd7464cf216'
 
-const CustomHeader = ({userImage, userFullName}) => {
+const CustomHeader = ({ userImage, userFullName }) => {
   const navigation = useNavigation()
   const [greeting, setGreeting] = useState('')
 
@@ -42,7 +42,7 @@ const CustomHeader = ({userImage, userFullName}) => {
         style={styles.profileImageContainer}
         onPress={handleProfileNavigation}>
         <Image
-          source={{uri: userImage || DEFAULT_IMAGE_URL}}
+          source={{ uri: userImage || DEFAULT_IMAGE_URL }}
           style={styles.profileImage}
         />
       </TouchableOpacity>
@@ -53,7 +53,7 @@ const CustomHeader = ({userImage, userFullName}) => {
       <TouchableOpacity
         style={styles.notificationIconContainer}
         onPress={handleNotificationPress}>
-        <Ionicons name="ios-notifications" size={24} color="white" />
+        <Ionicons name='ios-notifications' size={24} color='white' />
       </TouchableOpacity>
     </View>
   )
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     elevation: 4, // for Android shadow
     shadowColor: '#000', // for iOS shadow
-    shadowOffset: {width: 0, height: 2}, // for iOS shadow
+    shadowOffset: { width: 0, height: 2 }, // for iOS shadow
     shadowOpacity: 0.25, // for iOS shadow
     shadowRadius: 3.84, // for iOS shadow
   },

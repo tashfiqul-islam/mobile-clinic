@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Image,
 } from 'react-native'
-import {Ionicons} from '@expo/vector-icons'
+import { Ionicons } from '@expo/vector-icons'
 
 // Dummy Data
 const chats = [
@@ -32,13 +32,13 @@ const chats = [
   // ... (more dummy data can be added here)
 ]
 
-const MessageTab = ({navigation}) => {
+const MessageTab = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <FlatList
         data={chats}
         keyExtractor={item => item.id}
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <ChatItem chat={item} navigation={navigation} />
         )}
       />
@@ -46,14 +46,14 @@ const MessageTab = ({navigation}) => {
   )
 }
 
-const ChatItem = ({chat, navigation}) => {
+const ChatItem = ({ chat, navigation }) => {
   return (
     <TouchableOpacity
       style={styles.chatItem}
       onPress={() => navigation.navigate('ChatScreen')}>
       <View style={styles.avatarContainer}>
         <View style={styles.avatarBorder}>
-          <Image source={{uri: chat.avatar}} style={styles.avatar} />
+          <Image source={{ uri: chat.avatar }} style={styles.avatar} />
         </View>
         {chat.online && <View style={styles.onlineIndicator}></View>}
       </View>

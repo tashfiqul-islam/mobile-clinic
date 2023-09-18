@@ -1,7 +1,7 @@
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
 import 'firebase/compat/database'
-import {firebaseConfig} from './firebaseConfig'
+import { firebaseConfig } from './firebaseConfig'
 
 firebase.initializeApp(firebaseConfig)
 
@@ -20,17 +20,17 @@ export const loginHandle = async (email, password) => {
 
       const userType = userSnapshot.val().userType
 
-      return {success: true, userType}
+      return { success: true, userType }
     } else {
-      return {success: false, error: 'Authentication failed'}
+      return { success: false, error: 'Authentication failed' }
     }
   } catch (error) {
     // Handle specific errors here
     switch (error.code) {
       case 'auth/user-not-found':
-        return {success: false, error: 'User not found'}
+        return { success: false, error: 'User not found' }
       case 'auth/wrong-password':
-        return {success: false, error: 'Incorrect password'}
+        return { success: false, error: 'Incorrect password' }
       // ... handle other specific error codes
       default:
         return {
@@ -63,7 +63,7 @@ export const signupHandle = async (fullName, email, password, userType) => {
         userBio: '',
       })
 
-    return {success: true, userType}
+    return { success: true, userType }
   } catch (error) {
     console.error('Registration error:', error)
 

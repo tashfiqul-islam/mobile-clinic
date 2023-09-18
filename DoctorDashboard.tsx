@@ -1,18 +1,18 @@
-import React, {useEffect, useState} from 'react'
-import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native'
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
-import {Ionicons} from '@expo/vector-icons'
+import React, { useEffect, useState } from 'react'
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { Ionicons } from '@expo/vector-icons'
 import firebase from 'firebase/compat/app'
-import {useNavigation} from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 import 'firebase/compat/auth'
 import 'firebase/compat/database'
 import ProfileTab from './ProfileTab'
 import HomeTab from './HomeTab'
 import AppointmentList from './AppointmentList'
 import MessageTab from './MessageTab'
-import {useUser} from './UserContext'
+import { useUser } from './UserContext'
 
-const CustomTabLabel = ({title, focused}) => {
+const CustomTabLabel = ({ title, focused }) => {
   return (
     <View
       style={{
@@ -21,7 +21,7 @@ const CustomTabLabel = ({title, focused}) => {
         alignItems: 'center',
         paddingBottom: focused ? 5 : 0,
       }}>
-      {focused ? <Text style={{color: '#1069AD'}}>{title}</Text> : null}
+      {focused ? <Text style={{ color: '#1069AD' }}>{title}</Text> : null}
     </View>
   )
 }
@@ -55,7 +55,7 @@ const renderIcon = (name, color, size) => {
           name={name}
           size={iconSize}
           color={isFocused ? 'white' : color}
-          style={{marginTop: isFocused ? -2 : 15}}
+          style={{ marginTop: isFocused ? -2 : 15 }}
         />
       </View>
     </View>
@@ -67,8 +67,8 @@ const DEFAULT_IMAGE_URL =
 
 const Tab = createBottomTabNavigator()
 
-const DoctorDashboard = ({route}) => {
-  const {userFullName, setUserFullName} = useUser()
+const DoctorDashboard = ({ route }) => {
+  const { userFullName, setUserFullName } = useUser()
   const navigation = useNavigation()
   const [userImage, setUserImage] = useState(null) // <-- Add this state
 
@@ -135,7 +135,7 @@ const DoctorDashboard = ({route}) => {
           style={styles.profileImageContainer}
           onPress={handleProfileNavigation}>
           <Image
-            source={{uri: userImage || DEFAULT_IMAGE_URL}}
+            source={{ uri: userImage || DEFAULT_IMAGE_URL }}
             style={styles.profileImage}
           />
         </TouchableOpacity>
@@ -146,7 +146,7 @@ const DoctorDashboard = ({route}) => {
         <TouchableOpacity
           style={styles.notificationIconContainer}
           onPress={handleNotificationPress}>
-          <Ionicons name="ios-notifications" size={24} color="white" />
+          <Ionicons name='ios-notifications' size={24} color='white' />
         </TouchableOpacity>
       </View>
       <Tab.Navigator
@@ -173,45 +173,46 @@ const DoctorDashboard = ({route}) => {
           headerShown: false,
         }}>
         <Tab.Screen
-          name="Home"
+          name='Home'
           component={HomeTab}
           options={{
-            tabBarIcon: ({color, size}) => renderIcon('ios-home', color, size),
-            tabBarLabel: ({focused}) => (
-              <CustomTabLabel title="Home" focused={focused} />
+            tabBarIcon: ({ color, size }) =>
+              renderIcon('ios-home', color, size),
+            tabBarLabel: ({ focused }) => (
+              <CustomTabLabel title='Home' focused={focused} />
             ),
           }}
         />
         <Tab.Screen
-          name="AppointmentList"
+          name='AppointmentList'
           component={AppointmentList}
           options={{
-            tabBarIcon: ({color, size}) =>
+            tabBarIcon: ({ color, size }) =>
               renderIcon('ios-calendar', color, size),
-            tabBarLabel: ({focused}) => (
-              <CustomTabLabel title="Appointment" focused={focused} />
+            tabBarLabel: ({ focused }) => (
+              <CustomTabLabel title='Appointment' focused={focused} />
             ),
           }}
         />
         <Tab.Screen
-          name="Message"
+          name='Message'
           component={MessageTab}
           options={{
-            tabBarIcon: ({color, size}) =>
+            tabBarIcon: ({ color, size }) =>
               renderIcon('ios-chatbubbles', color, size),
-            tabBarLabel: ({focused}) => (
-              <CustomTabLabel title="Message" focused={focused} />
+            tabBarLabel: ({ focused }) => (
+              <CustomTabLabel title='Message' focused={focused} />
             ),
           }}
         />
         <Tab.Screen
-          name="Profile"
+          name='Profile'
           component={ProfileTab}
           options={{
-            tabBarIcon: ({color, size}) =>
+            tabBarIcon: ({ color, size }) =>
               renderIcon('ios-person', color, size),
-            tabBarLabel: ({focused}) => (
-              <CustomTabLabel title="Profile" focused={focused} />
+            tabBarLabel: ({ focused }) => (
+              <CustomTabLabel title='Profile' focused={focused} />
             ),
             tabBarItemStyle: {
               borderRightWidth: 0,

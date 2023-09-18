@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   View,
   Text,
@@ -19,8 +19,8 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
 } from '@expo/vector-icons'
-import {LinearGradient} from 'expo-linear-gradient'
-import {useNavigation} from '@react-navigation/native'
+import { LinearGradient } from 'expo-linear-gradient'
+import { useNavigation } from '@react-navigation/native'
 
 const SCREEN_WIDTH = Dimensions.get('window').width
 
@@ -73,9 +73,7 @@ export const UPCOMING_SCHEDULE_DATA = [
     id: '5',
     name: 'Janet Harwood',
     type: 'Physical Exam',
-    date: `${today.getFullYear()}-${(today.getMonth() + 1)
-      .toString()
-      .padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`,
+    date: `2023-09-19`,
     time: '10:00 - 11:00',
     image: require('./assets/images/head-3.jpg'),
     rating: 4.5,
@@ -88,8 +86,8 @@ export const UPCOMING_SCHEDULE_DATA = [
     date: '2023-09-18',
     time: '11:00 - 12:00',
     image: require('./assets/images/pat-3.jpeg'),
-    rating: 4.3, // Added rating
-    reviews: 22, // example review count
+    rating: 4.5, // Added rating
+    reviews: 25, // example review count
   },
   {
     id: '7',
@@ -98,18 +96,38 @@ export const UPCOMING_SCHEDULE_DATA = [
     date: '2023-09-18',
     time: '13:00 - 14:00',
     image: require('./assets/images/head-2.jpg'),
-    rating: 4.3, // Added rating
-    reviews: 22, // example review count
+    rating: 4, // Added rating
+    reviews: 12, // example review count
   },
   {
     id: '8',
     name: 'Michael Phelps',
     type: 'Monthly Checkup',
     date: '2023-09-19',
-    time: '11:00 - 12:00',
+    time: '09:00 - 10:00',
     image: require('./assets/images/pat-7.jpeg'),
-    rating: 4.3, // Added rating
-    reviews: 22, // example review count
+    rating: 4.7, // Added rating
+    reviews: 35, // example review count
+  },
+  {
+    id: '9',
+    name: 'Gina Schultz',
+    type: 'Physical Exam',
+    date: '2023-09-19',
+    time: '11:00 - 12:00',
+    image: require('./assets/images/pat-4.jpeg'),
+    rating: 4.6, // Added rating
+    reviews: 24, // example review count
+  },
+  {
+    id: '10',
+    name: 'Serena Costanza',
+    type: 'Physical Exam',
+    date: '2023-09-20',
+    time: '10:00 - 11:00',
+    image: require('./assets/images/pat-3.jpeg'),
+    rating: 3.9, // Added rating
+    reviews: 42, // example review count
   },
 ]
 
@@ -157,7 +175,7 @@ export const RECENT_APPOINTMENTS_DATA = [
   },
 ]
 
-const Touchable = ({children, style, ...props}) => {
+const Touchable = ({ children, style, ...props }) => {
   if (Platform.OS === 'android' && Platform.Version >= 21) {
     return (
       <TouchableNativeFeedback
@@ -169,7 +187,7 @@ const Touchable = ({children, style, ...props}) => {
     )
   }
   return (
-    <TouchableHighlight {...props} underlayColor="#adadad" style={style}>
+    <TouchableHighlight {...props} underlayColor='#adadad' style={style}>
       {children}
     </TouchableHighlight>
   )
@@ -177,12 +195,12 @@ const Touchable = ({children, style, ...props}) => {
 
 const SearchBar = () => (
   <View style={styles.searchBarContainer}>
-    <Ionicons name="ios-search" size={20} color="#888" />
-    <TextInput placeholder="Search..." style={styles.searchInput} />
+    <Ionicons name='ios-search' size={20} color='#888' />
+    <TextInput placeholder='Search...' style={styles.searchInput} />
   </View>
 )
 
-const VerticalStatusPill = ({day, date, isActive}) => {
+const VerticalStatusPill = ({ day, date, isActive }) => {
   const backgroundColor = isActive ? '#1069AD' : 'rgba(255, 255, 255, 0.8)'
   const textColor = isActive ? '#fff' : '#000'
 
@@ -192,8 +210,8 @@ const VerticalStatusPill = ({day, date, isActive}) => {
         ...styles.statusPillContainer,
         backgroundColor: backgroundColor,
       }}>
-      <Text style={{...styles.statusPillDay, color: textColor}}>{day}</Text>
-      <Text style={{...styles.statusPillDate, color: textColor}}>{date}</Text>
+      <Text style={{ ...styles.statusPillDay, color: textColor }}>{day}</Text>
+      <Text style={{ ...styles.statusPillDate, color: textColor }}>{date}</Text>
     </View>
   )
 }
@@ -201,9 +219,9 @@ const VerticalStatusPill = ({day, date, isActive}) => {
 const AppointmentTimelineTab = () => {
   const startDate = new Date(2023, 8, 18)
   const filterOptions = [
-    {label: 'This week', value: 'this_week'},
-    {label: 'Previous week', value: 'prev_week'},
-    {label: 'Next week', value: 'next_week'},
+    { label: 'This week', value: 'this_week' },
+    { label: 'Previous week', value: 'prev_week' },
+    { label: 'Next week', value: 'next_week' },
   ]
 
   const [selectedFilter, setSelectedFilter] = useState('this_week')
@@ -224,7 +242,7 @@ const AppointmentTimelineTab = () => {
           const date = new Date(startDate)
           date.setDate(startDate.getDate() + i)
           days.push(
-            date.toLocaleString('en-us', {weekday: 'short'}).substring(0, 1),
+            date.toLocaleString('en-us', { weekday: 'short' }).substring(0, 1),
           )
           dates.push(date.getDate().toString().padStart(2, '0'))
         }
@@ -235,7 +253,7 @@ const AppointmentTimelineTab = () => {
           const date = new Date(startDate)
           date.setDate(startDate.getDate() + i)
           days.push(
-            date.toLocaleString('en-us', {weekday: 'short'}).substring(0, 1),
+            date.toLocaleString('en-us', { weekday: 'short' }).substring(0, 1),
           )
           dates.push(date.getDate().toString().padStart(2, '0'))
         }
@@ -246,17 +264,17 @@ const AppointmentTimelineTab = () => {
           const date = new Date(startDate)
           date.setDate(startDate.getDate() + i)
           days.push(
-            date.toLocaleString('en-us', {weekday: 'short'}).substring(0, 1),
+            date.toLocaleString('en-us', { weekday: 'short' }).substring(0, 1),
           )
           dates.push(date.getDate().toString().padStart(2, '0'))
         }
         break
     }
 
-    return {days, dates}
+    return { days, dates }
   }
 
-  const {days, dates} = calculateDaysAndDates(selectedFilter)
+  const { days, dates } = calculateDaysAndDates(selectedFilter)
 
   const now = new Date()
 
@@ -317,7 +335,8 @@ const AppointmentTimelineTab = () => {
   const isDayActive = (day, date) => {
     const now = new Date()
     return (
-      day === now.toLocaleString('en-us', {weekday: 'short'}).substring(0, 1) &&
+      day ===
+        now.toLocaleString('en-us', { weekday: 'short' }).substring(0, 1) &&
       parseInt(date) === now.getDate()
     )
   }
@@ -332,22 +351,22 @@ const AppointmentTimelineTab = () => {
         </Text>
         <TouchableOpacity onPress={() => setShowFilterModal(true)}>
           <View style={styles.filterPill}>
-            <Text style={{...styles.filterText, marginTop: -1}}>
+            <Text style={{ ...styles.filterText, marginTop: -1 }}>
               {filterOptions.find(option => option.value === selectedFilter)
                 ?.label || ''}
             </Text>
-            <Text style={{...styles.filterSeparator, marginTop: -4}}>|</Text>
+            <Text style={{ ...styles.filterSeparator, marginTop: -4 }}>|</Text>
             <MaterialIcons
-              name="keyboard-arrow-down"
-              color="black"
+              name='keyboard-arrow-down'
+              color='black'
               size={24}
-              style={{...styles.filterIcon, marginTop: -4}}
+              style={{ ...styles.filterIcon, marginTop: -4 }}
             />
           </View>
         </TouchableOpacity>
         <Modal
           transparent={true}
-          animationType="slide"
+          animationType='slide'
           visible={showFilterModal}
           onRequestClose={() => setShowFilterModal(false)}>
           <View style={styles.filterModal}>
@@ -394,13 +413,13 @@ const AppointmentTimelineTab = () => {
               key={index}
               style={[
                 styles.statusPillContainer,
-                {backgroundColor, borderColor, borderWidth: 1},
+                { backgroundColor, borderColor, borderWidth: 1 },
               ]}
               onPress={() => setSelectedDay(index)}>
-              <Text style={[styles.statusPillDay, {color: textColor}]}>
+              <Text style={[styles.statusPillDay, { color: textColor }]}>
                 {day}
               </Text>
-              <Text style={[styles.statusPillDate, {color: textColor}]}>
+              <Text style={[styles.statusPillDate, { color: textColor }]}>
                 {dates[index]}
               </Text>
             </TouchableOpacity>
@@ -423,15 +442,15 @@ const AppointmentTimelineTab = () => {
                   <View style={styles.arrowContainer}>
                     {isPast ? (
                       <Ionicons
-                        name="ios-chevron-down-circle"
+                        name='ios-chevron-down-circle'
                         size={24}
-                        color="#1069AD"
+                        color='#1069AD'
                       />
                     ) : (
                       <Ionicons
-                        name="ios-chevron-down-circle-outline"
+                        name='ios-chevron-down-circle-outline'
                         size={24}
-                        color="#1069AD"
+                        color='#1069AD'
                       />
                     )}
                   </View>
@@ -470,14 +489,14 @@ const AppointmentTimelineTab = () => {
             )
           })
         ) : (
-          <Text>You don't have any new appointments today yet!</Text>
+          <Text style={styles.emptyText}>No new appointments booked yet!</Text>
         )}
       </View>
     </View>
   )
 }
 
-const UpcomingScheduleHeader = ({count}) => {
+const UpcomingScheduleHeader = ({ count }) => {
   const navigation = useNavigation()
 
   const handleViewAllPress = () => {
@@ -497,11 +516,11 @@ const UpcomingScheduleHeader = ({count}) => {
   )
 }
 
-export const UpcomingAppointmentCard = ({item}) => {
+export const UpcomingAppointmentCard = ({ item }) => {
   const navigation = useNavigation()
 
   const handleCardPress = () => {
-    navigation.navigate('AppointmentOverview', {appointmentData: item})
+    navigation.navigate('AppointmentOverview', { appointmentData: item })
   }
 
   return (
@@ -515,24 +534,24 @@ export const UpcomingAppointmentCard = ({item}) => {
           <View style={styles.appointmentTop}>
             <Image source={item.image} style={styles.patientImage} />
             <View style={styles.textContainer}>
-              <Text style={[styles.patientName, {color: '#FFFFFF'}]}>
+              <Text style={[styles.patientName, { color: '#FFFFFF' }]}>
                 {item.name}
               </Text>
-              <Text style={[styles.appointmentType, {color: '#FFFFFF'}]}>
+              <Text style={[styles.appointmentType, { color: '#FFFFFF' }]}>
                 {item.type}
               </Text>
             </View>
             <View style={styles.iconContainer}>
               <Ionicons
-                name="ios-videocam"
+                name='ios-videocam'
                 size={24}
-                color="#FFFFFF"
+                color='#FFFFFF'
                 style={[styles.icon, styles.icon3D]}
               />
               <Ionicons
-                name="ios-chatbubbles"
+                name='ios-chatbubbles'
                 size={24}
-                color="#FFFFFF"
+                color='#FFFFFF'
                 style={styles.icon3D}
               />
             </View>
@@ -540,11 +559,11 @@ export const UpcomingAppointmentCard = ({item}) => {
           <View
             style={[
               styles.appointmentDateContainer,
-              {backgroundColor: '#E4E4E4'},
+              { backgroundColor: '#E4E4E4' },
             ]}>
             <View style={styles.leftAlign}>
-              <Ionicons name="ios-calendar" size={20} color="#000000" />
-              <Text style={[styles.appointmentDate, {color: '#000000'}]}>
+              <Ionicons name='ios-calendar' size={20} color='#000000' />
+              <Text style={[styles.appointmentDate, { color: '#000000' }]}>
                 {item.date}
               </Text>
             </View>
@@ -558,12 +577,12 @@ export const UpcomingAppointmentCard = ({item}) => {
             </Text>
             <View style={styles.rightAlign}>
               <Ionicons
-                name="ios-time"
+                name='ios-time'
                 size={20}
-                color="#000000"
+                color='#000000'
                 style={styles.icon}
               />
-              <Text style={[styles.appointmentTime, {color: '#000000'}]}>
+              <Text style={[styles.appointmentTime, { color: '#000000' }]}>
                 {item.time}
               </Text>
             </View>
@@ -575,7 +594,7 @@ export const UpcomingAppointmentCard = ({item}) => {
 }
 ;<UpcomingScheduleHeader count={UPCOMING_SCHEDULE_DATA.length} />
 
-const StatsCard = ({iconName, value, label}) => {
+const StatsCard = ({ iconName, value, label }) => {
   return (
     <View style={styles.statsCard}>
       <Ionicons name={iconName} size={24} style={styles.statsIcon} />
@@ -585,7 +604,7 @@ const StatsCard = ({iconName, value, label}) => {
   )
 }
 
-const RecentAppointmentItem = ({item}) => {
+const RecentAppointmentItem = ({ item }) => {
   const fullStars = Math.floor(item.rating)
   const hasHalfStar = item.rating - fullStars > 0
 
@@ -600,21 +619,21 @@ const RecentAppointmentItem = ({item}) => {
         </Text>
         <View style={styles.recentRatingContainer}>
           {/* Display full stars */}
-          {Array.from({length: fullStars}).map((_, index) => (
-            <Ionicons key={index} name="ios-star" size={20} color="#1069AD" />
+          {Array.from({ length: fullStars }).map((_, index) => (
+            <Ionicons key={index} name='ios-star' size={20} color='#1069AD' />
           ))}
           {/* Display half star if needed */}
           {hasHalfStar && (
-            <Ionicons name="ios-star-half" size={20} color="#1069AD" />
+            <Ionicons name='ios-star-half' size={20} color='#1069AD' />
           )}
           {/* Display empty stars */}
-          {Array.from({length: 5 - fullStars - (hasHalfStar ? 1 : 0)}).map(
+          {Array.from({ length: 5 - fullStars - (hasHalfStar ? 1 : 0) }).map(
             (_, index) => (
               <Ionicons
                 key={fullStars + index}
-                name="ios-star-outline"
+                name='ios-star-outline'
                 size={20}
-                color="#1069AD"
+                color='#1069AD'
               />
             ),
           )}
@@ -622,9 +641,9 @@ const RecentAppointmentItem = ({item}) => {
         </View>
       </View>
       <Ionicons
-        name="ios-chatbubbles"
+        name='ios-chatbubbles'
         size={24}
-        color="#1069AD"
+        color='#1069AD'
         style={styles.recentMessageIcon}
       />
     </View>
@@ -658,10 +677,10 @@ const DoctorDashboardContent = () => {
     }
   }, [currentSlideIndex, isUserInteracting])
 
-  const CarouselIndicator = ({total, activeIndex}) => {
+  const CarouselIndicator = ({ total, activeIndex }) => {
     return (
       <View style={styles.indicatorContainer}>
-        {Array.from({length: total}).map((_, index) => (
+        {Array.from({ length: total }).map((_, index) => (
           <View
             key={index}
             style={[
@@ -674,24 +693,55 @@ const DoctorDashboardContent = () => {
     )
   }
 
+  const [upcomingAppointments, setUpcomingAppointments] = useState([])
+
+  useEffect(() => {
+    // Get current date and time
+    const now = new Date()
+    const currentHour = now.getHours()
+    const currentMinutes = now.getMinutes()
+
+    // Filter UPCOMING_SCHEDULE_DATA to get only upcoming appointments
+    const filteredAppointments = UPCOMING_SCHEDULE_DATA.filter(appointment => {
+      const appointmentDate = new Date(appointment.date)
+      if (appointmentDate > now) {
+        // If the appointment date is in the future, include it
+        return true
+      } else if (appointmentDate.toDateString() === now.toDateString()) {
+        // If the appointment is today, check the time
+        const [startHour, startMinutes] = appointment.time
+          .split(' - ')[0]
+          .split(':')
+          .map(Number)
+        return (
+          startHour > currentHour ||
+          (startHour === currentHour && startMinutes > currentMinutes)
+        )
+      }
+      return false
+    })
+
+    setUpcomingAppointments(filteredAppointments)
+  }, [])
+
   return (
     <ScrollView style={styles.dashboardContainer}>
       <SearchBar />
       <AppointmentTimelineTab />
-      <UpcomingScheduleHeader count={UPCOMING_SCHEDULE_DATA.length} />
+      <UpcomingScheduleHeader count={upcomingAppointments.length} />
       <FlatList
-        style={{marginBottom: 10}}
+        data={upcomingAppointments}
+        keyExtractor={item => item.id}
+        style={{ marginBottom: 10 }}
         ref={flatListRef}
-        data={UPCOMING_SCHEDULE_DATA}
         horizontal
         pagingEnabled
         contentContainerStyle={{
-          width: `${100 * UPCOMING_SCHEDULE_DATA.length}%`,
+          width: `${100 * upcomingAppointments.length}%`,
         }}
         showsHorizontalScrollIndicator={false}
-        keyExtractor={item => item.id}
-        renderItem={({item}) => (
-          <View style={{width: SCREEN_WIDTH}}>
+        renderItem={({ item }) => (
+          <View style={{ width: SCREEN_WIDTH }}>
             <UpcomingAppointmentCard item={item} />
           </View>
         )}
@@ -711,14 +761,14 @@ const DoctorDashboardContent = () => {
       <View style={styles.quickStatsHeader}>
         <Text style={styles.quickStatsTitle}>Recent Week Overview</Text>
         <TouchableOpacity>
-          <MaterialCommunityIcons name="refresh" size={24} color="#1069AD" />
+          <MaterialCommunityIcons name='refresh' size={24} color='#1069AD' />
         </TouchableOpacity>
       </View>
       <View style={styles.statsGrid}>
-        <StatsCard iconName="ios-people" value="15" label="Patients" />
-        <StatsCard iconName="ios-document" value="7" label="Prescriptions" />
-        <StatsCard iconName="ios-call" value="3" label="ER Calls" />
-        <StatsCard iconName="ios-time" value="2" label="Appointments" />
+        <StatsCard iconName='ios-people' value='15' label='Patients' />
+        <StatsCard iconName='ios-document' value='7' label='Prescriptions' />
+        <StatsCard iconName='ios-call' value='3' label='ER Calls' />
+        <StatsCard iconName='ios-time' value='2' label='Appointments' />
       </View>
       <View style={styles.recentAppointmentsHeader}>
         <Text style={styles.recentAppointmentsTitle}>Recent Appointments</Text>
@@ -744,7 +794,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#fff',
     padding: 10,
-    borderRadius: 8,
+    borderRadius: 50,
     margin: 10,
     alignItems: 'center',
   },
@@ -841,7 +891,7 @@ const styles = StyleSheet.create({
     height: '100%',
     position: 'absolute',
     left: '50%',
-    transform: [{translateX: -3}], // Adjust as needed for spacing
+    transform: [{ translateX: -3 }], // Adjust as needed for spacing
   },
   filterSeparator: {
     fontSize: 18,
@@ -997,6 +1047,11 @@ const styles = StyleSheet.create({
     position: 'relative',
     marginBottom: 20,
     width: '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
   },
 
   arrowContainer: {
@@ -1005,6 +1060,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     bottom: 20,
     marginLeft: -240,
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
   },
 
   timeContainer: {
@@ -1021,13 +1081,7 @@ const styles = StyleSheet.create({
     height: 75,
     position: 'relative', // Set to relative
     top: 27.5, // Adjust this value to move all the dots down together
-    marginLeft: -245,
-  },
-
-  horizontalDotsLeftContainer: {
-    flex: 1,
-    alignItems: 'flex-end',
-    justifyContent: 'center',
+    marginLeft: -258,
   },
 
   pillContainer2: {
@@ -1040,6 +1094,11 @@ const styles = StyleSheet.create({
     marginTop: -60,
     marginLeft: 10,
     width: 330,
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
   },
 
   pillsContainer3: {
@@ -1050,6 +1109,11 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     marginBottom: 100,
     marginLeft: 50,
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
   },
 
   horizontalDotsRightContainer: {
@@ -1076,22 +1140,23 @@ const styles = StyleSheet.create({
 
   appointmentTextContainer: {
     flexDirection: 'column',
-    marginLeft: 10,
+    marginLeft: 5,
   },
 
   appointmentTimeNew: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#555',
   },
 
   appointmentNameNew: {
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 15,
+    color: '#1069AD',
   },
 
   appointmentTypeNew: {
-    fontSize: 12,
+    fontSize: 13,
   },
   daysContainer1: {
     flexDirection: 'row',
@@ -1168,6 +1233,11 @@ const styles = StyleSheet.create({
   inactiveDot: {
     backgroundColor: '#d3d3d3',
   },
+  emptyText: {
+    color: '#1069AD',
+    marginTop: 10,
+    marginBottom: -10,
+  },
   quickStatsHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -1188,7 +1258,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10, // Adjusted padding to align with appointmentCard
     backgroundColor: '#E4E4E4',
     shadowColor: '#000',
-    shadowOffset: {width: 1, height: 2},
+    shadowOffset: { width: 1, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
   },
@@ -1203,7 +1273,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 2, height: 2},
+    shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4.65,
     elevation: 8,

@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useState, useEffect} from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
 import 'firebase/compat/database'
@@ -10,7 +10,7 @@ export const useUser = () => {
   return useContext(UserContext)
 }
 
-export const UserProvider = ({children}) => {
+export const UserProvider = ({ children }) => {
   const [userFullName, setUserFullName] = useState('')
   const [userEmail, setUserEmail] = useState('')
   const [userBio, setUserBio] = useState('')

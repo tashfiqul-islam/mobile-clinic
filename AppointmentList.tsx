@@ -17,25 +17,25 @@ import {
 
 const Spacer = () => <View style={styles.spacer} />
 
-const Touchable = ({children, style, ...props}) => {
+const Touchable = ({ children, style, ...props }) => {
   if (Platform.OS === 'android' && Platform.Version >= 21) {
     return (
       <TouchableNativeFeedback
         {...props}
         useForeground
         background={TouchableNativeFeedback.Ripple('#80adadad', false)}>
-        <View style={[style, {backgroundColor: '#E4E4E4'}]}>{children}</View>
+        <View style={[style, { backgroundColor: '#E4E4E4' }]}>{children}</View>
       </TouchableNativeFeedback>
     )
   }
   return (
-    <TouchableHighlight {...props} underlayColor="#adadad" style={style}>
+    <TouchableHighlight {...props} underlayColor='#adadad' style={style}>
       {children}
     </TouchableHighlight>
   )
 }
 
-const HeaderWithCount = ({title, count}) => (
+const HeaderWithCount = ({ title, count }) => (
   <View style={styles.headerWithCountContainer}>
     <Text style={styles.headerText}>{title}</Text>
     <View style={styles.countCircle}>
@@ -44,12 +44,12 @@ const HeaderWithCount = ({title, count}) => (
   </View>
 )
 
-const AppointmentList = ({navigation}) => {
+const AppointmentList = ({ navigation }) => {
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: '#E4E4E4'}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#E4E4E4' }}>
       <ScrollView style={styles.container}>
         <HeaderWithCount
-          title="Upcoming Appointments"
+          title='Upcoming Appointments'
           count={UPCOMING_SCHEDULE_DATA.length}
         />
         {UPCOMING_SCHEDULE_DATA.map((item, index) => (
@@ -70,7 +70,7 @@ const AppointmentList = ({navigation}) => {
         ))}
 
         <HeaderWithCount
-          title="Recent Appointments"
+          title='Recent Appointments'
           count={RECENT_APPOINTMENTS_DATA.length}
         />
         {RECENT_APPOINTMENTS_DATA.map((item, index) => (

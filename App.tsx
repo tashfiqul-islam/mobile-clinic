@@ -1,21 +1,21 @@
 import 'react-native-gesture-handler'
-import React, {useEffect, useState, useRef} from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import * as Font from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen'
-import {NavigationContainer} from '@react-navigation/native'
-import {createStackNavigator} from '@react-navigation/stack'
+import { NavigationContainer } from '@react-navigation/native'
+import { createStackNavigator } from '@react-navigation/stack'
 import MainScreen from './MainScreen'
 import LoginScreen from './LoginScreen'
 import SignUpScreen from './SignUpScreen'
 import DoctorDashboard from './DoctorDashboard'
 import PatientDashboard from './PatientDashboard'
 import AppointmentOverview from './AppointmentOverview'
-import {firebaseConfig} from './firebaseConfig'
+import { firebaseConfig } from './firebaseConfig'
 import ProfileTab from './ProfileTab'
 import DoctorDashboardNavigator from './DoctorDashboardNavigator'
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
-import {UserProvider} from './UserContext'
+import { UserProvider } from './UserContext'
 
 const Stack = createStackNavigator()
 
@@ -97,39 +97,39 @@ const App: React.FC = () => {
       <NavigationContainer ref={navigationRef}>
         <Stack.Navigator initialRouteName={initialRouteName}>
           <Stack.Screen
-            name="Home"
+            name='Home'
             component={MainScreen}
-            options={{title: 'Home'}}
+            options={{ title: 'Home' }}
           />
           <Stack.Screen
-            name="Login"
+            name='Login'
             component={LoginScreen}
-            options={{title: 'Login'}}
+            options={{ title: 'Login' }}
           />
           <Stack.Screen
-            name="Registration"
+            name='Registration'
             component={SignUpScreen}
-            options={{title: 'Registration'}}
+            options={{ title: 'Registration' }}
           />
           <Stack.Screen
-            name="DocDashboard"
+            name='DocDashboard'
             component={DoctorDashboardNavigator} // <-- This is the new nested navigator
-            options={{title: dashboardTitle, headerShown: false}}
+            options={{ title: dashboardTitle, headerShown: false }}
           />
           <Stack.Screen
-            name="PatDashboard"
+            name='PatDashboard'
             component={PatientDashboard}
-            options={{title: dashboardTitle, headerShown: false}}
+            options={{ title: dashboardTitle, headerShown: false }}
           />
           <Stack.Screen
-            name="Profile"
+            name='Profile'
             component={ProfileTab}
-            options={{title: 'Profile'}}
+            options={{ title: 'Profile' }}
           />
           <Stack.Screen
-            name="AppointmentOverview"
+            name='AppointmentOverview'
             component={AppointmentOverview}
-            options={{title: 'Appointment Overview'}}
+            options={{ title: 'Appointment Overview' }}
           />
         </Stack.Navigator>
       </NavigationContainer>

@@ -1,14 +1,14 @@
 import React from 'react'
-import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native'
-import {Ionicons} from '@expo/vector-icons'
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
 
-const AppointmentOverview = ({route, navigation}) => {
-  const {appointmentData} = route.params
+const AppointmentOverview = ({ route, navigation }) => {
+  const { appointmentData } = route.params
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="ios-arrow-back" size={24} color="#1069AD" />
+          <Ionicons name='ios-arrow-back' size={24} color='#1069AD' />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{appointmentData.patientName}</Text>
       </View>

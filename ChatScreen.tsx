@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
   SafeAreaView,
   View,
@@ -12,8 +12,8 @@ import {
   Image,
 } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
-import {useNavigation} from '@react-navigation/native'
-import {Ionicons} from '@expo/vector-icons'
+import { useNavigation } from '@react-navigation/native'
+import { Ionicons } from '@expo/vector-icons'
 
 const dummyData = [
   {
@@ -97,7 +97,7 @@ const ChatScreen = () => {
       setAttachment(null)
 
       setTimeout(() => {
-        scrollViewRef.current?.scrollToEnd({animated: true})
+        scrollViewRef.current?.scrollToEnd({ animated: true })
       }, 100)
     }
   }
@@ -144,7 +144,7 @@ const ChatScreen = () => {
   }, [])
 
   const _keyboardDidShow = () => {
-    scrollViewRef.current?.scrollToEnd({animated: true})
+    scrollViewRef.current?.scrollToEnd({ animated: true })
   }
 
   const _keyboardDidHide = () => {
@@ -155,27 +155,27 @@ const ChatScreen = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Ionicons
-          name="arrow-back-sharp"
+          name='arrow-back-sharp'
           size={30}
-          color="#1069AD"
+          color='#1069AD'
           style={styles.iconLeft}
           onPress={() => navigation.goBack()}
         />
         <Text style={styles.name}>John Doe</Text>
         <View style={styles.statusPill}>
-          <Ionicons name="ellipse-sharp" size={8} color="green" />
+          <Ionicons name='ellipse-sharp' size={8} color='green' />
           <Text style={styles.statusText}>Online</Text>
         </View>
         <Ionicons
-          name="ios-videocam-outline"
+          name='ios-videocam-outline'
           size={30}
-          color="#1069AD"
+          color='#1069AD'
           style={styles.iconRight}
         />
         <Ionicons
-          name="ios-call-outline"
+          name='ios-call-outline'
           size={25}
-          color="#1069AD"
+          color='#1069AD'
           style={styles.iconRight}
         />
       </View>
@@ -183,7 +183,7 @@ const ChatScreen = () => {
       <ScrollView
         style={styles.chatContainer}
         ref={scrollViewRef}
-        keyboardShouldPersistTaps="handled">
+        keyboardShouldPersistTaps='handled'>
         {messages.map(item => (
           <View
             key={item.id}
@@ -200,7 +200,7 @@ const ChatScreen = () => {
               }>
               {item.attachment && (
                 <Image
-                  source={{uri: item.attachment}}
+                  source={{ uri: item.attachment }}
                   style={styles.attachmentImage}
                 />
               )}
@@ -222,7 +222,7 @@ const ChatScreen = () => {
                       : 'ios-checkmark-done'
                   }
                   size={16}
-                  color="#1069AD"
+                  color='#1069AD'
                 />
               )}
               <Text style={styles.timestamp}>{item.timestamp}</Text>
@@ -235,31 +235,31 @@ const ChatScreen = () => {
         {attachment && (
           <View style={styles.attachmentContainer}>
             <Image
-              source={{uri: attachment}}
+              source={{ uri: attachment }}
               style={styles.attachmentPreview}
             />
             <TouchableOpacity
               style={styles.removeAttachment}
               onPress={removeAttachment}>
               <Ionicons
-                name="ios-close-circle-outline"
+                name='ios-close-circle-outline'
                 size={25}
-                color="#1069AD"
+                color='#1069AD'
               />
             </TouchableOpacity>
           </View>
         )}
         <Ionicons
-          name="ios-attach-outline"
+          name='ios-attach-outline'
           size={30}
-          color="#1069AD"
+          color='#1069AD'
           style={styles.iconLeft}
           onPress={handleAttachment}
         />
         <TextInput
-          style={[styles.input, {height: Math.min(MAX_HEIGHT, inputHeight)}]} // Don't allow the height to exceed MAX_HEIGHT.
-          placeholder="Type your message..."
-          placeholderTextColor="#1069AD"
+          style={[styles.input, { height: Math.min(MAX_HEIGHT, inputHeight) }]} // Don't allow the height to exceed MAX_HEIGHT.
+          placeholder='Type your message...'
+          placeholderTextColor='#1069AD'
           value={text}
           onChangeText={setText}
           multiline={true}
@@ -271,16 +271,16 @@ const ChatScreen = () => {
         />
 
         <Ionicons
-          name="ios-mic-outline"
+          name='ios-mic-outline'
           size={30}
-          color="#1069AD"
+          color='#1069AD'
           style={styles.iconRight}
           onPress={handleVoice}
         />
         <Ionicons
-          name="ios-send-sharp"
+          name='ios-send-sharp'
           size={30}
-          color="#1069AD"
+          color='#1069AD'
           style={styles.iconRight}
           onPress={handleSend}
         />

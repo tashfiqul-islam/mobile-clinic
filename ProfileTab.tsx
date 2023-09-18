@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   View,
   Text,
@@ -13,18 +13,18 @@ import {
   ActivityIndicator,
   ScrollView,
 } from 'react-native'
-import {useNavigation} from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 import * as Animatable from 'react-native-animatable'
-import {Feather} from '@expo/vector-icons'
-import {useTheme, TextInput as PaperTextInput} from 'react-native-paper'
+import { Feather } from '@expo/vector-icons'
+import { useTheme, TextInput as PaperTextInput } from 'react-native-paper'
 import * as Burnt from 'burnt'
 import * as ImagePicker from 'expo-image-picker'
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
 import 'firebase/compat/database'
 import 'firebase/compat/storage'
-import {firebaseConfig} from './firebaseConfig'
-import {useUser} from './UserContext'
+import { firebaseConfig } from './firebaseConfig'
+import { useUser } from './UserContext'
 
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig)
@@ -67,7 +67,7 @@ const EditableField = ({
     return (
       <TouchableOpacity onPress={handleUpdate} style={styles.inputContainer}>
         <View style={styles.iconContainer}>
-          <Feather name={icon} size={20} color="grey" />
+          <Feather name={icon} size={20} color='grey' />
         </View>
         <View style={styles.textInputContainer}>
           <Text style={styles.fieldText}>
@@ -82,19 +82,19 @@ const EditableField = ({
         onPress={() => inputRef.current && inputRef.current.blur()}>
         <View style={styles.inputContainer}>
           <View style={styles.iconContainer}>
-            <Feather name={icon} size={20} color="grey" />
+            <Feather name={icon} size={20} color='grey' />
           </View>
           <View style={styles.textInputContainer}>
             {isEditing ? (
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <PaperTextInput
                   onFocus={onFocus}
                   ref={inputRef}
-                  style={[styles.textInput, {height: 40}]}
+                  style={[styles.textInput, { height: 40 }]}
                   value={fieldValue}
                   onChangeText={handleChange}
                   onBlur={handleUpdate}
-                  textAlignVertical="top"
+                  textAlignVertical='top'
                   secureTextEntry={isPassword}
                 />
               </View>
@@ -109,7 +109,7 @@ const EditableField = ({
               <Feather
                 name={isEditing ? 'check' : 'edit'}
                 size={20}
-                color="grey"
+                color='grey'
               />
             </TouchableOpacity>
           )}
@@ -137,7 +137,7 @@ const ProfileTab = () => {
   } = useUser()
 
   const navigation = useNavigation()
-  const {colors} = useTheme()
+  const { colors } = useTheme()
 
   const [isEditingBio, setIsEditingBio] = useState(false)
   const [editingBio, setEditingBio] = useState(userBio)
@@ -194,7 +194,7 @@ const ProfileTab = () => {
 
       navigation.reset({
         index: 0,
-        routes: [{name: 'Login'}],
+        routes: [{ name: 'Login' }],
       })
     } catch (error) {
       console.error('Error while logging out:', error.message)
@@ -204,7 +204,8 @@ const ProfileTab = () => {
   useEffect(() => {
     ;(async () => {
       if (Platform.OS !== 'web') {
-        const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync()
+        const { status } =
+          await ImagePicker.requestMediaLibraryPermissionsAsync()
         if (status !== 'granted') {
           alert('Sorry, we need camera roll permissions to make this work!')
         }
@@ -241,7 +242,7 @@ const ProfileTab = () => {
       await ref.put(blob)
       const url = await ref.getDownloadURL()
 
-      setUserImage({uri: url})
+      setUserImage({ uri: url })
       updateUserImageURLInFirebase(url)
     } catch (error) {
       console.error('Image upload error:', error.message)
@@ -265,7 +266,7 @@ const ProfileTab = () => {
     if (user) {
       const userUid = user.uid
       const userRef = firebase.database().ref(`users/${userUid}`)
-      await userRef.update({profileImage: url})
+      await userRef.update({ profileImage: url })
 
       if (url && url.trim() !== '') {
         setUserImage(url)
@@ -290,7 +291,7 @@ const ProfileTab = () => {
       if (user) {
         const userUid = user.uid
         const userRef = firebase.database().ref(`users/${userUid}`)
-        await userRef.update({fullName: newFullName})
+        await userRef.update({ fullName: newFullName })
 
         setUserFullName(newFullName)
 
@@ -303,9 +304,9 @@ const ProfileTab = () => {
           duration: 5,
         })
 
-        return {success: true, message: 'Full name updated successfully'}
+        return { success: true, message: 'Full name updated successfully' }
       } else {
-        return {success: false, message: 'User is not signed in'}
+        return { success: false, message: 'User is not signed in' }
       }
     } catch (error) {
       return {
@@ -322,7 +323,7 @@ const ProfileTab = () => {
         await user.updateEmail(newEmail)
         const userUid = user.uid
         const userRef = firebase.database().ref(`users/${userUid}`)
-        await userRef.update({email: newEmail})
+        await userRef.update({ email: newEmail })
 
         setUserEmail(newEmail)
 
@@ -335,9 +336,9 @@ const ProfileTab = () => {
           duration: 5,
         })
 
-        return {success: true, message: 'Email updated successfully'}
+        return { success: true, message: 'Email updated successfully' }
       } else {
-        return {success: false, message: 'User is not signed in'}
+        return { success: false, message: 'User is not signed in' }
       }
     } catch (error) {
       return {
@@ -353,7 +354,7 @@ const ProfileTab = () => {
       if (user) {
         const userUid = user.uid
         const userRef = firebase.database().ref(`users/${userUid}`)
-        await userRef.update({userBio: newBio})
+        await userRef.update({ userBio: newBio })
 
         setUserBio(newBio)
 
@@ -366,9 +367,9 @@ const ProfileTab = () => {
           duration: 5,
         })
 
-        return {success: true, message: 'Bio updated successfully'}
+        return { success: true, message: 'Bio updated successfully' }
       } else {
-        return {success: false, message: 'User is not signed in'}
+        return { success: false, message: 'User is not signed in' }
       }
     } catch (error) {
       return {
@@ -393,9 +394,9 @@ const ProfileTab = () => {
           duration: 5,
         })
 
-        return {success: true, message: 'Password updated successfully'}
+        return { success: true, message: 'Password updated successfully' }
       } else {
-        return {success: false, message: 'User is not signed in'}
+        return { success: false, message: 'User is not signed in' }
       }
     } catch (error) {
       console.log('Firebase Error:', error.message) // Log the specific Firebase error
@@ -412,7 +413,7 @@ const ProfileTab = () => {
       if (user) {
         const userUid = user.uid
         const userRef = firebase.database().ref(`users/${userUid}`)
-        await userRef.update({location: newLocation})
+        await userRef.update({ location: newLocation })
 
         // Set the newLocation in the user context
         setUserLocation(newLocation)
@@ -426,9 +427,9 @@ const ProfileTab = () => {
           duration: 5,
         })
 
-        return {success: true, message: 'Location updated successfully'}
+        return { success: true, message: 'Location updated successfully' }
       } else {
-        return {success: false, message: 'User is not signed in'}
+        return { success: false, message: 'User is not signed in' }
       }
     } catch (error) {
       return {
@@ -438,14 +439,14 @@ const ProfileTab = () => {
     }
   }
 
-  const defaultImage = {uri: DEFAULT_IMAGE_URL}
+  const defaultImage = { uri: DEFAULT_IMAGE_URL }
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       enabled>
-      <StatusBar backgroundColor="#1069AD" barStyle="light-content" />
+      <StatusBar backgroundColor='#1069AD' barStyle='light-content' />
       <View style={styles.header}>
         <View style={styles.profileImageContainer}>
           <Image
@@ -453,28 +454,28 @@ const ProfileTab = () => {
               userImage &&
               typeof userImage === 'string' &&
               userImage.trim() !== ''
-                ? {uri: userImage}
+                ? { uri: userImage }
                 : defaultImage
             }
             style={styles.profileImage}
           />
           {isUploading ? (
             <ActivityIndicator
-              size="large"
-              color="#1069AD"
+              size='large'
+              color='#1069AD'
               style={styles.loader}
             />
           ) : (
             <TouchableOpacity
               style={styles.editIconContainer}
               onPress={pickImage}>
-              <Feather name="edit" size={14} color="grey" />
+              <Feather name='edit' size={14} color='grey' />
             </TouchableOpacity>
           )}
         </View>
       </View>
       <Animatable.View
-        animation="fadeInUpBig"
+        animation='fadeInUpBig'
         style={[
           styles.footer,
           {
@@ -503,21 +504,21 @@ const ProfileTab = () => {
                 onBlur={handleUpdateBio}
               />
               <TouchableOpacity onPress={handleUpdateBio}>
-                <Feather name="check" size={14} color="grey" />
+                <Feather name='check' size={14} color='grey' />
               </TouchableOpacity>
             </>
           ) : (
             <>
               <Text style={styles.bioText}>{userBio || 'Add a bio'}</Text>
               <TouchableOpacity onPress={handleEditBio}>
-                <Feather name="edit" size={14} color="grey" />
+                <Feather name='edit' size={14} color='grey' />
               </TouchableOpacity>
             </>
           )}
         </View>
         <ScrollView>
           <EditableField
-            icon="user"
+            icon='user'
             value={userFullName}
             onUpdate={async newFullName => {
               const response = await updateFullName(newFullName)
@@ -527,7 +528,7 @@ const ProfileTab = () => {
             }}
           />
           <EditableField
-            icon="mail"
+            icon='mail'
             value={userEmail}
             onUpdate={async newEmail => {
               const response = await updateEmail(newEmail)
@@ -537,8 +538,8 @@ const ProfileTab = () => {
             }}
           />
           <EditableField
-            icon="lock"
-            value="********" // placeholder value
+            icon='lock'
+            value='********' // placeholder value
             onUpdate={async newPassword => {
               const response = await updatePassword(newPassword)
               if (!response.success) {
@@ -549,7 +550,7 @@ const ProfileTab = () => {
           />
 
           <EditableField
-            icon="map-pin"
+            icon='map-pin'
             value={userLocation}
             onFocus={() => {
               setIsEditingLocation(true)
@@ -563,8 +564,8 @@ const ProfileTab = () => {
             showHelperText={!userLocation} // Show the helper text only if there's no location set
           />
           <EditableField
-            icon="log-out"
-            value="Logout"
+            icon='log-out'
+            value='Logout'
             onUpdate={handleLogout}
             editable={false}
           />

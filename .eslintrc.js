@@ -3,6 +3,6 @@ module.exports = {
   extends: '@react-native',
   plugins: ['prettier'],
   rules: {
-    'prettier/prettier': ['error', {resolveConfig: true}],
+    'prettier/prettier': ['error', { resolveConfig: true }],
   },
 }

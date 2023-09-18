@@ -5,7 +5,8 @@
 
 ## Tech Stack
 
-![logo](https://img.shields.io/badge/Frontend-React_Native-blue?style=flat-square&logo=react) ![logo](https://img.shields.io/badge/Backend-Firebase-yellow?style=flat-square&logo=firebase)
+![logo](https://img.shields.io/badge/Frontend-React_Native-blue?style=flat-square&logo=react)
+![logo](https://img.shields.io/badge/Backend-Firebase-yellow?style=flat-square&logo=firebase)
 
 ## Project Manager
 
@@ -64,7 +65,8 @@
 
 ## Operating system:
 
-![logo](https://img.shields.io/badge/Made_for-Android-green?style=for-the-badge&logo=android) ![logo](https://img.shields.io/badge/Made_for-iOS-black?style=for-the-badge&logo=apple)
+![logo](https://img.shields.io/badge/Made_for-Android-green?style=for-the-badge&logo=android)
+![logo](https://img.shields.io/badge/Made_for-iOS-black?style=for-the-badge&logo=apple)
 
 ## How to use:
 
@@ -91,6 +93,5 @@ To be updated while in development
 
 ## Developers:
 
-Md. Tashfiqul Islam | 161 1593 042 <br>
-Fannana Fahreen Aanan | 201 4168 042 <br>
-Fouzia Alam Mrittika | 183 1855 642
+Md. Tashfiqul Islam | 161 1593 042 <br> Fannana Fahreen Aanan | 201 4168 042
+<br> Fouzia Alam Mrittika | 183 1855 642
