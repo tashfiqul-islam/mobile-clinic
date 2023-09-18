@@ -24,6 +24,139 @@ import {useNavigation} from '@react-navigation/native'
 
 const SCREEN_WIDTH = Dimensions.get('window').width
 
+const today = new Date()
+const tomorrow = new Date(today)
+tomorrow.setDate(today.getDate() + 1)
+
+export const UPCOMING_SCHEDULE_DATA = [
+  {
+    id: '1',
+    name: 'Sara Jones',
+    type: 'Regular Checkup',
+    date: '2023-09-17',
+    time: '09:00 - 10:00',
+    image: require('./assets/images/head-4.jpg'),
+    rating: 4.3, // Added rating
+    reviews: 20, // example review count
+  },
+  {
+    id: '2',
+    name: 'Jonathan Brister',
+    type: 'Dental Cleaning',
+    date: '2023-09-17',
+    time: '11:00 - 12:00',
+    image: require('./assets/images/pat-1.jpeg'),
+    rating: 5, // Added rating
+    reviews: 4, // example review count
+  },
+  {
+    id: '3',
+    name: 'Mike Smith',
+    type: 'Eye Checkup',
+    date: '2023-09-17',
+    time: '14:00 - 15:00',
+    image: require('./assets/images/pat-2.jpeg'),
+    rating: 3.9, // Added rating
+    reviews: 25, // example review count
+  },
+  {
+    id: '4',
+    name: 'Norman Osborne',
+    type: 'Eye Checkup',
+    date: '2023-09-17',
+    time: '15:00 - 16:00',
+    image: require('./assets/images/pat-2.jpeg'),
+    rating: 3.9, // Added rating
+    reviews: 25, // example review count
+  },
+  {
+    id: '5',
+    name: 'Janet Harwood',
+    type: 'Physical Exam',
+    date: `${today.getFullYear()}-${(today.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`,
+    time: '10:00 - 11:00',
+    image: require('./assets/images/head-3.jpg'),
+    rating: 4.5,
+    reviews: 10,
+  },
+  {
+    id: '6',
+    name: 'Serena Costanza',
+    type: 'Oral Examination',
+    date: '2023-09-18',
+    time: '11:00 - 12:00',
+    image: require('./assets/images/pat-3.jpeg'),
+    rating: 4.3, // Added rating
+    reviews: 22, // example review count
+  },
+  {
+    id: '7',
+    name: 'Juliana Carpenter',
+    type: 'Dental Cleaning',
+    date: '2023-09-18',
+    time: '13:00 - 14:00',
+    image: require('./assets/images/head-2.jpg'),
+    rating: 4.3, // Added rating
+    reviews: 22, // example review count
+  },
+  {
+    id: '8',
+    name: 'Michael Phelps',
+    type: 'Monthly Checkup',
+    date: '2023-09-19',
+    time: '11:00 - 12:00',
+    image: require('./assets/images/pat-7.jpeg'),
+    rating: 4.3, // Added rating
+    reviews: 22, // example review count
+  },
+]
+
+export const RECENT_APPOINTMENTS_DATA = [
+  {
+    id: '1',
+    name: 'Josephine Costanza',
+    type: 'Eye Checkup',
+    date: 'Monday, 11 Sept',
+    time: '14:00 - 15:00',
+    image: require('./assets/images/pat-4.jpeg'),
+    rating: 4.5,
+    reviews: 20,
+  },
+  {
+    id: '2',
+    name: 'Mike Shinoda',
+    type: 'Physical Examination',
+    date: 'Sunday, 11 Sept',
+    time: '11:00 - 12:00',
+    image: require('./assets/images/pat-5.jpeg'),
+    rating: 4.0,
+    reviews: 15,
+  },
+
+  {
+    id: '4',
+    name: 'Jessica Parker',
+    type: 'Medicine Update',
+    date: 'Sunday, 10 Sept',
+    time: '11:00 - 12:00',
+    image: require('./assets/images/pat-3.jpeg'),
+    rating: 4.3,
+    reviews: 30,
+  },
+  {
+    id: '5',
+    name: 'Ishan Kishan',
+    type: 'Urgent Care',
+    date: 'Tuesday, 8 Sept',
+    time: '9:00 - 10:00',
+    image: require('./assets/images/pat-6.jpeg'),
+    rating: 4.5,
+    reviews: 35,
+  },
+]
+
 const Touchable = ({children, style, ...props}) => {
   if (Platform.OS === 'android' && Platform.Version >= 21) {
     return (
@@ -75,17 +208,21 @@ const AppointmentTimelineTab = () => {
 
   const [selectedFilter, setSelectedFilter] = useState('this_week')
   const [showFilterModal, setShowFilterModal] = useState(false)
+  const [selectedDay, setSelectedDay] = useState(new Date().getDay())
 
   const calculateDaysAndDates = filter => {
     const now = new Date()
     const days = []
     const dates = []
 
+    let startDate = new Date(now) // Starting with the current date
+    startDate.setDate(now.getDate() - now.getDay()) // Adjusting to the Sunday of the current week
+
     switch (filter) {
       case 'this_week':
         for (let i = 0; i < 7; i++) {
-          const date = new Date(now)
-          date.setDate(now.getDate() + i)
+          const date = new Date(startDate)
+          date.setDate(startDate.getDate() + i)
           days.push(
             date.toLocaleString('en-us', {weekday: 'short'}).substring(0, 1),
           )
@@ -93,14 +230,10 @@ const AppointmentTimelineTab = () => {
         }
         break
       case 'prev_week':
-        const prevWeekStartDate = new Date()
-        prevWeekStartDate.setDate(
-          prevWeekStartDate.getDate() - prevWeekStartDate.getDay() - 7,
-        )
-
+        startDate.setDate(startDate.getDate() - 7)
         for (let i = 0; i < 7; i++) {
-          const date = new Date(prevWeekStartDate)
-          date.setDate(prevWeekStartDate.getDate() + i)
+          const date = new Date(startDate)
+          date.setDate(startDate.getDate() + i)
           days.push(
             date.toLocaleString('en-us', {weekday: 'short'}).substring(0, 1),
           )
@@ -108,14 +241,10 @@ const AppointmentTimelineTab = () => {
         }
         break
       case 'next_week':
-        const nextWeekStartDate = new Date()
-        nextWeekStartDate.setDate(
-          nextWeekStartDate.getDate() - nextWeekStartDate.getDay() + 7,
-        )
-
+        startDate.setDate(startDate.getDate() + 7)
         for (let i = 0; i < 7; i++) {
-          const date = new Date(nextWeekStartDate)
-          date.setDate(nextWeekStartDate.getDate() + i)
+          const date = new Date(startDate)
+          date.setDate(startDate.getDate() + i)
           days.push(
             date.toLocaleString('en-us', {weekday: 'short'}).substring(0, 1),
           )
@@ -129,6 +258,62 @@ const AppointmentTimelineTab = () => {
 
   const {days, dates} = calculateDaysAndDates(selectedFilter)
 
+  const now = new Date()
+
+  let year = now.getFullYear()
+  let month = now.getMonth()
+
+  // Adjust the year and month based on the selected filter
+  switch (selectedFilter) {
+    case 'prev_week':
+      if (now.getDate() - now.getDay() < 7) {
+        month = month - 1
+        if (month < 0) {
+          month = 11
+          year = year - 1
+        }
+      }
+      break
+    case 'next_week':
+      if (
+        now.getDate() + (6 - now.getDay()) >=
+        new Date(year, month + 1, 0).getDate()
+      ) {
+        month = month + 1
+        if (month > 11) {
+          month = 0
+          year = year + 1
+        }
+      }
+      break
+    default:
+      // 'this_week' doesn't require any adjustment
+      break
+  }
+
+  const filteredAppointments = UPCOMING_SCHEDULE_DATA.filter(appointment => {
+    const dateParts = appointment.date
+      .split('-')
+      .map(part => parseInt(part, 10))
+
+    // No need to set hours, minutes, and seconds
+    const appointmentDate = new Date(
+      dateParts[0],
+      dateParts[1] - 1,
+      dateParts[2],
+    )
+
+    // Use the selectedDay to retrieve the date from the dates array
+    const selectedDateString = dates[selectedDay]
+    const selectedFullDate = new Date(year, month, parseInt(selectedDateString))
+
+    return (
+      appointmentDate.getDate() === selectedFullDate.getDate() &&
+      appointmentDate.getMonth() === selectedFullDate.getMonth() &&
+      appointmentDate.getFullYear() === selectedFullDate.getFullYear()
+    )
+  })
+
   const isDayActive = (day, date) => {
     const now = new Date()
     return (
@@ -136,6 +321,8 @@ const AppointmentTimelineTab = () => {
       parseInt(date) === now.getDate()
     )
   }
+
+  const DAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
   return (
     <View style={styles.appointmentTimelineContainer}>
@@ -154,7 +341,7 @@ const AppointmentTimelineTab = () => {
               name="keyboard-arrow-down"
               color="black"
               size={24}
-              style={{...styles.filterIcon, marginTop: -4}} // Adjust marginTop
+              style={{...styles.filterIcon, marginTop: -4}}
             />
           </View>
         </TouchableOpacity>
@@ -186,17 +373,105 @@ const AppointmentTimelineTab = () => {
           </View>
         </Modal>
       </View>
+
+      {/* Clickable Day/Date pills */}
       <View style={styles.pillContainer}>
-        {days.map((day, index) => (
-          <VerticalStatusPill
-            key={index}
-            day={day}
-            date={dates[index]}
-            isActive={isDayActive(day, dates[index])}
-          />
-        ))}
-        {/* Add an extra empty view to push Sunday to the next line */}
-        <View style={styles.statusPillContainer} />
+        {DAYS.map((day, index) => {
+          const currentDayIndex = new Date().getDay()
+          const isActiveDay = currentDayIndex === index
+          const isSelectedDay = selectedDay === index
+
+          const backgroundColor = isActiveDay ? '#1069AD' : '#fff'
+          const textColor = isActiveDay
+            ? '#fff'
+            : isSelectedDay
+            ? '#1069AD'
+            : '#000'
+          const borderColor = isSelectedDay ? '#1069AD' : 'transparent'
+
+          return (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.statusPillContainer,
+                {backgroundColor, borderColor, borderWidth: 1},
+              ]}
+              onPress={() => setSelectedDay(index)}>
+              <Text style={[styles.statusPillDay, {color: textColor}]}>
+                {day}
+              </Text>
+              <Text style={[styles.statusPillDate, {color: textColor}]}>
+                {dates[index]}
+              </Text>
+            </TouchableOpacity>
+          )
+        })}
+      </View>
+
+      <View style={styles.newSectionContainer}>
+        {filteredAppointments.length > 0 ? (
+          filteredAppointments.map(appointment => {
+            const isPast =
+              new Date(
+                appointment.date + 'T' + appointment.time.split('-')[0].trim(),
+              ) < new Date()
+
+            return (
+              <React.Fragment key={appointment.id}>
+                <View style={styles.appointmentContainer}>
+                  {/* Arrow Icons Container */}
+                  <View style={styles.arrowContainer}>
+                    {isPast ? (
+                      <Ionicons
+                        name="ios-chevron-down-circle"
+                        size={24}
+                        color="#1069AD"
+                      />
+                    ) : (
+                      <Ionicons
+                        name="ios-chevron-down-circle-outline"
+                        size={24}
+                        color="#1069AD"
+                      />
+                    )}
+                  </View>
+
+                  {/* Appointment Time Container */}
+                  <View style={styles.timeContainer}>
+                    <Text style={styles.appointmentTimeNew}>
+                      {appointment.time}
+                    </Text>
+                  </View>
+
+                  {/* Vertical Dotted Line Container */}
+                  <View style={styles.verticalDotsContainer}>
+                    {Array(9)
+                      .fill(0)
+                      .map((_, index) => (
+                        <Text key={index} style={styles.dot}>
+                          .
+                        </Text>
+                      ))}
+                  </View>
+                </View>
+
+                <View style={styles.pillContainer2}>
+                  <Image source={appointment.image} style={styles.avatar} />
+                  <View style={styles.appointmentTextContainer}>
+                    <Text style={styles.appointmentNameNew}>
+                      {appointment.name}
+                    </Text>
+                    <Text style={styles.appointmentTypeNew}>
+                      {appointment.type}
+                    </Text>
+                  </View>
+                </View>
+              </React.Fragment>
+            )
+          })
+        ) : (
+          <Text>You don't have any new appointments today yet!</Text>
+        )}
       </View>
     </View>
   )
@@ -298,6 +573,7 @@ export const UpcomingAppointmentCard = ({item}) => {
     </Touchable>
   )
 }
+;<UpcomingScheduleHeader count={UPCOMING_SCHEDULE_DATA.length} />
 
 const StatsCard = ({iconName, value, label}) => {
   return (
@@ -335,7 +611,7 @@ const RecentAppointmentItem = ({item}) => {
           {Array.from({length: 5 - fullStars - (hasHalfStar ? 1 : 0)}).map(
             (_, index) => (
               <Ionicons
-                key={`empty-${index}`}
+                key={fullStars + index}
                 name="ios-star-outline"
                 size={20}
                 color="#1069AD"
@@ -354,84 +630,6 @@ const RecentAppointmentItem = ({item}) => {
     </View>
   )
 }
-
-export const UPCOMING_SCHEDULE_DATA = [
-  {
-    id: '1',
-    name: 'Sara Jones',
-    type: 'Regular Checkup',
-    date: 'Friday, 15 Sept',
-    time: '09:00 - 10:00',
-    image: require('./assets/images/head-4.jpg'),
-    rating: 4.3, // Added rating
-    reviews: 20, // example review count
-  },
-  {
-    id: '2',
-    name: 'Jonathan Brister',
-    type: 'Dental Cleaning',
-    date: 'Saturday, 16 Sept',
-    time: '11:00 - 12:00',
-    image: require('./assets/images/pat-1.jpeg'),
-    rating: 5, // Added rating
-    reviews: 4, // example review count
-  },
-  {
-    id: '3',
-    name: 'Mike Smith',
-    type: 'Eye Checkup',
-    date: 'Sunday, 17 Sept',
-    time: '14:00 - 15:00',
-    image: require('./assets/images/pat-2.jpeg'),
-    rating: 3.9, // Added rating
-    reviews: 25, // example review count
-  },
-]
-
-export const RECENT_APPOINTMENTS_DATA = [
-  {
-    id: '1',
-    name: 'Josephine Costanza',
-    type: 'Eye Checkup',
-    date: 'Monday, 11 Sept',
-    time: '14:00 - 15:00',
-    image: require('./assets/images/pat-4.jpeg'),
-    rating: 4.5,
-    reviews: 20,
-  },
-  {
-    id: '2',
-    name: 'Mike Shinoda',
-    type: 'Physical Examination',
-    date: 'Sunday, 11 Sept',
-    time: '11:00 - 12:00',
-    image: require('./assets/images/pat-5.jpeg'),
-    rating: 4.0,
-    reviews: 15,
-  },
-
-  {
-    id: '4',
-    name: 'Jessica Parker',
-    type: 'Medicine Update',
-    date: 'Sunday, 10 Sept',
-    time: '11:00 - 12:00',
-    image: require('./assets/images/pat-3.jpeg'),
-    rating: 4.3,
-    reviews: 30,
-  },
-  {
-    id: '5',
-    name: 'Ishan Kishan',
-    type: 'Urgent Care',
-    date: 'Tuesday, 8 Sept',
-    time: '9:00 - 10:00',
-    image: require('./assets/images/pat-6.jpeg'),
-    rating: 4.5,
-    reviews: 35,
-  },
-]
-;<UpcomingScheduleHeader count={UPCOMING_SCHEDULE_DATA.length} />
 
 const DoctorDashboardContent = () => {
   const flatListRef = useRef(null)
@@ -555,7 +753,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   appointmentTimelineContainer: {
-    marginBottom: 10,
+    marginBottom: 15,
   },
   headerContainer: {
     flexDirection: 'row',
@@ -582,7 +780,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
     marginHorizontal: 5,
     flexDirection: 'column',
   },
@@ -783,6 +981,171 @@ const styles = StyleSheet.create({
   appointmentTime: {
     marginLeft: -5,
   },
+  newSectionContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    backgroundColor: '#E4E4E4',
+    padding: 10,
+  },
+
+  appointmentContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between', // Change flex-start to space-between
+    position: 'relative',
+    marginBottom: 20,
+    width: '100%',
+  },
+
+  arrowContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    bottom: 20,
+    marginLeft: -240,
+  },
+
+  timeContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    bottom: 20,
+    marginLeft: -240,
+  },
+
+  verticalDotsContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: 75,
+    position: 'relative', // Set to relative
+    top: 27.5, // Adjust this value to move all the dots down together
+    marginLeft: -245,
+  },
+
+  horizontalDotsLeftContainer: {
+    flex: 1,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+
+  pillContainer2: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    //justifyContent: 'center',
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 50,
+    marginTop: -60,
+    marginLeft: 10,
+    width: 330,
+  },
+
+  pillsContainer3: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    paddingRight: 10,
+    marginBottom: 100,
+    marginLeft: 50,
+  },
+
+  horizontalDotsRightContainer: {
+    flex: 1,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+  },
+
+  dot: {
+    backgroundColor: '#1069AD',
+    borderRadius: 50,
+    width: 3,
+    height: 4,
+    margin: 2,
+    marginRight: 195,
+  },
+
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
+  },
+
+  appointmentTextContainer: {
+    flexDirection: 'column',
+    marginLeft: 10,
+  },
+
+  appointmentTimeNew: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#555',
+  },
+
+  appointmentNameNew: {
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+
+  appointmentTypeNew: {
+    fontSize: 12,
+  },
+  daysContainer1: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
+
+  dayPill1: {
+    borderRadius: 15,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  activeDayPill1: {
+    backgroundColor: '#1069AD',
+  },
+
+  dayPillText1: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+
+  daysContainer2: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
+
+  dayPill2: {
+    borderRadius: 15,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  activeDayPill2: {
+    backgroundColor: '#1069AD',
+  },
+
+  dayPillText2: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
   dashboardContainer: {
     flex: 1,
     backgroundColor: '#E4E4E4',
@@ -793,7 +1156,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
   },
-  dot: {
+  dot2: {
     width: 8,
     height: 8,
     borderRadius: 4,
