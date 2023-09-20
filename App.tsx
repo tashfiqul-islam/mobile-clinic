@@ -44,7 +44,10 @@ const App: React.FC = () => {
               setDashboardTitle('Patient Dashboard')
             }
           } else {
+            // If the user is not authenticated, navigate to the home/login screen.
             setInitialRouteName('Home')
+            // If you have set up a ref to your NavigationContainer:
+            navigationRef.current?.navigate('Home')
           }
         })
         setAppReady(true)

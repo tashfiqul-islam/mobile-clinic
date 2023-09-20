@@ -1,58 +1,140 @@
 import React from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native'
+import {
+  FontAwesome,
+  MaterialCommunityIcons,
+  MaterialIcons,
+  Ionicons,
+} from '@expo/vector-icons'
 
-const AppointmentOverview = ({ route, navigation }) => {
-  const { appointmentData } = route.params
+const { width } = Dimensions.get('window')
+const patientData = {
+  name: 'John Doe',
+  location: 'Quebec, Canada',
+  rating: 4.7,
+  age: 35,
+  gender: 'Male',
+  date: '20th Sep 2023',
+  type: 'Check-up',
+  tags: ['Diabetes', 'Chronic Heart Diseases'],
+  notes: 'Occasional dizziness.',
+  prescriptions: [
+    'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
+    'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
+  ],
+  medicines: ['Medicine1', 'Medicine2', 'Medicine3'],
+}
+
+const AppointmentDetails = () => {
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name='ios-arrow-back' size={24} color='#1069AD' />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{appointmentData.patientName}</Text>
-      </View>
+    <ScrollView style={styles.container}>
+      {/* Full-width Avatar */}
+      <Image
+        source={{
+          uri: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
+        }}
+        style={styles.profileImage}
+      />
 
-      <View style={styles.patientInfo}>
-        <Image source={appointmentData.image} style={styles.patientImage} />
-        <View style={styles.patientDetails}>
-          <Text style={styles.patientName}>{appointmentData.patientName}</Text>
-          <Text>
-            {appointmentData.sex}, {appointmentData.age} years
-          </Text>
-          <Text>
-            {appointmentData.weight} kg, {appointmentData.height} cm
-          </Text>
+      {/* Frosted Glassmorphism Card */}
+      <View style={styles.glassCard}>
+        <Text style={styles.nameText}>{patientData.name}</Text>
+        <Text style={styles.locationText}>{patientData.location}</Text>
+        <View style={styles.detailRow}>
+          <Ionicons name='star' size={20} color='#1069AD' />
+          <Text style={styles.detailText}>{patientData.rating}</Text>
+          <View style={styles.separator} />
+          <FontAwesome name='calendar' size={20} color='#1069AD' />
+          <Text style={styles.detailText}>{patientData.age}</Text>
+          <View style={styles.separator} />
+          <MaterialCommunityIcons
+            name='gender-male-female'
+            size={20}
+            color='#1069AD'
+          />
+          <Text style={styles.detailText}>{patientData.gender}</Text>
         </View>
       </View>
 
-      <View style={styles.appointmentDetails}>
-        <Text style={styles.appointmentType}>{appointmentData.type}</Text>
-        <Text>
-          {appointmentData.date}, {appointmentData.time}
-        </Text>
-        <Text style={styles.appointmentStatus}>{appointmentData.status}</Text>
+      {/* Date & Type */}
+      <View style={styles.dateTypeBar}>
+        <View style={styles.dateTypeItem}>
+          <FontAwesome name='calendar' size={24} color='#1069AD' />
+          <Text style={styles.dateTypeText}>{patientData.date}</Text>
+        </View>
+        <View style={styles.dateTypeItem}>
+          <MaterialIcons name='meeting-room' size={24} color='#1069AD' />
+          <Text style={styles.dateTypeText}>{patientData.type}</Text>
+        </View>
       </View>
 
-      <View style={styles.healthNotes}>
-        <Text style={styles.notesTitle}>Reason for Visit:</Text>
-        <Text>{appointmentData.issue}</Text>
-        <Text style={styles.notesTitle}>Special Notes:</Text>
-        <Text>{appointmentData.specialNotes}</Text>
+      {/* Tags */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.tagContainer}>
+        {patientData.tags.map((tag, index) => (
+          <View style={styles.tag} key={index}>
+            <Text style={styles.tagText}>{tag}</Text>
+          </View>
+        ))}
+      </ScrollView>
+
+      {/* Expandable Patient Notes */}
+      <TouchableOpacity style={styles.expandableSection}>
+        <Text style={styles.sectionHeader}>Patient Notes:</Text>
+        <Text style={styles.sectionContent}>{patientData.notes}</Text>
+      </TouchableOpacity>
+
+      {/* Old Prescriptions */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.carousel}>
+        {patientData.prescriptions.map((prescription, index) => (
+          <Image
+            key={index}
+            source={{ uri: prescription }}
+            style={styles.carouselImage}
+          />
+        ))}
+      </ScrollView>
+
+      {/* Current/Old Medicines */}
+      <View style={styles.medicineList}>
+        <Text style={styles.sectionHeader}>Medicines:</Text>
+        {patientData.medicines.map((medicine, index) => (
+          <View key={index} style={styles.medicineItem}>
+            <MaterialIcons name='local-pharmacy' size={20} color='#1069AD' />
+            <Text style={styles.medicineText}>{medicine}</Text>
+          </View>
+        ))}
       </View>
 
-      <View style={styles.recordsContainer}>
-        <Text style={styles.recordsTitle}>Past Health Records:</Text>
-        {/* Render health record icons/buttons here */}
+      {/* Action Buttons */}
+      <View style={styles.actionButtons}>
+        <TouchableOpacity style={styles.button}>
+          <MaterialIcons name='videocam' size={24} color='#FFF' />
+          <Text style={styles.buttonText}>Video Call</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button}>
+          <MaterialIcons name='call' size={24} color='#FFF' />
+          <Text style={styles.buttonText}>Call</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button}>
+          <MaterialIcons name='message' size={24} color='#FFF' />
+          <Text style={styles.buttonText}>Message</Text>
+        </TouchableOpacity>
       </View>
-
-      <View style={styles.prescriptionsContainer}>
-        <Text style={styles.recordsTitle}>Past Prescriptions:</Text>
-        {/* Render prescription icons/buttons here */}
-      </View>
-
-      {/* Actions like start video call, chat, etc. can go here */}
-    </View>
+    </ScrollView>
   )
 }
 
@@ -60,143 +142,135 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#E4E4E4',
-    padding: 10,
   },
-  header: {
+  profileImage: {
+    width: width,
+    height: width - 200,
+  },
+  glassCard: {
+    position: 'absolute',
+    top: width - 248,
+    left: 20,
+    right: 20,
+    height: 90,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  nameText: {
+    fontSize: 22,
+    color: '#1069AD',
+    marginBottom: 0,
+    marginTop: 5,
+  },
+  locationText: {
+    fontSize: 14,
+    color: '#1069AD',
+    marginBottom: 15,
+  },
+  detailRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    width: '100%',
+    justifyContent: 'space-between',
+    marginBottom: 10,
   },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  detailText: {
+    fontSize: 15,
+    marginLeft: 10,
     color: '#1069AD',
+  },
+  separator: {
+    height: '70%',
+    width: 1,
+    backgroundColor: '#1069AD',
+    marginHorizontal: 10,
+  },
+  dateTypeBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 20,
+    backgroundColor: '#E4E4E4',
+  },
+  dateTypeItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  dateTypeText: {
+    fontSize: 18,
+    marginLeft: 10,
+    color: '#1069AD',
+  },
+  tagContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  tag: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 15,
+    padding: 10,
     marginLeft: 10,
   },
-  patientInfo: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 15,
+  tagText: {
+    color: '#1069AD',
   },
-  patientImage: {
+  expandableSection: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 15,
+    marginHorizontal: 10,
+    padding: 15,
+  },
+  sectionHeader: {
+    fontSize: 18,
+    marginBottom: 10,
+    color: '#1069AD',
+  },
+  sectionContent: {
+    fontSize: 16,
+    color: '#555',
+  },
+  carousel: {
+    marginVertical: 15,
+  },
+  carouselImage: {
     width: 80,
     height: 80,
-    borderRadius: 40,
-    marginRight: 15,
+    borderRadius: 15,
+    marginHorizontal: 10,
   },
-  patientDetails: {
-    flex: 1,
+  medicineList: {
+    marginVertical: 15,
   },
-  patientName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  appointmentDetails: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 15,
-  },
-  appointmentType: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  appointmentStatus: {
-    color: '#888',
-    marginTop: 5,
-    fontSize: 14,
-  },
-  healthNotes: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 15,
-  },
-  notesTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  recordsContainer: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  prescriptionsContainer: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 15,
-  },
-  recordsTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  backButton: {
-    marginRight: 10,
-  },
-  icon: {
-    color: '#1069AD',
-    marginRight: 5,
-  },
-  actionIconsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
-  },
-  iconContainer: {
+  medicineItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 15,
+    marginVertical: 5,
+    marginLeft: 20,
   },
-  iconLabel: {
-    color: '#888',
-    fontSize: 14,
+  medicineText: {
+    marginLeft: 10,
+    color: '#555',
   },
-  horizontalDivider: {
-    height: 1,
-    backgroundColor: '#d3d3d3',
-    marginVertical: 10,
-  },
-  patientStats: {
+  actionButtons: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
+    justifyContent: 'space-around',
+    marginVertical: 20,
   },
-  statItem: {
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  statLabel: {
-    fontSize: 14,
-    color: '#888',
-  },
-  recordItem: {
+  button: {
+    backgroundColor: '#1069AD',
+    borderRadius: 30,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
   },
-  recordIcon: {
-    marginRight: 10,
-  },
-  recordText: {
-    fontSize: 14,
-  },
-  recordLink: {
-    fontSize: 14,
-    color: '#1069AD',
-    textDecorationLine: 'underline',
+  buttonText: {
+    marginLeft: 10,
+    color: '#FFF',
   },
 })
 
-export default AppointmentOverview
+export default AppointmentDetails

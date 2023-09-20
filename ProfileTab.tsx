@@ -197,7 +197,7 @@ const ProfileTab = () => {
         routes: [{ name: 'Login' }],
       })
     } catch (error) {
-      console.error('Error while logging out:', error.message)
+      console.error('Error during logout:', error)
     }
   }
 
