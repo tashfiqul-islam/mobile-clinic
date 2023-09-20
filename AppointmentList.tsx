@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   ScrollView,
   StyleSheet,
@@ -14,6 +14,7 @@ import {
   UPCOMING_SCHEDULE_DATA,
   RECENT_APPOINTMENTS_DATA,
 } from './HomeTab'
+import { MaterialIcons } from '@expo/vector-icons'
 
 const Spacer = () => <View style={styles.spacer} />
 
@@ -45,50 +46,113 @@ const HeaderWithCount = ({ title, count }) => (
 )
 
 const AppointmentList = ({ navigation }) => {
+  const [selectedTab, setSelectedTab] = useState('Upcoming')
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#E4E4E4' }}>
-      <ScrollView style={styles.container}>
-        <HeaderWithCount
-          title='Upcoming Appointments'
-          count={UPCOMING_SCHEDULE_DATA.length}
-        />
-        {UPCOMING_SCHEDULE_DATA.map((item, index) => (
-          <Touchable
-            key={item.id}
-            onPress={() =>
-              navigation.navigate('AppointmentOverview', {
-                appointmentData: item,
-              })
-            }
-            style={
-              index !== UPCOMING_SCHEDULE_DATA.length - 1
-                ? styles.cardSpacing
-                : {}
-            }>
-            <UpcomingAppointmentCard item={item} />
-          </Touchable>
-        ))}
+      <View style={styles.tabContainer}>
+        <Touchable onPress={() => setSelectedTab('Upcoming')}>
+          <View
+            style={[
+              styles.tab,
+              selectedTab === 'Upcoming'
+                ? styles.activeTabBackground
+                : styles.inactiveTabBackground,
+            ]}>
+            <MaterialIcons
+              name='event-note'
+              size={24}
+              color={selectedTab === 'Upcoming' ? '#FFF' : '#1069AD'}
+            />
+            <Text
+              style={[
+                styles.tabText,
+                selectedTab === 'Upcoming'
+                  ? styles.activeTabText
+                  : styles.inactiveTabText,
+              ]}>
+              Upcoming
+            </Text>
+          </View>
+        </Touchable>
 
-        <HeaderWithCount
-          title='Recent Appointments'
-          count={RECENT_APPOINTMENTS_DATA.length}
-        />
-        {RECENT_APPOINTMENTS_DATA.map((item, index) => (
-          <Touchable
-            key={item.id}
-            onPress={() =>
-              navigation.navigate('AppointmentOverview', {
-                appointmentData: item,
-              })
-            }
-            style={
-              index !== RECENT_APPOINTMENTS_DATA.length - 1
-                ? styles.cardSpacing
-                : {}
-            }>
-            <UpcomingAppointmentCard item={item} />
-          </Touchable>
-        ))}
+        <Touchable onPress={() => setSelectedTab('Recent')}>
+          <View
+            style={[
+              styles.tab,
+              selectedTab === 'Recent'
+                ? styles.activeTabBackground
+                : styles.inactiveTabBackground,
+            ]}>
+            <MaterialIcons
+              name='history'
+              size={24}
+              color={selectedTab === 'Recent' ? '#FFF' : '#1069AD'}
+            />
+            <Text
+              style={[
+                styles.tabText,
+                selectedTab === 'Recent'
+                  ? styles.activeTabText
+                  : styles.inactiveTabText,
+              ]}>
+              Recent
+            </Text>
+          </View>
+        </Touchable>
+      </View>
+
+      <ScrollView style={styles.container}>
+        {selectedTab === 'Upcoming' && (
+          <>
+            <HeaderWithCount
+              title='Upcoming Appointments'
+              count={UPCOMING_SCHEDULE_DATA.length}
+            />
+            {UPCOMING_SCHEDULE_DATA.map((item, index) => (
+              <Touchable
+                key={item.id}
+                onPress={() =>
+                  navigation.navigate('AppointmentOverview', {
+                    appointmentData: item,
+                  })
+                }
+                style={
+                  index !== UPCOMING_SCHEDULE_DATA.length - 1
+                    ? styles.cardSpacing
+                    : {}
+                }>
+                <UpcomingAppointmentCard item={item} />
+              </Touchable>
+            ))}
+          </>
+        )}
+
+        {selectedTab === 'Recent' && (
+          <>
+            <HeaderWithCount
+              title='Recent Appointments'
+              count={RECENT_APPOINTMENTS_DATA.length}
+            />
+            {RECENT_APPOINTMENTS_DATA.map((item, index) => (
+              <Touchable
+                key={item.id}
+                onPress={() =>
+                  navigation.navigate('AppointmentOverview', {
+                    appointmentData: item,
+                  })
+                }
+                style={
+                  index !== RECENT_APPOINTMENTS_DATA.length - 1
+                    ? styles.cardSpacing
+                    : {}
+                }>
+                <UpcomingAppointmentCard item={item} />
+              </Touchable>
+            ))}
+          </>
+        )}
+
         <Spacer />
       </ScrollView>
     </SafeAreaView>
@@ -100,6 +164,38 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#E4E4E4',
   },
+  tabContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 15,
+    paddingHorizontal: 30,
+  },
+  tab: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    paddingHorizontal: 20,
+    borderRadius: 50,
+    marginHorizontal: 5,
+  },
+  activeTabBackground: {
+    backgroundColor: '#1069AD',
+  },
+  inactiveTabBackground: {
+    backgroundColor: '#FFF',
+  },
+  tabText: {
+    marginLeft: 10,
+  },
+  activeTabText: {
+    color: '#FFF',
+  },
+  inactiveTabText: {
+    color: '#1069AD',
+  },
   headerText: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -107,12 +203,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginLeft: 0,
     marginTop: 10,
-  },
-  recentHeaderSpacing: {
-    marginTop: 20,
-  },
-  cardSpacing: {
-    marginBottom: 10,
   },
   headerWithCountContainer: {
     flexDirection: 'row',
@@ -133,8 +223,11 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: 'bold',
   },
+  cardSpacing: {
+    marginBottom: 10,
+  },
   spacer: {
-    height: 75, // height of the bottom tabs
+    height: 75,
   },
 })
 

@@ -129,6 +129,26 @@ export const UPCOMING_SCHEDULE_DATA = [
     rating: 3.9, // Added rating
     reviews: 42, // example review count
   },
+  {
+    id: '11',
+    name: 'Sara Jones',
+    type: 'Dental Cleaning',
+    date: '2023-09-21',
+    time: '09:00 - 10:00',
+    image: require('./assets/images/head-4.jpg'),
+    rating: 4.3, // Added rating
+    reviews: 20, // example review count
+  },
+  {
+    id: '12',
+    name: 'Jonathan Brister',
+    type: 'Regular Checkup',
+    date: '2023-09-21',
+    time: '11:00 - 12:00',
+    image: require('./assets/images/pat-1.jpeg'),
+    rating: 5, // Added rating
+    reviews: 4, // example review count
+  },
 ]
 
 export const RECENT_APPOINTMENTS_DATA = [
