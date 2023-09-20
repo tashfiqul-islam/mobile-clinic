@@ -2,20 +2,22 @@ import React from 'react'
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   Dimensions,
+  Animated,
   TouchableOpacity,
   ScrollView,
+  Image,
 } from 'react-native'
 import {
   FontAwesome,
+  Ionicons,
   MaterialCommunityIcons,
   MaterialIcons,
-  Ionicons,
 } from '@expo/vector-icons'
 
 const { width } = Dimensions.get('window')
+
 const patientData = {
   name: 'John Doe',
   location: 'Quebec, Canada',
@@ -36,14 +38,16 @@ const patientData = {
 const AppointmentDetails = () => {
   return (
     <ScrollView style={styles.container}>
-      {/* Full-width Avatar */}
-      <Image
-        source={{
-          uri: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
-        }}
-        style={styles.profileImage}
-      />
-
+      {/* Top Section - Frosted Glass Avatar */}
+      <View style={styles.frostedContainer}>
+        <Image
+          source={{
+            uri: 'https://images.pexels.com/photos/307008/pexels-photo-307008.jpeg',
+          }}
+          style={styles.backgroundImage}
+        />
+        <View style={styles.frostedOverlay} />
+      </View>
       {/* Frosted Glassmorphism Card */}
       <View style={styles.glassCard}>
         <Text style={styles.nameText}>{patientData.name}</Text>
@@ -64,74 +68,54 @@ const AppointmentDetails = () => {
         </View>
       </View>
 
-      {/* Date & Type */}
-      <View style={styles.dateTypeBar}>
-        <View style={styles.dateTypeItem}>
-          <FontAwesome name='calendar' size={24} color='#1069AD' />
-          <Text style={styles.dateTypeText}>{patientData.date}</Text>
+      {/* Modern Interactive Details */}
+      <View style={styles.detailsContainer}>
+        {/* Details */}
+        <View style={styles.appointmentDetailsContainer}>
+          <View style={styles.infoRow}>
+            <MaterialIcons name='event' size={24} color='#1069AD' />
+            <Text style={styles.infoText}>Appointment: {patientData.date}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <MaterialIcons name='medical-services' size={24} color='#1069AD' />
+            <Text style={styles.infoText}>Type: {patientData.type}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <FontAwesome name='tags' size={24} color='#1069AD' />
+            <Text style={styles.infoText}>
+              Concerns: {patientData.tags.join(', ')}
+            </Text>
+          </View>
         </View>
-        <View style={styles.dateTypeItem}>
-          <MaterialIcons name='meeting-room' size={24} color='#1069AD' />
-          <Text style={styles.dateTypeText}>{patientData.type}</Text>
+
+        {/* Notes */}
+        <View style={styles.notesContainer}>
+          <Text style={styles.notesHeader}>Notes:</Text>
+          <Text style={styles.notesText}>{patientData.notes}</Text>
+        </View>
+
+        {/* Medicines */}
+        <View style={styles.medicinesContainer}>
+          <Text style={styles.medicinesHeader}>Prescribed Medicines:</Text>
+          {patientData.medicines.map((medicine, index) => (
+            <View key={index} style={styles.medicineItem}>
+              <MaterialIcons name='local-pharmacy' size={24} color='#1069AD' />
+              <Text style={styles.medicineText}>{medicine}</Text>
+            </View>
+          ))}
         </View>
       </View>
 
-      {/* Tags */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.tagContainer}>
-        {patientData.tags.map((tag, index) => (
-          <View style={styles.tag} key={index}>
-            <Text style={styles.tagText}>{tag}</Text>
-          </View>
-        ))}
-      </ScrollView>
-
-      {/* Expandable Patient Notes */}
-      <TouchableOpacity style={styles.expandableSection}>
-        <Text style={styles.sectionHeader}>Patient Notes:</Text>
-        <Text style={styles.sectionContent}>{patientData.notes}</Text>
-      </TouchableOpacity>
-
-      {/* Old Prescriptions */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.carousel}>
-        {patientData.prescriptions.map((prescription, index) => (
-          <Image
-            key={index}
-            source={{ uri: prescription }}
-            style={styles.carouselImage}
-          />
-        ))}
-      </ScrollView>
-
-      {/* Current/Old Medicines */}
-      <View style={styles.medicineList}>
-        <Text style={styles.sectionHeader}>Medicines:</Text>
-        {patientData.medicines.map((medicine, index) => (
-          <View key={index} style={styles.medicineItem}>
-            <MaterialIcons name='local-pharmacy' size={20} color='#1069AD' />
-            <Text style={styles.medicineText}>{medicine}</Text>
-          </View>
-        ))}
-      </View>
-
-      {/* Action Buttons */}
-      <View style={styles.actionButtons}>
-        <TouchableOpacity style={styles.button}>
+      {/* Floating Action Buttons */}
+      <View style={styles.fabContainer}>
+        <TouchableOpacity style={[styles.fab, styles.fabVideoCall]}>
           <MaterialIcons name='videocam' size={24} color='#FFF' />
-          <Text style={styles.buttonText}>Video Call</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={[styles.fab, styles.fabCall]}>
           <MaterialIcons name='call' size={24} color='#FFF' />
-          <Text style={styles.buttonText}>Call</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={[styles.fab, styles.fabMessage]}>
           <MaterialIcons name='message' size={24} color='#FFF' />
-          <Text style={styles.buttonText}>Message</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -143,13 +127,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#E4E4E4',
   },
-  profileImage: {
+  frostedContainer: {
     width: width,
-    height: width - 200,
+    height: 220,
+    overflow: 'hidden',
+  },
+  backgroundImage: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+  },
+  frostedOverlay: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    position: 'absolute',
   },
   glassCard: {
     position: 'absolute',
-    top: width - 248,
+    top: width - 230,
     left: 20,
     right: 20,
     height: 90,
@@ -188,88 +184,84 @@ const styles = StyleSheet.create({
     backgroundColor: '#1069AD',
     marginHorizontal: 10,
   },
-  dateTypeBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 20,
-    backgroundColor: '#E4E4E4',
+  detailsContainer: {
+    marginTop: 50,
+    margin: 15,
+    padding: 15,
+    borderRadius: 15,
+    backgroundColor: '#FFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
-  dateTypeItem: {
+  infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 10,
   },
-  dateTypeText: {
-    fontSize: 18,
+  infoText: {
     marginLeft: 10,
-    color: '#1069AD',
+    fontSize: 16,
+    color: '#555',
   },
-  tagContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+  notesContainer: {
+    marginTop: 20,
   },
-  tag: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 15,
-    padding: 10,
-    marginLeft: 10,
-  },
-  tagText: {
-    color: '#1069AD',
-  },
-  expandableSection: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 15,
-    marginHorizontal: 10,
-    padding: 15,
-  },
-  sectionHeader: {
+  notesHeader: {
     fontSize: 18,
     marginBottom: 10,
     color: '#1069AD',
   },
-  sectionContent: {
+  notesText: {
     fontSize: 16,
     color: '#555',
   },
-  carousel: {
-    marginVertical: 15,
+  medicinesContainer: {
+    marginTop: 20,
   },
-  carouselImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 15,
-    marginHorizontal: 10,
-  },
-  medicineList: {
-    marginVertical: 15,
+  medicinesHeader: {
+    fontSize: 18,
+    marginBottom: 10,
+    color: '#1069AD',
   },
   medicineItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 5,
-    marginLeft: 20,
+    marginBottom: 10,
   },
   medicineText: {
     marginLeft: 10,
+    fontSize: 16,
     color: '#555',
   },
-  actionButtons: {
+  fabContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginVertical: 20,
+    justifyContent: 'space-between',
+    marginTop: 10,
+    marginBottom: 30,
+    paddingHorizontal: 15,
   },
-  button: {
-    backgroundColor: '#1069AD',
-    borderRadius: 30,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    flexDirection: 'row',
+  fab: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
     alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 5, // For Android shadow
+    shadowColor: '#000', // For iOS shadow
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
-  buttonText: {
-    marginLeft: 10,
-    color: '#FFF',
+  fabVideoCall: {
+    backgroundColor: '#1069AD',
+  },
+  fabCall: {
+    backgroundColor: '#1069AD',
+  },
+  fabMessage: {
+    backgroundColor: '#1069AD',
   },
 })
 
