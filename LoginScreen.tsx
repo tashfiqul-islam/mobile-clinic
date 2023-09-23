@@ -102,6 +102,11 @@ const LoginScreen = () => {
         const result = await loginHandle(data.username, data.password)
 
         if (result.success) {
+          // Fetch the Firebase ID token after successful login
+          const userToken = await firebase.auth().currentUser.getIdToken()
+          console.log('Firebase ID token:', userToken) // Log the token
+
+          // Continue with your existing code
           console.log('Authentication successful')
           navigateByUserType(result.userType)
           Burnt.toast({
@@ -115,8 +120,19 @@ const LoginScreen = () => {
           handleError(result.error)
         }
       } catch (error) {
-        // This catch block should remain empty if you're handling the errors in the handleError function.
-        // Any console logs or other error handling here might be causing the Firebase error to appear.
+        // Handle specific errors here
+        switch (error.code) {
+          case 'auth/user-not-found':
+            return { success: false, error: 'User not found' }
+          case 'auth/wrong-password':
+            return { success: false, error: 'Incorrect password' }
+          // ... handle other specific error codes
+          default:
+            return {
+              success: false,
+              error: 'An error occurred. Please try again later.',
+            }
+        }
       } finally {
         setIsLoading(false)
       }
