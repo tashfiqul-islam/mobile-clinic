@@ -3,7 +3,7 @@ import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
 import 'firebase/compat/database'
 
-const UserContext = createContext()
+export const UserContext = createContext()
 
 export const useUser = () => {
   return useContext(UserContext)
@@ -17,29 +17,36 @@ export const UserProvider = ({ children }) => {
   const [userLocation, setUserLocation] = useState('')
   const [userImage, setUserImage] = useState('')
   const [loginTimestamp, setLoginTimestamp] = useState(null)
+  const [userId, setUserId] = useState(0)
+  const [users, setUsers] = useState({}) // New state for users
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Listen for changes in the user's data (e.g., full name and email)
+    const usersRef = firebase.database().ref('users')
+    const handleData = snap => {
+      if (snap.val()) {
+        console.log('Fetched users:', snap.val())
+        setUsers(snap.val())
+      }
+    }
+    usersRef.on('value', handleData)
+    return () => usersRef.off('value', handleData)
+  }, [])
+
+  useEffect(() => {
     const unsubscribe = firebase.auth().onAuthStateChanged(user => {
-      // Check elapsed time since the saved timestamp and log out if more than a month
       if (
         loginTimestamp &&
         Date.now() - loginTimestamp > 30 * 24 * 60 * 60 * 1000
       ) {
-        // 30 days in milliseconds
         firebase.auth().signOut()
       }
-
       if (user) {
-        // User is signed in, fetch and set user data
-        // Setting the login timestamp
         if (!loginTimestamp) {
           setLoginTimestamp(Date.now())
         }
-
         const userUid = user.uid
         const userRef = firebase.database().ref(`users/${userUid}`)
-
         userRef.on('value', snapshot => {
           const userData = snapshot.val()
           setUserFullName(userData.fullName || '')
@@ -47,22 +54,23 @@ export const UserProvider = ({ children }) => {
           setUserBio(userData.userBio || '')
           setUserLocation(userData.location || '')
           setUserImage(userData.profileImage || '')
+          setUserId(userUid || 0)
+          setLoading(false) // Set loading to false once user data is fetched
         })
       } else {
-        // User is signed out, clear user data
         setUserFullName('')
         setUserEmail('')
         setUserImage('')
+        setLoading(false) // Set loading to false if there's no user
       }
     })
-
     return () => {
-      // Clean up the subscription when the component unmounts
       unsubscribe()
     }
-  }, [])
+  }, [loginTimestamp])
 
   const value = {
+    userId,
     userFullName,
     setUserFullName,
     userEmail,
@@ -75,6 +83,7 @@ export const UserProvider = ({ children }) => {
     setUserLocation,
     userImage,
     setUserImage,
+    users, // New users state added to context value
   }
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>

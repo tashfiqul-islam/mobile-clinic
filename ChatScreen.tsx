@@ -16,88 +16,65 @@ import { Ionicons } from '@expo/vector-icons'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/firestore'
-import { sendMessage, listenToMessages } from './Auth' // Ensure the path is correct
+import { sendMessage, onNewMessage, initializeChat } from './Auth'
+import moment from 'moment'
+
+const DEFAULT_IMAGE_URL =
+  'https://firebasestorage.googleapis.com/v0/b/mclinic-df2b5.appspot.com/o/profile_images%2FdefaultProfile.png?alt=media&token=600ebca7-a028-428c-9199-3bd7464cf216'
 
 const ChatScreen = () => {
-  const MAX_HEIGHT = 140
   const [text, setText] = useState('')
   const [messages, setMessages] = useState([])
-  const [attachment, setAttachment] = useState(null)
+  const [userData, setUserData] = useState({
+    name: '',
+    profileImage: DEFAULT_IMAGE_URL,
+  })
   const scrollViewRef = useRef(null)
-  const [inputHeight, setInputHeight] = useState(35)
   const navigation = useNavigation()
   const route = useRoute()
   const conversationId = route.params.conversationId
-  const [doctorId, setDoctorId] = useState(null)
+  const currentUserId = firebase.auth().currentUser?.uid
+  const otherUserId = route.params.otherUserId
 
   useEffect(() => {
-    // Fetch doctorId based on the conversationId
-    const conversationDoc = firebase
-      .firestore()
-      .collection('conversations')
-      .doc(conversationId)
-    conversationDoc.get().then(doc => {
-      if (doc.exists) {
-        setDoctorId(doc.data().doctorId)
+    const fetchUserData = async () => {
+      const userRef = firebase.database().ref(`users/${otherUserId}`)
+      const snapshot = await userRef.once('value')
+      const fetchedData = snapshot.val()
+      if (fetchedData) {
+        setUserData({
+          name: fetchedData.fullName || '',
+          profileImage: fetchedData.profileImage || DEFAULT_IMAGE_URL,
+        })
       }
-    })
+    }
+
+    fetchUserData()
+  }, [otherUserId])
+
+  useEffect(() => {
+    const setListeners = async () => {
+      if (!conversationId) {
+        const newChatId = await initializeChat(otherUserId, currentUserId)
+      }
+
+      onNewMessage(conversationId, newMessages => {
+        setMessages(newMessages)
+        if (scrollViewRef.current) {
+          scrollViewRef.current.scrollToEnd({ animated: true })
+        }
+      })
+    }
+
+    setListeners()
   }, [conversationId])
 
-  useEffect(() => {
-    // Now, you can use conversationId directly
-    const unsubscribe = listenToMessages(conversationId, newMessages => {
-      setMessages(newMessages)
-
-      // Add this logging statement
-      console.log('Fetched Messages:', newMessages)
-    })
-
-    const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      _keyboardDidShow,
-    )
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      _keyboardDidHide,
-    )
-
-    return () => {
-      unsubscribe()
-      keyboardDidShowListener.remove()
-      keyboardDidHideListener.remove()
-    }
-  }, [navigation])
-
-  const _keyboardDidShow = () => {
-    scrollViewRef.current?.scrollToEnd({ animated: true })
-  }
-
-  const _keyboardDidHide = () => {
-    // Logic if needed when keyboard hides
-  }
-
   const handleSend = async () => {
-    if (text.trim() !== '' || attachment) {
+    if (text.trim() !== '') {
       const senderId = firebase.auth().currentUser.uid
-
-      // If there's text, send it as a message
-      if (text.trim() !== '') {
-        await sendMessage(conversationId, senderId, text)
-      }
-
-      // If there's an attachment, send it as a separate message
-      if (attachment) {
-        await sendMessage(conversationId, senderId, '', attachment) // Pass an empty text and the image URI
-        setAttachment(null) // Clear the attachment after sending
-      }
-
+      await sendMessage(conversationId, senderId, text)
       setText('')
     }
-  }
-
-  const handleVoice = () => {
-    // Mock voice-to-text
-    setText('This is a mock voice message.')
   }
 
   const handleAttachment = async () => {
@@ -110,16 +87,9 @@ const ChatScreen = () => {
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
       const selectedImageUri = result.assets[0].uri
-      setAttachment(selectedImageUri)
-
-      // Optionally, you can send the attachment immediately after selecting it
       const senderId = firebase.auth().currentUser.uid
-      await sendMessage(conversationId, senderId, '', selectedImageUri) // Pass an empty text and the image URI
+      await sendMessage(conversationId, senderId, '', selectedImageUri)
     }
-  }
-
-  const removeAttachment = () => {
-    setAttachment(null)
   }
 
   return (
@@ -132,7 +102,11 @@ const ChatScreen = () => {
           style={styles.iconLeft}
           onPress={() => navigation.goBack()}
         />
-        <Text style={styles.name}>John Doe</Text>
+        <Image
+          source={{ uri: userData.profileImage }}
+          style={styles.profileImage}
+        />
+        <Text style={styles.name}>{userData.name}</Text>
         <View style={styles.statusPill}>
           <Ionicons name='ellipse-sharp' size={8} color='green' />
           <Text style={styles.statusText}>Online</Text>
@@ -150,86 +124,59 @@ const ChatScreen = () => {
           style={styles.iconRight}
         />
       </View>
-
-      {messages.length === 0 ? (
-        <View style={styles.emptyStateContainer}>
-          <Text style={styles.emptyStateText}>
-            Send a message to start the conversation.
-          </Text>
-        </View>
-      ) : (
-        <ScrollView
-          style={styles.chatContainer}
-          ref={scrollViewRef}
-          keyboardShouldPersistTaps='handled'>
-          {messages.map(item => (
+      <ScrollView
+        style={styles.chatContainer}
+        ref={scrollViewRef}
+        keyboardShouldPersistTaps='handled'>
+        {messages.map(item => (
+          <View
+            key={item.id}
+            style={
+              item.senderId === currentUserId
+                ? styles.selfMessageContainer
+                : styles.otherMessageContainer
+            }>
             <View
-              key={item.id}
               style={
-                item.senderId === doctorId
-                  ? styles.doctorMessageContainer
-                  : styles.patientMessageContainer
+                item.senderId === currentUserId
+                  ? styles.selfMessageBubble
+                  : styles.otherMessageBubble
               }>
-              <View
+              {item.attachment && (
+                <Image
+                  source={{ uri: item.attachment }}
+                  style={styles.attachmentImage}
+                />
+              )}
+              <Text
                 style={
-                  item.senderId === doctorId
-                    ? styles.doctorMessageBubble
-                    : styles.patientMessageBubble
+                  item.senderId === currentUserId
+                    ? styles.selfMessageText
+                    : styles.otherMessageText
                 }>
-                {item.attachment && (
-                  <Image
-                    source={{ uri: item.attachment }}
-                    style={styles.attachmentImage}
-                  />
-                )}
-                <Text
-                  style={
-                    item.senderId === doctorId
-                      ? styles.doctorMessageText
-                      : styles.patientMessageText
-                  }>
-                  {item.text}
-                </Text>
-              </View>
-              <View style={styles.timestampContainer}>
-                {item.senderId === doctorId && (
-                  <Ionicons
-                    name={
-                      item.status === 'sent'
-                        ? 'ios-checkmark'
-                        : 'ios-checkmark-done'
-                    }
-                    size={16}
-                    color='#1069AD'
-                  />
-                )}
-                <Text style={styles.timestamp}>
-                  {item.timestamp?.toDate().toLocaleString()}
-                </Text>
-              </View>
+                {item.text}
+              </Text>
             </View>
-          ))}
-        </ScrollView>
-      )}
-
-      <View style={styles.inputContainer}>
-        {attachment && (
-          <View style={styles.attachmentContainer}>
-            <Image
-              source={{ uri: attachment }}
-              style={styles.attachmentPreview}
-            />
-            <TouchableOpacity
-              style={styles.removeAttachment}
-              onPress={removeAttachment}>
-              <Ionicons
-                name='ios-close-circle-outline'
-                size={25}
-                color='#1069AD'
-              />
-            </TouchableOpacity>
+            <View style={styles.timestampContainer}>
+              {item.senderId === currentUserId && (
+                <Ionicons
+                  name={
+                    item.status === 'sent'
+                      ? 'ios-checkmark'
+                      : 'ios-checkmark-done'
+                  }
+                  size={16}
+                  color='#1069AD'
+                />
+              )}
+              <Text style={styles.timestamp}>
+                {moment.utc(item.clientTimestamp?.toDate()).format('hh:mm A')}
+              </Text>
+            </View>
           </View>
-        )}
+        ))}
+      </ScrollView>
+      <View style={styles.inputContainer}>
         <Ionicons
           name='ios-attach-outline'
           size={30}
@@ -238,24 +185,12 @@ const ChatScreen = () => {
           onPress={handleAttachment}
         />
         <TextInput
-          style={[styles.input, { height: Math.min(MAX_HEIGHT, inputHeight) }]}
+          style={styles.input}
           placeholder='Type your message...'
           placeholderTextColor='#1069AD'
           value={text}
           onChangeText={setText}
           multiline={true}
-          onContentSizeChange={e => {
-            const newHeight = e.nativeEvent.contentSize.height
-            setInputHeight(newHeight)
-          }}
-          numberOfLines={4}
-        />
-        <Ionicons
-          name='ios-mic-outline'
-          size={30}
-          color='#1069AD'
-          style={styles.iconRight}
-          onPress={handleVoice}
         />
         <Ionicons
           name='ios-send-sharp'
@@ -281,6 +216,12 @@ const styles = StyleSheet.create({
     borderBottomColor: '#D1D1D1',
     borderBottomWidth: 1,
     backgroundColor: '#E4E4E4',
+  },
+  profileImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
   },
   name: {
     flex: 1,
@@ -309,52 +250,31 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
   },
-  emptyStateContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  emptyStateText: {
-    fontSize: 16,
-    textAlign: 'center',
-    color: '#888',
-  },
-  doctorMessageContainer: {
+  selfMessageContainer: {
     alignItems: 'flex-end',
     marginBottom: 10,
   },
-  patientMessageContainer: {
+  otherMessageContainer: {
     alignItems: 'flex-start',
     marginBottom: 10,
   },
-  doctorMessageBubble: {
+  selfMessageBubble: {
     backgroundColor: 'rgba(255, 255, 255, 0.5)',
     borderRadius: 10,
     padding: 10,
     maxWidth: '70%',
-    ...Platform.select({
-      ios: {
-        backdropFilter: 'blur(10px)',
-      },
-    }),
   },
-  patientMessageBubble: {
+  otherMessageBubble: {
     backgroundColor: '#1069AD',
     borderRadius: 10,
     padding: 10,
     maxWidth: '70%',
-    ...Platform.select({
-      ios: {
-        backdropFilter: 'blur(10px)',
-      },
-    }),
   },
-  doctorMessageText: {
+  selfMessageText: {
     color: '#000',
     fontSize: 16,
   },
-  patientMessageText: {
+  otherMessageText: {
     color: '#FFF',
     fontSize: 16,
   },
@@ -384,19 +304,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: 'rgba(255, 255, 255, 0.5)',
     marginHorizontal: 5,
-  },
-  attachmentContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: 5,
-  },
-  attachmentPreview: {
-    width: 50,
-    height: 50,
-    borderRadius: 10,
-  },
-  removeAttachment: {
-    marginLeft: 5,
   },
   attachmentImage: {
     width: 150,

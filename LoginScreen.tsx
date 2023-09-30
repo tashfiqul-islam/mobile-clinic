@@ -106,9 +106,17 @@ const LoginScreen = () => {
           const userToken = await firebase.auth().currentUser.getIdToken()
           console.log('Firebase ID token:', userToken) // Log the token
 
+          // Fetch the user's userType from Firebase Realtime Database
+          const userSnapshot = await firebase
+            .database()
+            .ref('users/' + firebase.auth().currentUser.uid)
+            .once('value')
+
+          const userType = userSnapshot.val().userType
+
           // Continue with your existing code
           console.log('Authentication successful')
-          navigateByUserType(result.userType)
+          navigateByUserType(userType)
           Burnt.toast({
             title: 'Success!',
             message: 'Login Successful',
@@ -123,15 +131,13 @@ const LoginScreen = () => {
         // Handle specific errors here
         switch (error.code) {
           case 'auth/user-not-found':
-            return { success: false, error: 'User not found' }
+            handleError('User not found')
+            break
           case 'auth/wrong-password':
-            return { success: false, error: 'Incorrect password' }
-          // ... handle other specific error codes
+            handleError('Incorrect password')
+            break
           default:
-            return {
-              success: false,
-              error: 'An error occurred. Please try again later.',
-            }
+            handleError('An error occurred. Please try again later.')
         }
       } finally {
         setIsLoading(false)
