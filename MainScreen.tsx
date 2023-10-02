@@ -12,7 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { useTheme } from '@react-navigation/native'
 import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper'
 import Footer from './Footer'
-
+import { NavigationContext } from './NavigationContext'
 const theme = {
   ...DefaultTheme,
   colors: {
@@ -23,6 +23,14 @@ const theme = {
 
 const SplashScreen = ({ navigation }) => {
   const { colors } = useTheme()
+
+  const goToLogin = () => {
+    navigation.navigate('Login')
+  }
+
+  const goToRegistration = () => {
+    navigation.navigate('Registration')
+  }
 
   return (
     <PaperProvider theme={theme}>
@@ -48,7 +56,7 @@ const SplashScreen = ({ navigation }) => {
             <Text style={styles.text}>Healthcare</Text>
           </View>
           <View style={styles.button1}>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <TouchableOpacity onPress={goToLogin}>
               <LinearGradient
                 colors={['#1987D8', '#0F6FB6']}
                 style={styles.signIn}>
@@ -58,7 +66,7 @@ const SplashScreen = ({ navigation }) => {
           </View>
           <View style={styles.button2}>
             <TouchableOpacity
-              onPress={() => navigation.navigate('Registration')}
+              onPress={goToRegistration}
               style={[
                 styles.signIn,
                 {

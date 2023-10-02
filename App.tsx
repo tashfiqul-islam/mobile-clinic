@@ -2,28 +2,40 @@ import 'react-native-gesture-handler'
 import React, { useEffect, useState, useRef } from 'react'
 import * as Font from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen'
-import { NavigationContainer } from '@react-navigation/native'
-import { createStackNavigator } from '@react-navigation/stack'
+import { firebaseConfig } from './firebaseConfig'
+
+import firebase from 'firebase/compat/app'
+import 'firebase/compat/auth'
+import 'firebase/compat/database'
+import { UserProvider } from './UserContext'
+import { AppContext } from './AppContext'
+
+import 'react-native-gesture-handler'
+import { NavigationContext } from './NavigationContext'
 import MainScreen from './MainScreen'
 import LoginScreen from './LoginScreen'
 import SignUpScreen from './SignUpScreen'
-import DoctorDashboard from './DoctorDashboard'
+// import DoctorDashboard from './DoctorDashboard'
 import PatientDashboard from './PatientDashboard'
 import AppointmentOverview from './AppointmentOverview'
-import { firebaseConfig } from './firebaseConfig'
+import AuthProvider from './AuthCheck'
 import ProfileTab from './ProfileTab'
 import DoctorDashboardNavigator from './DoctorDashboardNavigator'
-import firebase from 'firebase/compat/app'
-import 'firebase/compat/auth'
-import { UserProvider } from './UserContext'
+import { NavigationContainer } from '@react-navigation/native'
+import { createStackNavigator } from '@react-navigation/stack'
+import AuthCheck from './AuthCheck'
 
 const Stack = createStackNavigator()
 
 const App: React.FC = () => {
-  const [initialRouteName, setInitialRouteName] = useState('Home')
   const [dashboardTitle, setDashboardTitle] = useState('Dashboard')
   const [isAppReady, setAppReady] = useState(false)
-  const navigationRef = useRef(null)
+  const [initialRouteName, setInitialRouteName] = useState('Home')
+  const mainNavigationRef = useRef(null)
+
+  const [allUsers, setAllUsers] = useState([])
+  const [isUsersLoaded, setUsersLoaded] = useState(false)
+  const [currentNavigation, setCurrentNavigation] = useState('main')
 
   useEffect(() => {
     async function prepareApp() {
@@ -47,7 +59,7 @@ const App: React.FC = () => {
             // If the user is not authenticated, navigate to the home/login screen.
             setInitialRouteName('Home')
             // If you have set up a ref to your NavigationContainer:
-            navigationRef.current?.navigate('Home')
+            mainNavigationRef.current?.navigate('Home')
           }
         })
         setAppReady(true)
@@ -96,47 +108,62 @@ const App: React.FC = () => {
   }
 
   return (
-    <UserProvider>
-      <NavigationContainer ref={navigationRef}>
-        <Stack.Navigator initialRouteName={initialRouteName}>
-          <Stack.Screen
-            name='Home'
-            component={MainScreen}
-            options={{ title: 'Home' }}
-          />
-          <Stack.Screen
-            name='Login'
-            component={LoginScreen}
-            options={{ title: 'Login' }}
-          />
-          <Stack.Screen
-            name='Registration'
-            component={SignUpScreen}
-            options={{ title: 'Registration' }}
-          />
-          <Stack.Screen
-            name='DocDashboard'
-            component={DoctorDashboardNavigator} // <-- This is the new nested navigator
-            options={{ title: dashboardTitle, headerShown: false }}
-          />
-          <Stack.Screen
-            name='PatDashboard'
-            component={PatientDashboard}
-            options={{ title: dashboardTitle, headerShown: false }}
-          />
-          <Stack.Screen
-            name='Profile'
-            component={ProfileTab}
-            options={{ title: 'Profile' }}
-          />
-          <Stack.Screen
-            name='AppointmentOverview'
-            component={AppointmentOverview}
-            options={{ title: 'Appointment Overview' }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </UserProvider>
+    <AppContext.Provider
+      value={{
+        users: allUsers,
+        setUsers: setAllUsers,
+        isUsersLoaded,
+        setUsersLoaded,
+      }}>
+      <UserProvider>
+        <NavigationContext.Provider value={{ navigator: mainNavigationRef }}>
+          <NavigationContainer ref={mainNavigationRef}>
+            <Stack.Navigator initialRouteName={initialRouteName}>
+              <Stack.Screen
+                name='Home'
+                component={MainScreen}
+                options={{ title: 'Home' }}
+              />
+              <Stack.Screen
+                name='DocDashboard'
+                options={{ title: dashboardTitle, headerShown: false }}>
+                {(...props) => {
+                  return (
+                    <AuthCheck RenderComponent={DoctorDashboardNavigator} />
+                  )
+                }}
+              </Stack.Screen>
+              <Stack.Screen
+                name='PatDashboard'
+                component={PatientDashboard}
+                options={{ title: dashboardTitle, headerShown: false }}
+              />
+              <Stack.Screen name='Profile' options={{ title: 'Profile' }}>
+                {(...props) => {
+                  return <AuthCheck RenderComponent={ProfileTab} />
+                }}
+              </Stack.Screen>
+              <Stack.Screen
+                name='AppointmentOverview'
+                component={AppointmentOverview}
+                options={{ title: 'Appointment Overview' }}
+              />
+
+              <Stack.Screen
+                name='Login'
+                component={LoginScreen}
+                options={{ title: 'Login' }}
+              />
+              <Stack.Screen
+                name='Registration'
+                component={SignUpScreen}
+                options={{ title: 'Registration' }}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </NavigationContext.Provider>
+      </UserProvider>
+    </AppContext.Provider>
   )
 }
 

@@ -185,7 +185,7 @@ const ProfileTab = () => {
 
   const handleLogout = async () => {
     try {
-      await firebase.auth().signOut()
+      const signedOut = await firebase.auth().signOut()
 
       setUserFullName('')
       setUserEmail('')

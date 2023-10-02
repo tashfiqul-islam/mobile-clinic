@@ -3,7 +3,7 @@ import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
 import 'firebase/compat/database'
 
-export const UserContext = createContext()
+export const UserContext = createContext({})
 
 export const useUser = () => {
   return useContext(UserContext)
@@ -21,17 +21,17 @@ export const UserProvider = ({ children }) => {
   const [users, setUsers] = useState({}) // New state for users
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const usersRef = firebase.database().ref('users')
-    const handleData = snap => {
-      if (snap.val()) {
-        console.log('Fetched users:', snap.val())
-        setUsers(snap.val())
-      }
-    }
-    usersRef.on('value', handleData)
-    return () => usersRef.off('value', handleData)
-  }, [])
+  // useEffect(() => {
+  //   const usersRef = firebase.database().ref('users')
+  //   const handleData = snap => {
+  //     if (snap.val()) {
+  //       console.log('Fetched users:', snap.val())
+  //       setUsers(snap.val())
+  //     }
+  //   }
+  //   usersRef.on('value', handleData)
+  //   return () => usersRef.off('value', handleData)
+  // }, [])
 
   useEffect(() => {
     const unsubscribe = firebase.auth().onAuthStateChanged(user => {
@@ -40,7 +40,16 @@ export const UserProvider = ({ children }) => {
         Date.now() - loginTimestamp > 30 * 24 * 60 * 60 * 1000
       ) {
         firebase.auth().signOut()
+        setUserFullName('')
+        setUserEmail('')
+        setUserBio('')
+        setUserLocation('')
+        setUserImage('')
+        setUserId(0)
+        setLoading(false)
+        return // Early return after signing out
       }
+
       if (user) {
         if (!loginTimestamp) {
           setLoginTimestamp(Date.now())
@@ -54,16 +63,20 @@ export const UserProvider = ({ children }) => {
           setUserBio(userData.userBio || '')
           setUserLocation(userData.location || '')
           setUserImage(userData.profileImage || '')
-          setUserId(userUid || 0)
-          setLoading(false) // Set loading to false once user data is fetched
+          setUserId(userUid)
+          setLoading(false)
         })
       } else {
         setUserFullName('')
         setUserEmail('')
+        setUserBio('')
+        setUserLocation('')
         setUserImage('')
-        setLoading(false) // Set loading to false if there's no user
+        setUserId(0)
+        setLoading(false)
       }
     })
+
     return () => {
       unsubscribe()
     }

@@ -104,7 +104,6 @@ const LoginScreen = () => {
         if (result.success) {
           // Fetch the Firebase ID token after successful login
           const userToken = await firebase.auth().currentUser.getIdToken()
-          console.log('Firebase ID token:', userToken) // Log the token
 
           // Fetch the user's userType from Firebase Realtime Database
           const userSnapshot = await firebase
@@ -143,7 +142,6 @@ const LoginScreen = () => {
         setIsLoading(false)
       }
     } else {
-      console.log('Incomplete login credentials')
       Burnt.toast({
         title: '⚠️ Warning',
         message: 'Incomplete login credentials!',

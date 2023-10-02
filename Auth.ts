@@ -128,7 +128,6 @@ export const postMessage = (chatID: string, text: string) => {
     senderID: senderID,
     text: text,
     timestamp: firebase.database.ServerValue.TIMESTAMP,
-    isUnread: true, // Add the unread flag
   }
 
   return firebase.database().ref(`chats/${chatID}/messages`).push(message)
@@ -167,7 +166,8 @@ export const listenForNewMessages = (
 ) => {
   const chatRef = firebase.database().ref(`chats/${chatID}/messages`)
   const listener = chatRef.on('child_added', snapshot => {
-    callback(snapshot.val())
+    const newMessage = snapshot.val()
+    callback(newMessage)
   })
   return () => chatRef.off('child_added', listener)
 }

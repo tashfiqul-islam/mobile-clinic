@@ -9,8 +9,10 @@ import 'firebase/compat/database'
 import ProfileTab from './ProfileTab'
 import HomeTab from './HomeTab'
 import AppointmentList from './AppointmentList'
-import MessageTab from './MessageTab'
+import MessageTab from './Views/Tabs/Messages/MessageTab'
 import { useUser } from './UserContext'
+import { ref, getDatabase, get } from 'firebase/database'
+import { AppContext } from './AppContext'
 
 const CustomTabLabel = ({ title, focused }) => {
   return (
@@ -81,6 +83,27 @@ const DoctorDashboard = ({ route }) => {
     } else {
       return 'Good Evening!'
     }
+  }
+
+  const appContext = React.useContext(AppContext)
+
+  useEffect(() => {
+    console.log('fetching user data')
+
+    fetchAllUsers()
+  }, [])
+
+  const fetchAllUsers = async () => {
+    const usersRef = ref(getDatabase(), 'users')
+
+    get(usersRef)
+      .then(snapshot => {
+        appContext.setUsers(snapshot.val())
+      })
+      .catch(err => {
+        console.log(err)
+        fetchAllUsers()
+      })
   }
 
   useEffect(() => {

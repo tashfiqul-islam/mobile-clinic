@@ -1,315 +1,173 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
-  SafeAreaView,
   View,
   Text,
-  TouchableOpacity,
-  TextInput,
-  ScrollView,
   StyleSheet,
-  Platform,
-  Keyboard,
-  Image,
+  TextInput,
+  TouchableOpacity,
 } from 'react-native'
-import * as ImagePicker from 'expo-image-picker'
-import { Ionicons } from '@expo/vector-icons'
-import { useNavigation, useRoute } from '@react-navigation/native'
-import firebase from 'firebase/compat/app'
-import 'firebase/compat/firestore'
-import { sendMessage, onNewMessage, initializeChat } from './Auth'
-import moment from 'moment'
+import {
+  MaterialIcons,
+  MaterialCommunityIcons,
+  Ionicons,
+} from '@expo/vector-icons'
+import LinearGradient from 'react-native-linear-gradient'
 
-const DEFAULT_IMAGE_URL =
-  'https://firebasestorage.googleapis.com/v0/b/mclinic-df2b5.appspot.com/o/profile_images%2FdefaultProfile.png?alt=media&token=600ebca7-a028-428c-9199-3bd7464cf216'
-
-const ChatScreen = () => {
-  const [text, setText] = useState('')
-  const [messages, setMessages] = useState([])
-  const [userData, setUserData] = useState({
-    name: '',
-    profileImage: DEFAULT_IMAGE_URL,
-  })
-  const scrollViewRef = useRef(null)
-  const navigation = useNavigation()
-  const route = useRoute()
-  const conversationId = route.params.conversationId
-  const currentUserId = firebase.auth().currentUser?.uid
-  const otherUserId = route.params.otherUserId
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const userRef = firebase.database().ref(`users/${otherUserId}`)
-      const snapshot = await userRef.once('value')
-      const fetchedData = snapshot.val()
-      if (fetchedData) {
-        setUserData({
-          name: fetchedData.fullName || '',
-          profileImage: fetchedData.profileImage || DEFAULT_IMAGE_URL,
-        })
-      }
-    }
-
-    fetchUserData()
-  }, [otherUserId])
-
-  useEffect(() => {
-    const setListeners = async () => {
-      if (!conversationId) {
-        const newChatId = await initializeChat(otherUserId, currentUserId)
-      }
-
-      onNewMessage(conversationId, newMessages => {
-        setMessages(newMessages)
-        if (scrollViewRef.current) {
-          scrollViewRef.current.scrollToEnd({ animated: true })
-        }
-      })
-    }
-
-    setListeners()
-  }, [conversationId])
-
-  const handleSend = async () => {
-    if (text.trim() !== '') {
-      const senderId = firebase.auth().currentUser.uid
-      await sendMessage(conversationId, senderId, text)
-      setText('')
-    }
-  }
-
-  const handleAttachment = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    })
-
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      const selectedImageUri = result.assets[0].uri
-      const senderId = firebase.auth().currentUser.uid
-      await sendMessage(conversationId, senderId, '', selectedImageUri)
-    }
-  }
+const ChatScreen: React.FC = () => {
+  const [message, setMessage] = useState<string>('')
+  const [height, setHeight] = useState(35) // initial height
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
-        <Ionicons
-          name='arrow-back-sharp'
-          size={30}
-          color='#1069AD'
-          style={styles.iconLeft}
-          onPress={() => navigation.goBack()}
-        />
-        <Image
-          source={{ uri: userData.profileImage }}
-          style={styles.profileImage}
-        />
-        <Text style={styles.name}>{userData.name}</Text>
-        <View style={styles.statusPill}>
-          <Ionicons name='ellipse-sharp' size={8} color='green' />
-          <Text style={styles.statusText}>Online</Text>
-        </View>
-        <Ionicons
-          name='ios-videocam-outline'
-          size={30}
-          color='#1069AD'
-          style={styles.iconRight}
-        />
-        <Ionicons
-          name='ios-call-outline'
-          size={25}
-          color='#1069AD'
-          style={styles.iconRight}
-        />
-      </View>
-      <ScrollView
-        style={styles.chatContainer}
-        ref={scrollViewRef}
-        keyboardShouldPersistTaps='handled'>
-        {messages.map(item => (
-          <View
-            key={item.id}
-            style={
-              item.senderId === currentUserId
-                ? styles.selfMessageContainer
-                : styles.otherMessageContainer
-            }>
-            <View
-              style={
-                item.senderId === currentUserId
-                  ? styles.selfMessageBubble
-                  : styles.otherMessageBubble
-              }>
-              {item.attachment && (
-                <Image
-                  source={{ uri: item.attachment }}
-                  style={styles.attachmentImage}
-                />
-              )}
-              <Text
-                style={
-                  item.senderId === currentUserId
-                    ? styles.selfMessageText
-                    : styles.otherMessageText
-                }>
-                {item.text}
-              </Text>
-            </View>
-            <View style={styles.timestampContainer}>
-              {item.senderId === currentUserId && (
-                <Ionicons
-                  name={
-                    item.status === 'sent'
-                      ? 'ios-checkmark'
-                      : 'ios-checkmark-done'
-                  }
-                  size={16}
-                  color='#1069AD'
-                />
-              )}
-              <Text style={styles.timestamp}>
-                {moment.utc(item.clientTimestamp?.toDate()).format('hh:mm A')}
-              </Text>
-            </View>
+        <TouchableOpacity>
+          <Ionicons name='arrow-back' size={24} color='#1069AD' />
+        </TouchableOpacity>
+        <View style={styles.userInfo}>
+          <Text style={styles.userName}>John Doe</Text>
+          <View style={styles.statusContainer}>
+            <View style={styles.onlineDot} />
+            <Text style={styles.userStatus}>Online</Text>
           </View>
-        ))}
-      </ScrollView>
-      <View style={styles.inputContainer}>
-        <Ionicons
-          name='ios-attach-outline'
-          size={30}
-          color='#1069AD'
-          style={styles.iconLeft}
-          onPress={handleAttachment}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder='Type your message...'
-          placeholderTextColor='#1069AD'
-          value={text}
-          onChangeText={setText}
-          multiline={true}
-        />
-        <Ionicons
-          name='ios-send-sharp'
-          size={30}
-          color='#1069AD'
-          style={styles.iconRight}
-          onPress={handleSend}
-        />
+        </View>
+        <TouchableOpacity>
+          <MaterialIcons name='videocam' size={24} color='#1069AD' />
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Ionicons name='call' size={24} color='#1069AD' />
+        </TouchableOpacity>
       </View>
-    </SafeAreaView>
+
+      <LinearGradient
+        colors={['#FFB6C1', '#FFDAB9', '#E6E6FA']}
+        style={styles.chatBubble}>
+        <Text>Hey there!</Text>
+      </LinearGradient>
+      <LinearGradient
+        colors={['#E6E6FA', '#FFDAB9', '#FFB6C1']}
+        style={styles.chatBubble}>
+        <Text>Hello! How are you?</Text>
+      </LinearGradient>
+
+      <View style={[styles.inputContainer, { height: height + 10 }]}>
+        <TouchableOpacity>
+          <MaterialCommunityIcons name='attachment' size={24} color='#1069AD' />
+        </TouchableOpacity>
+        <View style={styles.separator} />
+        <TextInput
+          style={[styles.messageInput, { height: height }]}
+          value={message}
+          onChangeText={setMessage}
+          placeholder='Message'
+          multiline={true}
+          onContentSize={e => {
+            setHeight(e.nativeEvent.contentSize.height)
+          }}
+          textAlignVertical='bottom'
+        />
+        <TouchableOpacity>
+          <MaterialIcons name='keyboard-voice' size={24} color='#1069AD' />
+        </TouchableOpacity>
+      </View>
+      <TouchableOpacity style={styles.sendButton}>
+        <Ionicons name='send' size={24} color='#1069AD' />
+      </TouchableOpacity>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F7F7F7',
+    padding: 10,
+    backgroundColor: '#E4E4E4E4',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
-    borderBottomColor: '#D1D1D1',
-    borderBottomWidth: 1,
-    backgroundColor: '#E4E4E4',
+    justifyContent: 'space-between',
+    marginBottom: 20,
   },
-  profileImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 10,
+  userInfo: {
+    flexDirection: 'column',
+    alignItems: 'center',
   },
-  name: {
-    flex: 1,
+  userName: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
     color: '#1069AD',
-    marginLeft: 10,
   },
-  statusPill: {
+  statusContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 10,
   },
-  statusText: {
-    fontSize: 12,
-    color: 'green',
-    marginLeft: 5,
-  },
-  iconLeft: {
-    marginLeft: 5,
-  },
-  iconRight: {
+  onlineDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'green',
     marginRight: 5,
   },
-  chatContainer: {
-    flex: 1,
-    padding: 10,
-  },
-  selfMessageContainer: {
-    alignItems: 'flex-end',
-    marginBottom: 10,
-  },
-  otherMessageContainer: {
-    alignItems: 'flex-start',
-    marginBottom: 10,
-  },
-  selfMessageBubble: {
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-    borderRadius: 10,
-    padding: 10,
-    maxWidth: '70%',
-  },
-  otherMessageBubble: {
-    backgroundColor: '#1069AD',
-    borderRadius: 10,
-    padding: 10,
-    maxWidth: '70%',
-  },
-  selfMessageText: {
-    color: '#000',
-    fontSize: 16,
-  },
-  otherMessageText: {
-    color: '#FFF',
-    fontSize: 16,
-  },
-  timestampContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 5,
-  },
-  timestamp: {
-    marginLeft: 5,
-    color: '#1069AD',
+  userStatus: {
     fontSize: 12,
+    color: 'grey',
+  },
+  chatBubble: {
+    maxWidth: '70%',
+    padding: 10,
+    borderRadius: 20,
+    marginVertical: 10,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
-    borderTopColor: '#D1D1D1',
-    borderTopWidth: 1,
-    backgroundColor: '#E4E4E4',
-  },
-  input: {
-    flex: 1,
-    color: '#1069AD',
+    justifyContent: 'space-between',
+    position: 'absolute',
+    bottom: 10,
+    left: 10,
+    right: 65, // Reduced the length from the right to accommodate the send button
+    backgroundColor: '#f1f1f1',
+    borderRadius: 25,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-    marginHorizontal: 5,
+    height: 50, // Height matches the diameter of the send button
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  attachmentImage: {
-    width: 150,
-    height: 150,
-    borderRadius: 10,
-    marginBottom: 10,
+  separator: {
+    width: 1,
+    height: 20, // Increase or decrease as needed
+    backgroundColor: '#1069AD',
+    marginHorizontal: 10,
+  },
+  messageInput: {
+    flex: 1,
+    marginLeft: -5, // reduced margin to bring it closer to the separator
+    marginRight: 10,
+    borderRadius: 20,
+    padding: 10,
+    backgroundColor: '#f1f1f1',
+    color: '#fff',
+    minHeight: 35,
+  },
+  sendButton: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    backgroundColor: 'white',
+    borderRadius: 25,
+    width: 45,
+    height: 45,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 })
 

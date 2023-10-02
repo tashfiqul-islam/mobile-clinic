@@ -12,10 +12,12 @@ import {
   ActivityIndicator,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import { retrieveDoctorChats, listenForNewMessages } from './Auth'
-import { UserContext } from './UserContext'
+import { retrieveDoctorChats, listenForNewMessages } from './../../../Auth'
+import { UserContext } from './../../../UserContext'
+import { useNavigation } from '@react-navigation/native'
+import ConversationItem from './ConversationItem'
 
-const DEFAULT_IMAGE = require('./assets/images/defaultProfile.png')
+const DEFAULT_IMAGE = require('../../../assets/images/ms-1.jpeg')
 
 type Message = {
   chatID: string
@@ -29,44 +31,70 @@ type Message = {
 }
 
 export default function MessagesScreen() {
+  const navigation = useNavigation()
   const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(true) // New state for loading
   const { userId } = useContext(UserContext)
 
-  const markMessageAsRead = chatID => {
-    setMessages(prevMessages =>
-      prevMessages.map(m =>
-        m.chatID === chatID ? { ...m, isUnread: false } : m,
-      ),
-    )
-  }
+  let interval = null
 
   useEffect(() => {
-    const fetchChats = async () => {
-      const chats = await retrieveDoctorChats(userId)
-      setMessages(chats)
+    fetchChats()
+    interval = setInterval(() => {
+      fetchChats()
+    }, 1000)
 
-      chats.forEach(chat => {
-        listenForNewMessages(chat.chatID, newMessage => {
-          setMessages(prevMessages => {
-            const updatedChats = prevMessages.map(prevChat => {
-              if (prevChat.chatID === chat.chatID) {
-                return { ...prevChat, lastMessage: newMessage }
+    return () => {
+      clearInterval(interval)
+    }
+  }, [])
+
+  const fetchChats = async () => {
+    const chats = await retrieveDoctorChats(userId)
+
+    // Sort the chats based on the timestamp of the last message
+    const sortedChats = chats.sort(
+      (a, b) => b.lastMessage.timestamp - a.lastMessage.timestamp,
+    )
+    setMessages(sortedChats)
+
+    /* chats.forEach(chat => {
+      listenForNewMessages(chat.chatID, newMessage => {
+        setMessages(prevMessages => {
+          const updatedChats = prevMessages.map(prevChat => {
+            if (prevChat.chatID === chat.chatID) {
+              return {
+                ...prevChat,
+                lastMessage: { ...newMessage, isUnread: true },
               }
-              return prevChat
-            })
-            return updatedChats
+            }
+            return prevChat
           })
+          return updatedChats.sort(
+            (a, b) => b.lastMessage.timestamp - a.lastMessage.timestamp,
+          )
         })
       })
+    }) */
 
-      setLoading(false) // Set loading to false after fetching
-    }
-    fetchChats()
-  }, [userId])
+    setLoading(false) // Set loading to false after fetching
+  }
 
-  const unreadMessages = messages.filter(message => message.isUnread)
-  const readMessages = messages.filter(message => !message.isUnread)
+  const markMessageAsRead = async chatID => {
+    setMessages(prevMessages =>
+      prevMessages.map(m =>
+        m.chatID === chatID
+          ? { ...m, lastMessage: { ...m.lastMessage, isUnread: false } }
+          : m,
+      ),
+    )
+    await fetchChats()
+  }
+
+  const unreadMessages = messages.filter(
+    message => message.lastMessage.isUnread,
+  )
+  const allMessages = messages.filter(message => !message.lastMessage.isUnread)
 
   if (loading) {
     return (
@@ -93,11 +121,17 @@ export default function MessagesScreen() {
             showsHorizontalScrollIndicator={false}
             style={styles.avatarScroll}>
             {messages.map(message => (
-              <TouchableOpacity key={message.chatID}>
-                <Image
-                  style={styles.avatarImage}
-                  source={message.image || DEFAULT_IMAGE}
-                />
+              <TouchableOpacity
+                key={message.chatID}
+                onPress={() =>
+                  navigation.navigate('ChatScreen', { chatID: message.chatID })
+                }>
+                <View style={styles.avatarBorder}>
+                  <Image
+                    style={styles.avatarImage}
+                    source={message.image || DEFAULT_IMAGE}
+                  />
+                </View>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -107,64 +141,30 @@ export default function MessagesScreen() {
           <View>
             <Text style={styles.sectionTitle}>Unread</Text>
             {unreadMessages.map(message => (
-              <MessageItem
+              <ConversationItem
                 key={message.chatID}
-                message={message.lastMessage}
+                conversation={message.lastMessage}
                 image={message.image || DEFAULT_IMAGE}
-                onRead={markMessageAsRead} // Pass the function as a prop
+                onRead={markMessageAsRead}
+                navigation={navigation}
               />
             ))}
           </View>
         )}
-        <View style={{ height: 0 }} />
+
         <Text style={styles.sectionTitle}>All Messages</Text>
-        {readMessages.map(message => (
-          <MessageItem
+        {allMessages.map(message => (
+          <ConversationItem
             key={message.chatID}
-            message={message.lastMessage}
+            conversation={message.lastMessage}
             image={message.image || DEFAULT_IMAGE}
-            onRead={markMessageAsRead} // Pass the function as a prop
+            onRead={markMessageAsRead}
+            navigation={undefined}
           />
         ))}
         <View style={{ height: 85 }} />
       </ScrollView>
     </SafeAreaView>
-  )
-}
-
-const MessageItem = ({ message, image }) => {
-  const { users } = useContext(UserContext)
-  console.log(users)
-
-  console.log('Users Context:', users)
-  console.log('Current senderID:', message.senderID)
-  console.log('Name from Users Context:', users?.[message.senderID]?.name)
-
-  const handleReadMessage = () => {
-    if (message.isUnread) {
-      // Only mark as read if it's currently unread
-      onRead(message.chatID) // Call the passed function with the chatID
-    }
-  }
-
-  return (
-    <TouchableOpacity
-      style={styles.messageContainer}
-      onPress={handleReadMessage}>
-      <Image source={image} style={styles.profileImage} />
-      <View style={styles.messageDetails}>
-        <Text style={styles.messageName}>
-          {users?.[message.senderID]?.name || 'Unknown'}
-        </Text>
-        <Text style={styles.messageText}>{message.text}</Text>
-      </View>
-      <View style={styles.messageTimeContainer}>
-        <Text style={styles.messageTime}>
-          {new Date(message.timestamp).toLocaleTimeString()}
-        </Text>
-        {message.isUnread && <View style={styles.unreadIndicator} />}
-      </View>
-    </TouchableOpacity>
   )
 }
 
@@ -208,20 +208,26 @@ const styles = StyleSheet.create({
   avatarAdd: {
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 25,
-    width: 50,
-    height: 50,
+    borderRadius: 30,
+    width: 55,
+    height: 55,
     marginRight: 10,
     borderWidth: 1, // Decreased the borderWidth
     borderColor: 'grey', // Changed color to grey
     borderStyle: 'dotted',
     borderDashOffset: 2, // Added 2px offset for the space between dots
   },
+  avatarBorder: {
+    borderWidth: 2,
+    borderColor: '#1069AD',
+    borderRadius: 30, // Increased to account for the border and padding
+    padding: 1.5, // This creates the tiny gap
+    marginRight: 10, // Adjust margin if needed
+  },
   avatarImage: {
     width: 50,
     height: 50,
     borderRadius: 25,
-    marginRight: 10,
   },
   messageContainer: {
     flexDirection: 'row',
@@ -234,6 +240,8 @@ const styles = StyleSheet.create({
   profileImage: {
     width: 50,
     height: 50,
+    borderWidth: 0.8,
+    borderColor: 'black',
     borderRadius: 25,
     marginRight: 10,
   },
@@ -263,5 +271,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#1069AD',
     borderRadius: 4,
     marginTop: 4,
+    marginLeft: 10,
   },
 })
