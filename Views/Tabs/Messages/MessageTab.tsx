@@ -58,25 +58,6 @@ export default function MessagesScreen() {
     )
     setMessages(sortedChats)
 
-    /* chats.forEach(chat => {
-      listenForNewMessages(chat.chatID, newMessage => {
-        setMessages(prevMessages => {
-          const updatedChats = prevMessages.map(prevChat => {
-            if (prevChat.chatID === chat.chatID) {
-              return {
-                ...prevChat,
-                lastMessage: { ...newMessage, isUnread: true },
-              }
-            }
-            return prevChat
-          })
-          return updatedChats.sort(
-            (a, b) => b.lastMessage.timestamp - a.lastMessage.timestamp,
-          )
-        })
-      })
-    }) */
-
     setLoading(false) // Set loading to false after fetching
   }
 
@@ -123,9 +104,10 @@ export default function MessagesScreen() {
             {messages.map(message => (
               <TouchableOpacity
                 key={message.chatID}
-                onPress={() =>
+                onPress={() => {
+                  console.log('Navigating with chatID:', message.chatID)
                   navigation.navigate('ChatScreen', { chatID: message.chatID })
-                }>
+                }}>
                 <View style={styles.avatarBorder}>
                   <Image
                     style={styles.avatarImage}

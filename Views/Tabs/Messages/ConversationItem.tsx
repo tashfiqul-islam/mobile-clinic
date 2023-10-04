@@ -19,23 +19,19 @@ import { AppContext } from '../../../AppContext'
 
 export default function ConversationItem({
   conversation,
+  message,
   image,
   onRead,
   navigation,
 }) {
   const { users } = React.useContext(AppContext)
 
-  /*console.log('Users Context:', users)
-    console.log('Current senderID:', conversation.senderID)
-    console.log('Name from Users Context:', users?.[conversation.senderID]?.fullName)
-    */
-
   const handleReadMessage = () => {
     if (conversation.isUnread) {
-      // Only mark as read if it's currently unread
-      onRead(conversation.chatID) // Call the passed function with the chatID
+      onRead(conversation.id)
     }
-    navigation.navigate('ChatScreen', { chatID: conversation.chatID }) // Navigate to ChatScreen with chatID as a parameter
+    console.log('Navigating with chatID:', conversation.chatID)
+    navigation.navigate('ChatScreen', { chatID: conversation.chatID })
   }
 
   return (
