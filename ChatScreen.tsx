@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useRef } from 'react'
 import {
   View,
   Text,
@@ -9,6 +9,10 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Modal,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native'
 import {
   MaterialIcons,
@@ -30,7 +34,7 @@ interface Message {
   senderID: string
   text: string
   timestamp: number
-  attachmentURL?: string // This is optional in case there are messages without attachments
+  attachmentURL?: string
 }
 
 type RouteParams = {
@@ -43,26 +47,45 @@ const ChatScreen: React.FC = () => {
   const navigation = useNavigation()
   const route = useRoute<RouteProp<Record<string, RouteParams>, string>>()
   const { userId } = useContext(UserContext)
+  const scrollViewRef = useRef<ScrollView>(null) // Create a ref for the ScrollView
 
-  const { chatID } = route.params // Assuming chatID is passed as a parameter
+  const { chatID } = route.params
   console.log('All route params:', route.params)
   const [messages, setMessages] = useState<Message[]>([])
   const [message, setMessage] = useState<string>('')
-  const [height, setHeight] = useState(35) // initial height
+  const [height, setHeight] = useState(35)
   const [patientName, setPatientName] = useState<string>('')
+  const [attachment, setAttachment] = useState<string | null>(null)
+  const [isImageViewVisible, setIsImageViewVisible] = useState(false)
+  const [currentImageURI, setCurrentImageURI] = useState<string | null>(null)
+
+  const viewFullImage = (uri: string) => {
+    setCurrentImageURI(uri)
+    setIsImageViewVisible(true)
+  }
+
+  useEffect(() => {
+    // Scroll to the end of the ScrollView when messages change
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollToEnd({ animated: false })
+    }
+  }, [messages])
 
   useEffect(() => {
     const fetchPatientName = async () => {
       try {
         const chatRef = firebase.database().ref(`chats/${chatID}`)
-        console.log('Using chatID:', chatID)
         const chatDataSnapshot = await chatRef.once('value')
-        console.log('Chat Data:', chatDataSnapshot.val())
-        const patientID = chatDataSnapshot.val().patientID
+        const chatData = chatDataSnapshot.val()
 
+        if (!chatData) {
+          console.error('No chat data found for chatID:', chatID)
+          return
+        }
+
+        const patientID = chatData.patientID
         const userRef = firebase.database().ref(`users/${patientID}`)
         const userDataSnapshot = await userRef.once('value')
-        console.log('User Data:', userDataSnapshot.val())
         const patientFullName = userDataSnapshot.val().fullName
 
         setPatientName(patientFullName)
@@ -82,7 +105,6 @@ const ChatScreen: React.FC = () => {
     return () => unsubscribe()
   }, [chatID])
 
-  // Function to display a Burnt Toast notification
   const showToast = (message: string) => {
     Burnt.toast({
       from: 'bottom',
@@ -95,15 +117,47 @@ const ChatScreen: React.FC = () => {
   }
 
   const handleSendMessage = async () => {
-    if (message.trim() !== '') {
+    if (message.trim() !== '' || attachment) {
       try {
-        await postMessage(chatID, message)
+        if (attachment) {
+          // If there's an attachment, send it
+          const messageData = {
+            senderID: userId,
+            text: '',
+            attachmentURL: attachment, // The URL of the uploaded image
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+          }
+
+          await firebase
+            .database()
+            .ref(`chats/${chatID}/messages`)
+            .push(messageData)
+          setAttachment(null) // Clear the attachment after sending
+        } else {
+          // Otherwise, send the text message
+          const messageData = {
+            senderID: userId,
+            text: message,
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+          }
+
+          await firebase
+            .database()
+            .ref(`chats/${chatID}/messages`)
+            .push(messageData)
+        }
         setMessage('') // Clear the input after sending
       } catch (error) {
         console.error('Error sending message:', error.message)
 
-        // Display a Burnt Toast notification
-        showToast('Failed to send message!')
+        Burnt.toast({
+          from: 'bottom',
+          title: 'Failed to send message!',
+          shouldDismissByDrag: true,
+          preset: 'error',
+          haptic: 'error',
+          duration: 5,
+        })
       }
     }
   }
@@ -136,8 +190,8 @@ const ChatScreen: React.FC = () => {
 
       const downloadURL = await addChatAttachment(chatID, blob)
 
-      // Post a message with the image as an attachment
-      postMessageWithAttachment(chatID, downloadURL)
+      // Instead of sending the image immediately, we store it in the attachment state
+      setAttachment(downloadURL)
     } catch (error) {
       console.error('Image upload error:', error.message)
 
@@ -152,116 +206,164 @@ const ChatScreen: React.FC = () => {
     }
   }
 
-  const postMessageWithAttachment = async (
-    chatID: string,
-    attachmentURL: string,
-  ) => {
-    const messageData = {
-      senderID: userId,
-      text: '', // You can leave the text empty or put some default text like "Sent an image."
-      attachmentURL: attachmentURL, // The URL of the uploaded image
-      timestamp: firebase.database.ServerValue.TIMESTAMP,
-    }
-
-    return firebase.database().ref(`chats/${chatID}/messages`).push(messageData)
-  }
-
   const inputContainerHeight = 60
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name='arrow-back' size={24} color='white' />
+  const ImageModal = () => (
+    <Modal
+      animationType='slide'
+      transparent={false}
+      visible={isImageViewVisible}
+      onRequestClose={() => {
+        setIsImageViewVisible(false)
+      }}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: 'black',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Image
+          source={{ uri: currentImageURI }}
+          style={{ width: '100%', height: '70%', resizeMode: 'contain' }}
+        />
+        <TouchableOpacity
+          style={{ position: 'absolute', top: 50, right: 20 }}
+          onPress={() => setIsImageViewVisible(false)}>
+          <Ionicons name='close-circle' size={40} color='white' />
         </TouchableOpacity>
-        <View style={styles.leftContainer}>
-          <View style={styles.userInfo}>
-            <View style={styles.userImageContainer}>
-              <View style={styles.userImage}>
-                <ImageBackground
-                  source={DEFAULT_IMAGE}
-                  style={{ width: 40, height: 40, borderRadius: 20 }}
-                />
+      </View>
+    </Modal>
+  )
+
+  return (
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}>
+      <View style={styles.container}>
+        <ImageModal />
+        <View style={styles.headerContainer}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name='arrow-back' size={24} color='white' />
+          </TouchableOpacity>
+          <View style={styles.leftContainer}>
+            <View style={styles.userInfo}>
+              <View style={styles.userImageContainer}>
+                <View style={styles.userImage}>
+                  <ImageBackground
+                    source={DEFAULT_IMAGE}
+                    style={{ width: 40, height: 40, borderRadius: 20 }}
+                  />
+                </View>
+                <View style={styles.onlineDot} />
               </View>
-              <View style={styles.onlineDot} />
+              <View style={styles.nameAndStatusContainer}>
+                <Text style={styles.userName}>{patientName}</Text>
+              </View>
             </View>
-            <View style={styles.nameAndStatusContainer}>
-              <Text style={styles.userName}>{patientName}</Text>
+            <View style={styles.callIconsContainer}>
+              <TouchableOpacity>
+                <MaterialIcons name='videocam' size={24} color='white' />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.voiceIcon}>
+                <Ionicons name='call' size={24} color='white' />
+              </TouchableOpacity>
             </View>
-          </View>
-          <View style={styles.callIconsContainer}>
-            <TouchableOpacity>
-              <MaterialIcons name='videocam' size={24} color='white' />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.voiceIcon}>
-              <Ionicons name='call' size={24} color='white' />
-            </TouchableOpacity>
           </View>
         </View>
-      </View>
 
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ paddingBottom: inputContainerHeight }}>
-        {messages.map((msg, index) => (
-          <View key={index} style={styles.messageContainer}>
-            <LinearGradient
-              colors={
-                msg.senderID === userId
-                  ? ['#1069ADAA', '#1069ADAA']
-                  : ['#FFFFFFAA', '#FFFFFFAA']
-              }
-              style={
-                msg.senderID === userId
-                  ? styles.outgoingBubble
-                  : styles.incomingBubble
-              }>
-              <Text
-                style={
-                  msg.senderID === userId
-                    ? styles.outgoingBubbleText
-                    : styles.incomingBubbleText
-                }>
-                {msg.text}
-              </Text>
-            </LinearGradient>
-            {/* You can format the timestamp if needed */}
-            <Text
-              style={
-                msg.senderID === userId
-                  ? styles.timestampOutgoing
-                  : styles.timestampIncoming
-              }>
-              {moment(msg.timestamp).format('h:mm A')}
-            </Text>
-          </View>
-        ))}
-      </ScrollView>
+        <ScrollView
+          ref={scrollViewRef}
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingBottom: inputContainerHeight }}
+          keyboardShouldPersistTaps='handled'>
+          {messages.map((msg, index) => (
+            <View key={index} style={styles.messageContainer}>
+              {msg.attachmentURL ? (
+                <View
+                  style={
+                    msg.senderID === userId
+                      ? styles.outgoingImageContainer
+                      : styles.incomingImageContainer
+                  }>
+                  <TouchableOpacity
+                    onPress={() => viewFullImage(msg.attachmentURL)}>
+                    <Image
+                      source={{ uri: msg.attachmentURL }}
+                      style={styles.chatImagePreview}
+                    />
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <LinearGradient
+                  colors={
+                    msg.senderID === userId
+                      ? ['#1069ADAA', '#1069ADAA']
+                      : ['#FFFFFFAA', '#FFFFFFAA']
+                  }
+                  style={
+                    msg.senderID === userId
+                      ? styles.outgoingBubble
+                      : styles.incomingBubble
+                  }>
+                  <Text
+                    style={
+                      msg.senderID === userId
+                        ? styles.outgoingBubbleText
+                        : styles.incomingBubbleText
+                    }>
+                    {msg.text}
+                  </Text>
+                </LinearGradient>
+              )}
+            </View>
+          ))}
+        </ScrollView>
 
-      <View style={[styles.inputContainer, { height: height + 10 }]}>
-        <TouchableOpacity onPress={pickImage}>
-          <MaterialCommunityIcons name='attachment' size={24} color='#1069AD' />
-        </TouchableOpacity>
-        <View style={styles.separator} />
-        <TextInput
-          style={[styles.messageInput, { height: height }]}
-          value={message}
-          onChangeText={setMessage}
-          placeholder='Message'
-          multiline={true}
-          onContentSize={e => {
-            setHeight(e.nativeEvent.contentSize.height)
-          }}
-          textAlignVertical='bottom'
-        />
-        <TouchableOpacity>
-          <MaterialIcons name='keyboard-voice' size={24} color='#1069AD' />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
-          <Ionicons name='send' size={24} color='#1069AD' />
-        </TouchableOpacity>
+        <View style={[styles.inputContainer, { height: height + 10 }]}>
+          {attachment && (
+            <View style={styles.attachmentPreview}>
+              <Image
+                source={{ uri: attachment }}
+                style={styles.attachmentImage}
+              />
+              <TouchableOpacity onPress={() => setAttachment(null)}>
+                <Ionicons name='close-circle' size={24} color='#1069AD' />
+              </TouchableOpacity>
+            </View>
+          )}
+
+          <TouchableOpacity onPress={pickImage}>
+            <MaterialCommunityIcons
+              name='attachment'
+              size={24}
+              color='#1069AD'
+            />
+          </TouchableOpacity>
+          <View style={styles.separator} />
+          <TextInput
+            style={[styles.messageInput, { height: height }]}
+            value={message}
+            onChangeText={setMessage}
+            placeholder='Message'
+            multiline={true}
+            onContentSize={e => {
+              setHeight(e.nativeEvent.contentSize.height)
+            }}
+            textAlignVertical='bottom'
+          />
+          <TouchableOpacity>
+            <MaterialIcons name='keyboard-voice' size={24} color='#1069AD' />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.sendButton}
+            onPress={handleSendMessage}>
+            <Ionicons name='send' size={24} color='#1069AD' />
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   )
 }
 
@@ -430,6 +532,35 @@ const styles = StyleSheet.create({
     backgroundColor: '#f1f1f1',
     color: '#000',
     minHeight: 35,
+  },
+  outgoingImageContainer: {
+    alignSelf: 'flex-end', // Align to the right
+    marginRight: 5,
+    marginVertical: 7,
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  incomingImageContainer: {
+    alignSelf: 'flex-start', // Align to the left
+    marginLeft: 5,
+    marginVertical: 7,
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  chatImagePreview: {
+    width: 150,
+    height: 100,
+    borderRadius: 10,
+  },
+  attachmentPreview: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    margin: 5,
+  },
+  attachmentImage: {
+    width: 50,
+    height: 50,
+    marginRight: 10,
   },
   sendButton: {
     position: 'absolute',

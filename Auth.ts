@@ -122,8 +122,7 @@ export const initializeConversation = async (patientID: string) => {
 }
 
 // Post a message in a chat
-export const postMessage = (chatID: string, text: string) => {
-  const { userId: senderID } = useUser()
+export const postMessage = (chatID: string, text: string, senderID: string) => {
   const message = {
     senderID: senderID,
     text: text,

@@ -16,6 +16,8 @@ import { retrieveDoctorChats, listenForNewMessages } from './../../../Auth'
 import { UserContext } from './../../../UserContext'
 import { useNavigation } from '@react-navigation/native'
 import ConversationItem from './ConversationItem'
+import firebase from 'firebase/compat/app'
+import 'firebase/compat/database'
 
 const DEFAULT_IMAGE = require('../../../assets/images/ms-1.jpeg')
 
@@ -35,6 +37,7 @@ export default function MessagesScreen() {
   const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(true) // New state for loading
   const { userId } = useContext(UserContext)
+  const [patientName, setPatientName] = useState<string>('')
 
   let interval = null
 
@@ -59,6 +62,40 @@ export default function MessagesScreen() {
     setMessages(sortedChats)
 
     setLoading(false) // Set loading to false after fetching
+
+    // Fetch patient name for each chat and store it in the messages array
+    for (const chat of sortedChats) {
+      fetchPatientName(chat.chatID)
+    }
+  }
+
+  const fetchPatientName = async (chatID: string) => {
+    try {
+      const chatRef = firebase.database().ref(`chats/${chatID}`)
+      const chatDataSnapshot = await chatRef.once('value')
+      const chatData = chatDataSnapshot.val()
+
+      if (!chatData) {
+        console.error('No chat data found for chatID:', chatID)
+        return
+      }
+
+      const patientID = chatData.patientID
+      const userRef = firebase.database().ref(`users/${patientID}`)
+      const userDataSnapshot = await userRef.once('value')
+      const patientFullName = userDataSnapshot.val().fullName
+
+      setPatientName(patientFullName)
+
+      // Update the message with the patientName
+      setMessages(prevMessages =>
+        prevMessages.map(m =>
+          m.chatID === chatID ? { ...m, patientName: patientFullName } : m,
+        ),
+      )
+    } catch (error) {
+      console.error('Error fetching patient name:', error)
+    }
   }
 
   const markMessageAsRead = async chatID => {
@@ -125,10 +162,14 @@ export default function MessagesScreen() {
             {unreadMessages.map(message => (
               <ConversationItem
                 key={message.chatID}
-                conversation={message.lastMessage}
+                conversation={{
+                  ...message.lastMessage,
+                  chatID: message.chatID,
+                }}
                 image={message.image || DEFAULT_IMAGE}
                 onRead={markMessageAsRead}
                 navigation={navigation}
+                patientName={patientName} // Pass patientName as a prop
               />
             ))}
           </View>
@@ -138,10 +179,11 @@ export default function MessagesScreen() {
         {allMessages.map(message => (
           <ConversationItem
             key={message.chatID}
-            conversation={message.lastMessage}
+            conversation={{ ...message.lastMessage, chatID: message.chatID }}
             image={message.image || DEFAULT_IMAGE}
             onRead={markMessageAsRead}
-            navigation={undefined}
+            navigation={navigation}
+            patientName={patientName} // Pass patientName as a prop
           />
         ))}
         <View style={{ height: 85 }} />

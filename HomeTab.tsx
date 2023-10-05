@@ -149,6 +149,36 @@ export const UPCOMING_SCHEDULE_DATA = [
     rating: 5, // Added rating
     reviews: 4, // example review count
   },
+  {
+    id: '13',
+    name: 'Jonathan Brister',
+    type: 'Regular Checkup',
+    date: '2023-10-05',
+    time: '03:00 - 04:00',
+    image: require('./assets/images/pat-1.jpeg'),
+    rating: 5, // Added rating
+    reviews: 4, // example review count
+  },
+  {
+    id: '14',
+    name: 'Jonathan Brister',
+    type: 'Regular Checkup',
+    date: '2023-10-05',
+    time: '04:00 - 05:00',
+    image: require('./assets/images/pat-1.jpeg'),
+    rating: 5, // Added rating
+    reviews: 4, // example review count
+  },
+  {
+    id: '15',
+    name: 'Jonathan Brister',
+    type: 'Regular Checkup',
+    date: '2023-10-06',
+    time: '10:00 - 11:00',
+    image: require('./assets/images/pat-1.jpeg'),
+    rating: 5, // Added rating
+    reviews: 4, // example review count
+  },
 ]
 
 export const RECENT_APPOINTMENTS_DATA = [

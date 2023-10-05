@@ -19,12 +19,14 @@ import { AppContext } from '../../../AppContext'
 
 export default function ConversationItem({
   conversation,
-  message,
   image,
   onRead,
-  navigation,
+  patientName, // Add patientName as a prop
 }) {
   const { users } = React.useContext(AppContext)
+
+  // Using the useNavigation hook directly
+  const navigation = useNavigation()
 
   const handleReadMessage = () => {
     if (conversation.isUnread) {
@@ -41,7 +43,7 @@ export default function ConversationItem({
       <Image source={image} style={styles.profileImage} />
       <View style={styles.messageDetails}>
         <Text style={styles.messageName}>
-          {users[conversation.senderID]?.fullName || 'Unknown'}
+          {patientName || 'Unknown'} {/* Use patientName prop */}
         </Text>
         <Text style={styles.messageText}>{conversation.text}</Text>
       </View>
